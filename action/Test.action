@@ -1,0 +1,8 @@
+#goal definition
+uint16 number
+---
+#result definition
+uint16 final
+---
+#feedback definition
+uint16 count

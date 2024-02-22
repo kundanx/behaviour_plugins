@@ -1,0 +1,12 @@
+<!-- Behaviour Tree that sequentially navigates locations naively -->
+<root main_tree_to_execute = "MainTree">
+    <BehaviorTree ID="MainTree">
+        <Sequence name="root_sequence">
+            <GoToPose name="go_to_location1" loc="location_1" />
+            <GoToPose name="go_to_location2" loc="location_2" />
+            <GoToPose name="go_to_location3" loc="location_3" />
+            <GoToPose name="go_to_location4" loc="location_4" />
+            <Fib      name="calc_fibonacci"  order="order"    />
+        </Sequence>
+    </BehaviorTree>
+</root>

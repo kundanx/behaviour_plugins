@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/ros/humble/include/rclcpp",
+                "/opt/ros/humble/include/rclcpp_action",
+                "/opt/ros/humble/include/tf2",
+                "/opt/ros/humble/include/tf2_geometry_msgs",
+                "/opt/ros/humble/include/ament_index_cpp",
+                "/opt/ros/humble/include/nav2_msgs",
+                "/usr/include/yaml-cpp",
+                
+                "/home/rpi/ros-projects/nav2_ws/src/navigation2",
+                "/home/rpi/ros-projects/dev_pi_communicate/src/behaviour_plugins/include",
+                "/home/rpi/ros-projects/dev_pi_communicate/src/action_pkg"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang-14",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-arm64"
+        }
+    ],
+    "version": 4
+}
