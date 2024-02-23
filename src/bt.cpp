@@ -1,4 +1,4 @@
-#include "bt.h"
+#include "../include/bt.h"
 
 using namespace std::chrono_literals;
 
@@ -8,12 +8,15 @@ autonomy::autonomy(const std::string &nodeName): Node(nodeName)
 {
     this->declare_parameter("location_file","none");
     RCLCPP_INFO(get_logger(),"Init_done");
+    RCLCPP_INFO(get_logger(),"constructor");
 }
 
 void autonomy::setup()
 {
+    RCLCPP_INFO(get_logger(),"inside setup");;
     // initial BT setup
     create_behavior_tree();
+    RCLCPP_INFO(get_logger(),"BT created");
 
     const auto timer_period = 500ms;
     timer_ = this->create_wall_timer(
@@ -26,8 +29,12 @@ void autonomy::setup()
 
 void autonomy::create_behavior_tree()
 {
+    RCLCPP_INFO(get_logger(),"inside create function");
+
     // create BT
     BT::BehaviorTreeFactory factory;
+
+    RCLCPP_INFO(get_logger(),"create Factory");
 
     BT::NodeBuilder builder_1 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -35,6 +42,7 @@ void autonomy::create_behavior_tree()
         return std::make_unique<GoToPose>(name, config, shared_from_this());
     };
     factory.registerBuilder<GoToPose>("GoToPose",builder_1);
+    RCLCPP_INFO(get_logger(),"registerd builder_1");
 
     BT::NodeBuilder builder_2  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -43,8 +51,12 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Fib>("Fib",builder_2);
 
+    RCLCPP_INFO(get_logger(),"registered builder_2");
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/bt_tree.xml");
+    RCLCPP_INFO(get_logger(),"created tree from file");
     BT::Groot2Publisher publisher(tree_);
+    RCLCPP_INFO(get_logger(),"published tree");
+    return;
 // publiser.clearTree();
 }
 

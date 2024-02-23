@@ -49,6 +49,7 @@ BT::NodeStatus GoToPose::onRunning()
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());
         return BT::NodeStatus::SUCCESS;
     }
+    RCLCPP_INFO(node_ptr_->get_logger(),"Running\n");
     return BT::NodeStatus::RUNNING;
 }
 void GoToPose::nav_to_pose_callback(const GoalHandleNav::WrappedResult &result)

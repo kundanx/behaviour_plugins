@@ -1,0 +1,10 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GDB",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/bt",
+        }
+    ]
+}

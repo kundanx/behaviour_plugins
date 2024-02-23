@@ -5,6 +5,7 @@
 
 #include "navigation_behaviour.h"
 #include "fib_behaviour.h"
+#include <iostream>
 
 class autonomy : public rclcpp::Node
 {
