@@ -5,15 +5,18 @@ using namespace std::chrono_literals;
 const std::string bt_xml_dir = ament_index_cpp::get_package_share_directory("behaviour_plugins") + "/bt_xml";
 
 autonomy::autonomy(const std::string &nodeName): Node(nodeName)
-{
+{   
     this->declare_parameter("location_file","none");
-    RCLCPP_INFO(get_logger(),"Init_done");
+    RCLCPP_INFO(this->get_logger(),"Init_done");
+    RCLCPP_INFO(get_logger(),"Constructor");
 }
 
 void autonomy::setup()
-{
+{   
+    RCLCPP_INFO(get_logger(),"Inside setup");
     // initial BT setup
     create_behavior_tree();
+    RCLCPP_INFO(get_logger(),"BT created");
 
     const auto timer_period = 500ms;
     timer_ = this->create_wall_timer(
@@ -73,7 +76,7 @@ int main(int argc, char **argv)
     rclcpp::init(argc,argv);
     auto node = std::make_shared<autonomy>("Autonomy_node");
     node->setup();
-
+    
     rclcpp::spin(node);
     rclcpp::shutdown();
 }
