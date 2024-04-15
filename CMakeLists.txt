@@ -5,7 +5,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/install/action_pkg")
+# set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/src/action_pkg;
+#                        /home/rpi/ros-projects/dev_pi_communicate/src/behaviortree_ros2")
+set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/install/behaviortree_ros2")
+list(APPEND CMAKE_MODULE_PATH "ros-projects/dev_pi_communicate/install/behaviortree_ros2/share/behaviortree_ros2/cmake")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -18,6 +21,9 @@ find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(action_pkg REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(my_bt REQUIRED)
+find_package(behaviortree_ros2 REQUIRED)
+
 
 # Install directories
 install(DIRECTORY
@@ -28,6 +34,8 @@ DESTINATION share/${PROJECT_NAME}
 set(BEHAVIOUR_SOURCES
 src/navigation_behaviour.cpp
 src/fib_behaviour.cpp
+src/goalPose_subscriber.cpp
+# src/goalPose_subs.cpp
 )
 
 set(TARGET_DEPENDS
@@ -39,6 +47,9 @@ set(TARGET_DEPENDS
       tf2_geometry_msgs
       tf2
       action_pkg
+      behaviortree_ros2
+      # my_bt
+      # sstream
 )
 
 if(BUILD_TESTING)
@@ -53,22 +64,26 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-include_directories(include action_pkg/include/action/)
+include_directories(
+  include 
+  ${action_pkg_INCLUDE_DIRS} 
+  ${behaviortree_ros2_INCLUDE_DIRS}
+  )
+
 add_executable(bt src/bt.cpp ${BEHAVIOUR_SOURCES})
-ament_target_dependencies(bt ${TARGET_DEPENDS})
+
 target_link_libraries(bt ${YAML_CPP_LIBRARIES})
+
+ament_target_dependencies(bt ${TARGET_DEPENDS})
 
 install(TARGETS
 bt
 DESTINATION lib/${PROJECT_NAME}
 )
 
-
 rosidl_generate_interfaces(${PROJECT_NAME}
   "action/Test.action"
   # "action/Action.action"
 )
-
-
 
 ament_package()
