@@ -1,3 +1,6 @@
+#ifndef NAVIGATION_BEHAVIOUR_H
+#define NAVIGATION_BEHAVIOUR_H
+
 #include <string>
 #include <memory>
 #include <tf2/LinearMath/Quaternion.h>
@@ -22,27 +25,31 @@ class GoToPose : public BT::StatefulActionNode
 
     using NavigateToPose = nav2_msgs::action::NavigateToPose;
     using GoalHandleNav = rclcpp_action::ClientGoalHandle<NavigateToPose>;
+    using PosMsg = geometry_msgs::msg::PoseStamped;
 
     rclcpp::Node::SharedPtr node_ptr_;
-    rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr publisher_;
-    rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr subscription_;
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
 
     double xyz[3]; // x, y, z
     double q[4];   // x, y, z , w
     bool done_flag;
 
-    // // Methods override (uncomment if you have ports to I/O data)
-    // static BT::PortsList providedPorts();
+    // Methods override (uncomment if you have ports to I/O data)
+    static BT::PortsList providedPorts();
 
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
-    void onHalted() override{};
+    void onHalted() override;
 
     // Subscriber callback
-    void ball_pose_callback(const geometry_msgs::msg::Pose & msg);
+    // void ball_pose_callback(const geometry_msgs::msg::Pose & msg);
 
-    // Action client callback
-    void nav_to_pose_callback(const GoalHandleNav::WrappedResult &result);
+    // Action client result callback
+    void nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result);
+
+    // // Action client feedback callback
+    // void nav_to_pose_feedback_callback(const GoalHandleNav::Feedback feedback);
     
 };
+
+#endif

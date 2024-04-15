@@ -1,3 +1,6 @@
+#ifndef FIB_BEHAVIOUR_H
+#define FIB_BEHAVIOUR_H
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp/bt_factory.h"
@@ -32,3 +35,5 @@ class Fib : public BT::StatefulActionNode
     void result_callback(const GoalHandleFibonacci::WrappedResult &result);
 
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef BT_H
+#define BT_H
+
 #include "rclcpp/rclcpp.hpp"
 #include "behaviortree_cpp/bt_factory.h"
 #include "behaviortree_cpp/loggers/groot2_publisher.h"
@@ -5,6 +8,7 @@
 
 #include "navigation_behaviour.h"
 #include "fib_behaviour.h"
+#include "goalPose_subscriber.hpp"
 
 class autonomy : public rclcpp::Node
 {
@@ -18,3 +22,5 @@ class autonomy : public rclcpp::Node
     rclcpp::TimerBase::SharedPtr timer_;
     BT::Tree tree_;
 };
+
+#endif

@@ -20,6 +20,9 @@
   <depend>yaml-cpp</depend>
   <depend>tf2</depend>
   <depend>tf2_geometry_msgs</depend>
+  <depend>action_pkgs</depend>
+  <depend>my_bt</depend>
+  <!-- <depend>sstream</depend> -->
 
 
   <test_depend>ament_lint_auto</test_depend>

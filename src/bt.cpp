@@ -31,6 +31,15 @@ void autonomy::create_behavior_tree()
 {
     // create BT
     BT::BehaviorTreeFactory factory;
+    // RCLCPP_INFO(get_logger(),"kuns");
+    auto nh = std::make_shared<rclcpp::Node>("kuns");
+    
+    RosNodeParams params;
+    params.nh = nh;
+    // RCLCPP_INFO(get_logger(),"okss");
+    params.default_port_value = "ball_pose_topic";  // Specify topic here
+
+    factory.registerNodeType<RecieveGoalPose>("RecieveGoalPose", params);
 
     BT::NodeBuilder builder_1 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -46,9 +55,22 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Fib>("Fib",builder_2);
 
+    
+
+    // BT::NodeBuilder builder_3  =
+    //     [=](const std::string &name, const BT::NodeConfiguration &config)
+    // {
+    //     return std::make_unique<RecieveGoalPose>(name, config, shared_from_this());
+    // };
+    // factory.registerBuilder<RecieveGoalPose>("RecieveGoalPose",builder_3);
+    
+    // RCLCPP_INFO(get_logger(),"siwa");
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/bt_tree.xml");
-    BT::Groot2Publisher publisher(tree_);
-// publiser.clearTree();
+
+   // Connect the Groot2Publisher. This will allow Groot2 to
+  // get the tree and poll status updates.
+    const unsigned port = 1667;
+    BT::Groot2Publisher publisher(tree_, port);
 }
 
 void autonomy::update_behavior_tree()
@@ -66,7 +88,7 @@ void autonomy::update_behavior_tree()
     else
     {
         RCLCPP_INFO(this->get_logger(),"Navigation failed");
-        timer_->cancel();
+        // timer_->cancel();
     }
 
 }
