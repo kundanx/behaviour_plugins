@@ -21,7 +21,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(action_pkg REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-find_package(my_bt REQUIRED)
+# find_package(my_bt REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
 
 
