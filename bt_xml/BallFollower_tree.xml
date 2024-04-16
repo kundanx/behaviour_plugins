@@ -1,0 +1,23 @@
+<!-- Behaviour Tree that sequentially navigates locations naively -->
+<root main_tree_to_execute = "MainTree">
+    <BehaviorTree ID="MainTree">
+        <Sequence name="root_sequence">
+            <ReactiveSequence name="navigate_to_ball_pos">
+                <RecoveryNode number_of_retries="1">
+                    <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
+                    <Sequence name="spin_sequence">
+                        <Spin spin_dist="1.57" server_name="spin_1" server_timeout="10" 
+                            is_recovery="false" error_code_id="{spin_error_code}"/>
+                        <Spin spin_dist="-3.14" server_name="spin_2" server_timeout="10" 
+                            is_recovery="false" error_code_id="{spin_error_code}"/>
+                        <Spin spin_dist="1.57" server_name="spin_3" server_timeout="10" 
+                            is_recovery="false" error_code_id="{spin_error_code}"/>
+                    </Sequence>
+                </RecoveryNode>
+                <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
+                <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
+            </ReactiveSequence>
+            <Fib     name="calc_fibonacci"  order="order"    />
+        </Sequence>
+    </BehaviorTree>
+</root>
