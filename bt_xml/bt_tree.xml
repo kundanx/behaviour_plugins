@@ -2,8 +2,8 @@
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
         <SequenceWithMemory name="root_sequence">
-            <RecieveGoalPose name="Get_ball_pose"/>
-            <GoToPose name="go_to_location1"/>
+            <RecieveGoalPose name="Get_ball_pose" pose="{pose}"/>
+            <GoToPose name="go_to_location1" loc="{pose}"/>
             <!-- <GoToPose name="go_to_location2" loc="location_2" />
             <GoToPose name="go_to_location3" loc="location_3" />
             <GoToPose name="go_to_location4" loc="location_4" /> -->

@@ -15,7 +15,7 @@ class RecieveGoalPose: public  RosTopicSubNode<PosMsg>
                     const NodeConfig& conf,
                     const RosNodeParams& params);
 
-    geometry_msgs::msg::PoseStamped pose_;
+    std::shared_ptr<PosMsg>  pose_;
 
     static BT::PortsList providedPorts();
 

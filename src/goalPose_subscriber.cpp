@@ -27,8 +27,9 @@ BT::NodeStatus RecieveGoalPose::onTick(const std::shared_ptr<PosMsg>& new_goal)
         // pose_.pose.orientation.y = new_goal->pose.orientation.y;
         // pose_.pose.orientation.z = new_goal->pose.orientation.z;
         // pose_.pose.orientation.w = new_goal->pose.orientation.w;
-        RCLCPP_INFO(logger(),"Inside on newgoal");
-        setOutput("pose", new_goal );
+        RecieveGoalPose::pose_ = new_goal;
+        RCLCPP_INFO(logger(),"%f",pose_->pose.position.x);
+        setOutput("pose", pose_ );
         return NodeStatus::SUCCESS;
     }
     return NodeStatus::FAILURE;

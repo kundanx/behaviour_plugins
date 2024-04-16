@@ -13,7 +13,7 @@ GoToPose::GoToPose(const std::string &name,
 
 BT::PortsList GoToPose::providedPorts()
 {
-    return {BT::InputPort<std::shared_ptr<PosMsg>>("pose")};
+    return {BT::InputPort<std::shared_ptr<PosMsg>>("loc")};
 }
 
 BT::NodeStatus GoToPose::onStart()
@@ -25,10 +25,10 @@ BT::NodeStatus GoToPose::onStart()
     // std::vector<float> pose = locations[loc.value()].as<std::vector<float>>();
 
 
-    auto goal_pose_ = getInput<std::shared_ptr<PosMsg>>("pose");
+    auto goal_pose_ = getInput<std::shared_ptr<PosMsg>>("loc");
     if( !goal_pose_ )
     {
-        throw BT::RuntimeError("error reading port [target]:", goal_pose_.error());
+        throw BT::RuntimeError("error reading port [pose]:", goal_pose_.error());
     }
     auto goal_pose = goal_pose_.value();
 
