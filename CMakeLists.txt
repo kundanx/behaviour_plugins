@@ -32,10 +32,11 @@ DESTINATION share/${PROJECT_NAME}
 )
 
 set(BEHAVIOUR_SOURCES
-src/navigation_behaviour.cpp
+src/GoToBallPose.cpp
 src/fib_behaviour.cpp
 src/goalPose_subscriber.cpp
-# src/goalPose_subs.cpp
+src/GetBallPose.cpp
+src/isBallDetected.cpp
 )
 
 set(TARGET_DEPENDS

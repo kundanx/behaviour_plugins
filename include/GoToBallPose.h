@@ -6,20 +6,17 @@
 #include <tf2/LinearMath/Quaternion.h>
 
 #include "geometry_msgs/msg/pose.hpp"
-#include "std_msgs/msg/u_int8.hpp"
 #include "nav2_msgs/action/navigate_to_pose.hpp"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp/bt_factory.h"
-#include "yaml-cpp/yaml.h"
 
 
-class GoToPose : public BT::StatefulActionNode
+class GoToBallPose : public BT::StatefulActionNode
 {
     public:
-    GoToPose(const std::string &name,
+    GoToBallPose(const std::string &name,
              const BT::NodeConfiguration &config,
              rclcpp::Node::SharedPtr node_ptr);
 

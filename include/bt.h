@@ -6,8 +6,11 @@
 #include "behaviortree_cpp/loggers/groot2_publisher.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
-#include "navigation_behaviour.h"
+#include "isBallDetected.hpp"
+#include "GetBallPose.hpp"
+#include "GoToBallPose.h"
 #include "fib_behaviour.h"
+
 #include "goalPose_subscriber.hpp"
 
 class autonomy : public rclcpp::Node

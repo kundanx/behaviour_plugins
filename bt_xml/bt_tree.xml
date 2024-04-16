@@ -2,12 +2,10 @@
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
         <SequenceWithMemory name="root_sequence">
-            <RecieveGoalPose name="Get_ball_pose" pose="{pose}"/>
-            <GoToPose name="go_to_location1" loc="{pose}"/>
-            <!-- <GoToPose name="go_to_location2" loc="location_2" />
-            <GoToPose name="go_to_location3" loc="location_3" />
-            <GoToPose name="go_to_location4" loc="location_4" /> -->
-            <Fib      name="calc_fibonacci"  order="order"    />
+            <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
+            <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
+            <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
+            <Fib     name="calc_fibonacci"  order="order"    />
         </SequenceWithMemory>
     </BehaviorTree>
 </root>

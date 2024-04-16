@@ -29,25 +29,19 @@ void autonomy::setup()
 
 void autonomy::create_behavior_tree()
 {
-    // create BT
+   
     BT::BehaviorTreeFactory factory;
-    // RCLCPP_INFO(get_logger(),"kuns");
-    auto nh = std::make_shared<rclcpp::Node>("kuns");
-    
-    RosNodeParams params;
-    params.nh = nh;
-    // RCLCPP_INFO(get_logger(),"okss");
-    params.default_port_value = "ball_pose_topic";  // Specify topic here
 
-    factory.registerNodeType<RecieveGoalPose>("RecieveGoalPose", params);
-
+    /* Register GoToBallPose node */
     BT::NodeBuilder builder_1 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<GoToPose>(name, config, shared_from_this());
+        return std::make_unique<GoToBallPose>(name, config, shared_from_this());
     };
-    factory.registerBuilder<GoToPose>("GoToPose",builder_1);
+    factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_1);
 
+
+    /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_2  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
@@ -55,20 +49,30 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Fib>("Fib",builder_2);
 
-    
 
-    // BT::NodeBuilder builder_3  =
-    //     [=](const std::string &name, const BT::NodeConfiguration &config)
-    // {
-    //     return std::make_unique<RecieveGoalPose>(name, config, shared_from_this());
-    // };
-    // factory.registerBuilder<RecieveGoalPose>("RecieveGoalPose",builder_3);
+    /* Register GetBallPose node */ 
+    BT::NodeBuilder builder_3  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<GetBallPose>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<GetBallPose>("GetBallPose",builder_3);
+
+
+    /* Register isBallDetected node */ 
+    BT::NodeBuilder builder_4  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<isBallDetected>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<isBallDetected>("isBallDetected",builder_4);
+
     
-    // RCLCPP_INFO(get_logger(),"siwa");
+    /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/bt_tree.xml");
 
-   // Connect the Groot2Publisher. This will allow Groot2 to
-  // get the tree and poll status updates.
+    // Connect the Groot2Publisher. This will allow Groot2 to
+    // get the tree and poll status updates.
     const unsigned port = 1667;
     BT::Groot2Publisher publisher(tree_, port);
 }
