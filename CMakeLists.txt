@@ -7,7 +7,8 @@ endif()
 
 # set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/src/action_pkg;
 #                        /home/rpi/ros-projects/dev_pi_communicate/src/behaviortree_ros2")
-set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/install/behaviortree_ros2")
+set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/install/behaviortree_ros2;
+                        /home/rpi/ros-projects/nav2_ws/install")
 list(APPEND CMAKE_MODULE_PATH "ros-projects/dev_pi_communicate/install/behaviortree_ros2/share/behaviortree_ros2/cmake")
 
 # find dependencies
@@ -15,6 +16,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(nav2_msgs REQUIRED)
+find_package(nav2_behaviors REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(tf2 REQUIRED)
@@ -43,6 +45,7 @@ set(TARGET_DEPENDS
       rclcpp
       rclcpp_action
       nav2_msgs
+      nav2_behaviors
       behaviortree_cpp
       yaml-cpp
       tf2_geometry_msgs
@@ -69,6 +72,7 @@ include_directories(
   include 
   ${action_pkg_INCLUDE_DIRS} 
   ${behaviortree_ros2_INCLUDE_DIRS}
+  ${nav2_behaviors_INCLUDE_DIRS}
   )
 
 add_executable(bt src/bt.cpp ${BEHAVIOUR_SOURCES})

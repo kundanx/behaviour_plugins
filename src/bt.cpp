@@ -69,7 +69,7 @@ void autonomy::create_behavior_tree()
 
     
     /* create BT */
-    tree_ = factory.createTreeFromFile(bt_xml_dir + "/bt_tree.xml");
+    tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
 
     // Connect the Groot2Publisher. This will allow Groot2 to
     // get the tree and poll status updates.
