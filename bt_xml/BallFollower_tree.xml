@@ -3,7 +3,7 @@
     <BehaviorTree ID="MainTree">
         <Sequence name="root_sequence">
             <ReactiveSequence name="navigate_to_ball_pos">
-                <RecoveryNode number_of_retries="1">
+                <RecoveryNode number_of_retries="1" name="RecoveryNode">
                     <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
                     <Sequence name="spin_sequence">
                         <Spin spin_dist="1.57" server_name="spin_1" server_timeout="10" 

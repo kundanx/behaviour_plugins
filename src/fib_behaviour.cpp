@@ -14,7 +14,7 @@ BT::PortsList Fib::providedPorts()
 
 BT::NodeStatus Fib::onStart()
 {
-    BT::Expected<std::string> goal = getInput<std::string>("order");
+    BT::Optional<std::string> goal = getInput<std::string>("order");
     const std::string config_file = node_ptr__->get_parameter("location_file").as_string();
 
     YAML::Node config = YAML::LoadFile(config_file);

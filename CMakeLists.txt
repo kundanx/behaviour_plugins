@@ -5,23 +5,25 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects")
-list(APPEND CMAKE_MODULE_PATH "ros-projects/dev_pi_communicate/install/behaviortree_ros2/share/behaviortree_ros2/cmake")
+# set(CMAKE_PREFIX_PATH "/usr/local/include")
+# list(APPEND CMAKE_MODULE_PATH "ros-projects/dev_pi_communicate/install/behaviortree_ros2/share/behaviortree_ros2/cmake")
+# list(APPEND CMAKE_MODULE_PATH "/usr/local/share/behaviortree_cpp/cmake")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(nav2_msgs REQUIRED)
-find_package(nav2_behaviors REQUIRED)
-find_package(behaviortree_cpp REQUIRED)
+find_package(nav2_behaviors REQUIRED)  ##
+find_package(nav2_behavior_tree REQUIRED)  ##
+find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(action_pkg REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 # find_package(my_bt REQUIRED)
-find_package(behaviortree_ros2 REQUIRED)
+# find_package(behaviortree_ros2 REQUIRED)
 
 
 # Install directories
@@ -33,7 +35,6 @@ DESTINATION share/${PROJECT_NAME}
 set(BEHAVIOUR_SOURCES
 src/GoToBallPose.cpp
 src/fib_behaviour.cpp
-src/goalPose_subscriber.cpp
 src/GetBallPose.cpp
 src/isBallDetected.cpp
 )
@@ -42,13 +43,14 @@ set(TARGET_DEPENDS
       rclcpp
       rclcpp_action
       nav2_msgs
-      nav2_behaviors
-      behaviortree_cpp
+      nav2_behaviors  ##
+      nav2_behavior_tree
+      behaviortree_cpp_v3
       yaml-cpp
       tf2_geometry_msgs
       tf2
       action_pkg
-      behaviortree_ros2
+      # behaviortree_ros2
 )
 
 if(BUILD_TESTING)
@@ -65,17 +67,11 @@ endif()
 
 include_directories(
   include 
-  ${action_pkg_INCLUDE_DIRS} 
-  ${behaviortree_ros2_INCLUDE_DIRS}
-  # ${CMAKE_PREFIX_PATH}/dev_pi_communicate/install/behaviortree_ros2/include
-  ${CMAKE_PREFIX_PATH}/nav2_ws/install/nav2_behaviors/include
-  # ${CMAKE_PREFIX_PATH}/include
-  )
+)
 
 add_executable(bt src/bt.cpp ${BEHAVIOUR_SOURCES})
-
-target_link_libraries(bt ${YAML_CPP_LIBRARIES})
-
+target_link_libraries(bt ${YAML_CPP_LIBRARIES} BT::behaviortree_cpp_v3)
+# target_link_libraries(${PROJECT_NAME} BT::behaviortree_cpp_v3)
 ament_target_dependencies(bt ${TARGET_DEPENDS})
 
 install(TARGETS
@@ -85,7 +81,7 @@ DESTINATION lib/${PROJECT_NAME}
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "action/Test.action"
-  # "action/Action.action"
 )
 
 ament_package()
+
