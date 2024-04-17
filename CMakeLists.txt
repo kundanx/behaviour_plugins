@@ -5,10 +5,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/src/action_pkg;
-#                        /home/rpi/ros-projects/dev_pi_communicate/src/behaviortree_ros2")
-set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects/dev_pi_communicate/install/behaviortree_ros2;
-                        /home/rpi/ros-projects/nav2_ws/install")
+set(CMAKE_PREFIX_PATH "/home/rpi/ros-projects")
 list(APPEND CMAKE_MODULE_PATH "ros-projects/dev_pi_communicate/install/behaviortree_ros2/share/behaviortree_ros2/cmake")
 
 # find dependencies
@@ -52,8 +49,6 @@ set(TARGET_DEPENDS
       tf2
       action_pkg
       behaviortree_ros2
-      # my_bt
-      # sstream
 )
 
 if(BUILD_TESTING)
@@ -72,7 +67,9 @@ include_directories(
   include 
   ${action_pkg_INCLUDE_DIRS} 
   ${behaviortree_ros2_INCLUDE_DIRS}
-  ${nav2_behaviors_INCLUDE_DIRS}
+  # ${CMAKE_PREFIX_PATH}/dev_pi_communicate/install/behaviortree_ros2/include
+  ${CMAKE_PREFIX_PATH}/nav2_ws/install/nav2_behaviors/include
+  # ${CMAKE_PREFIX_PATH}/include
   )
 
 add_executable(bt src/bt.cpp ${BEHAVIOUR_SOURCES})

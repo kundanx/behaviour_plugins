@@ -32,6 +32,8 @@ void autonomy::create_behavior_tree()
    
     BT::BehaviorTreeFactory factory;
 
+    RCLCPP_INFO(get_logger(),"kuns1");
+
     /* Register GoToBallPose node */
     BT::NodeBuilder builder_1 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -40,7 +42,7 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_1);
 
-
+    RCLCPP_INFO(get_logger(),"kuns2");
     /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_2  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -49,7 +51,7 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Fib>("Fib",builder_2);
 
-
+    RCLCPP_INFO(get_logger(),"kuns3");
     /* Register GetBallPose node */ 
     BT::NodeBuilder builder_3  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -58,7 +60,7 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GetBallPose>("GetBallPose",builder_3);
 
-
+    RCLCPP_INFO(get_logger(),"kuns4");
     /* Register isBallDetected node */ 
     BT::NodeBuilder builder_4  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -67,9 +69,9 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<isBallDetected>("isBallDetected",builder_4);
 
-    
+    RCLCPP_INFO(get_logger(),"kuns5");
     /* create BT */
-    tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
+    tree_ = factory.createTreeFromFile(bt_xml_dir + "bt_tree.xml");
 
     // Connect the Groot2Publisher. This will allow Groot2 to
     // get the tree and poll status updates.

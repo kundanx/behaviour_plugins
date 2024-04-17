@@ -12,7 +12,7 @@
 #include "fib_behaviour.h"
 #include "goalPose_subscriber.hpp"
 
-#include "nav2_behaviors/include/nav2_behaviors/plugins/spin.hpp"
+#include "nav2_behaviors/plugins/spin.hpp"
 
 class autonomy : public rclcpp::Node
 {
