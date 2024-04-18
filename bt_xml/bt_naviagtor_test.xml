@@ -1,0 +1,49 @@
+<!-- Behaviour Tree that sequentially navigates locations naively -->
+<root main_tree_to_execute = "MainTree">
+
+    <BehaviorTree ID="MainTree">
+        <Sequence name="root_sequence">
+            <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
+            <Sequence name="spin_sequence">
+                <Spin spin_dist="1.57" server_name="spin_1" server_timeout="10" 
+                    is_recovery="false" error_code_id="{spin_error_code}"/>
+                <Spin spin_dist="-3.14" server_name="spin_2" server_timeout="10" 
+                    is_recovery="false" error_code_id="{spin_error_code}"/>
+                <Spin spin_dist="1.57" server_name="spin_3" server_timeout="10" 
+                    is_recovery="false" error_code_id="{spin_error_code}"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="navigate_through_poses_w_replanning_and_recovery">
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+      <PipelineSequence name="NavigateWithReplanning">
+        <RateController hz="0.333">
+          <RecoveryNode number_of_retries="1" name="ComputePathThroughPoses">
+            <ReactiveSequence>
+              <RemovePassedGoals input_goals="{goals}" output_goals="{goals}" radius="0.7"/>
+              <ComputePathThroughPoses goals="{goals}" path="{path}" planner_id="GridBased"/>
+            </ReactiveSequence>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <RoundRobin name="RecoveryActions">
+          <Sequence name="ClearingActions">
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+          <Spin spin_dist="1.57"/>
+          <Wait wait_duration="5"/>
+          <BackUp backup_dist="0.30" backup_speed="0.05"/>
+        </RoundRobin>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>
