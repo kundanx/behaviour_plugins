@@ -15,6 +15,8 @@
 #include "GoToBallPose.h"
 #include "fib_behaviour.h"
 #include "spinActionClient.hpp"
+#include "waitActionClient.hpp"   
+
 
 #include "control/pipeline_sequence.hpp"
 #include "control/recovery_node.hpp"
@@ -31,7 +33,7 @@ class autonomy : public rclcpp::Node
     void create_behavior_tree();
     void update_behavior_tree();
     void register_control_nodes();
-    void register_action_nodes();
+    void register_actionClient_nodes();
 
     private:
     rclcpp::TimerBase::SharedPtr timer_;

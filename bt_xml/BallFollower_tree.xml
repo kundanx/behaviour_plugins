@@ -5,13 +5,14 @@
             <ReactiveSequence name="navigate_to_ball_pos">
                 <RecoveryNode number_of_retries="1" name="RecoveryNode">
                     <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
-                    <Sequence name="spin_sequence">
+                    <RoundRobin name="spin_sequence">
                     <!-- <Spin spin_dist="1.57"/> -->
                     <!-- <Spin name="spin" spin_dist="1.57" server_timeout="10" is_recovery="true"/> -->
-                    <spinActionClient name="spin1" In_angle="0.78"/>
+                    <!-- <spinActionClient name="spin1" In_angle="0.78"/> -->
+                    <waitActionClient name="wait1" In_sec="0.5" In_nanosec="1"/>
                     <spinActionClient name="spin2" In_angle="-1.57"/>
                     <spinActionClient name="spin3" In_angle="0.78"/>
-                    </Sequence>
+                    </RoundRobin>
                 </RecoveryNode>
                 <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
                 <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>

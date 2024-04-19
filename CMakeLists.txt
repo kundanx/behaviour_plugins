@@ -38,6 +38,7 @@ src/fib_behaviour.cpp
 src/GetBallPose.cpp
 src/isBallDetected.cpp
 src/spinActionClient.cpp
+src/waitActionClient.cpp
 src/control/pipeline_sequence.cpp
 src/control/recovery_node.cpp
 src/control/round_robin_node.cpp
