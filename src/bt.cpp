@@ -28,30 +28,28 @@ void autonomy::setup()
 }
 
 void autonomy::create_behavior_tree()
-{
-   
-    BT::BehaviorTreeFactory factory;
+{   
+    // register_action_nodes();
+    register_control_nodes();
 
-    RCLCPP_INFO(get_logger(),"kuns1");
+    /* Register fibbonacci_action node*/
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {   
+        return std::make_unique<Fib>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<Fib>("Fib",builder_1);
+
 
     /* Register GoToBallPose node */
-    BT::NodeBuilder builder_1 =
+    BT::NodeBuilder builder_2 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
         return std::make_unique<GoToBallPose>(name, config, shared_from_this());
     };
-    factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_1);
+    factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_2);
 
-    RCLCPP_INFO(get_logger(),"kuns2");
-    /* Register fibbonacci_action node*/
-    BT::NodeBuilder builder_2  =
-        [=](const std::string &name, const BT::NodeConfiguration &config)
-    {
-        return std::make_unique<Fib>(name, config, shared_from_this());
-    };
-    factory.registerBuilder<Fib>("Fib",builder_2);
 
-    RCLCPP_INFO(get_logger(),"kuns3");
     /* Register GetBallPose node */ 
     BT::NodeBuilder builder_3  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -60,7 +58,7 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GetBallPose>("GetBallPose",builder_3);
 
-    RCLCPP_INFO(get_logger(),"kuns4");
+
     /* Register isBallDetected node */ 
     BT::NodeBuilder builder_4  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -69,20 +67,32 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<isBallDetected>("isBallDetected",builder_4);
 
-    RCLCPP_INFO(get_logger(),"kuns5");
+
+    /* Register spinActionClient node */ 
+    BT::NodeBuilder builder_5  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<spinActionClient>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<spinActionClient>("spinActionClient",builder_5);
+
+
+
     /* create BT */
-    tree_ = factory.createTreeFromFile(bt_xml_dir + "bt_tree.xml");
+    tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
+    RCLCPP_INFO(get_logger(),"kuns4");
+
 
     // Connect the Groot2Publisher. This will allow Groot2 to
     // get the tree and poll status updates.
-    const unsigned port = 1667;
-    BT::Groot2Publisher publisher(tree_, port);
+    // const unsigned port = 1667;
+    // BT::Groot2Publisher publisher(tree_, port);
 }
 
 void autonomy::update_behavior_tree()
 {
     // tick BT when asked
-    BT::NodeStatus tree_status = tree_.tickOnce();
+    BT::NodeStatus tree_status = tree_.tickRoot();
     if(tree_status == BT::NodeStatus::RUNNING)
     {
         return;
@@ -96,6 +106,28 @@ void autonomy::update_behavior_tree()
         RCLCPP_INFO(this->get_logger(),"Navigation failed");
         // timer_->cancel();
     }
+
+}
+
+
+void autonomy::register_action_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::SpinAction>(name,"Spin",config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::SpinAction>("Spin",builder_1);
+}
+
+void autonomy::register_control_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::RecoveryNode>(name,config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::RecoveryNode>("RecoveryNode",builder_1);
 
 }
 

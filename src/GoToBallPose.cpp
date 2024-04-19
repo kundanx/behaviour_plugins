@@ -1,11 +1,11 @@
 #include "GoToBallPose.h"   
 
-GoToBallPose::GoToBallPose(const std::string &name,
-                    const BT::NodeConfiguration &config,
-                    rclcpp::Node::SharedPtr node_ptr) : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
+GoToBallPose::GoToBallPose(
+    const std::string &name,
+    const BT::NodeConfiguration &config,
+    rclcpp::Node::SharedPtr node_ptr) 
+    : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
-    // publisher_ = node_ptr_->create_publisher<std_msgs::msg::UInt8>("/control_topic", 10);
-    // subscription_ = node_ptr_->create_subscription<geometry_msgs::msg::Pose>( "/ball_pose_topic", 10, std::bind(&GoToBallPose::ball_pose_callback,this,std::placeholders::_1));
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
     RCLCPP_INFO(node_ptr_->get_logger(),"GoToBallPose node created..");
     done_flag = false;
@@ -35,7 +35,7 @@ BT::NodeStatus GoToBallPose::onStart()
     // Setup action client goal
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.result_callback = std::bind(&GoToBallPose::nav_to_pose_result_callback, this, std::placeholders::_1);
-    // send_goal_options.feedback_callback = std::bind(&GoToBallPose::nav_to_pose_feedback_callback, this, std::placeholders::_1);
+    send_goal_options.feedback_callback = std::bind(&GoToBallPose::nav_to_pose_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
     // make pose
     auto goal_msg = NavigateToPose::Goal();
@@ -44,10 +44,6 @@ BT::NodeStatus GoToBallPose::onStart()
     goal_msg.pose.pose.position.x = goal_pose.pose.position.x;
     goal_msg.pose.pose.position.y = goal_pose.pose.position.y;
     goal_msg.pose.pose.position.z = goal_pose.pose.position.z;
-
-    // tf2::Quaternion q;
-    // q.setRPY(0,0,xy_theta[2]);
-    // q.normalize();
 
     goal_msg.pose.pose.orientation.x = goal_pose.pose.orientation.x;
     goal_msg.pose.pose.orientation.y = goal_pose.pose.orientation.y;
@@ -69,10 +65,12 @@ BT::NodeStatus GoToBallPose::onRunning()
     }
     return BT::NodeStatus::RUNNING;
 }
+
 void GoToBallPose::onHalted() 
 {
      RCLCPP_WARN(node_ptr_->get_logger(),"Navigation aborted");
 }
+
 void GoToBallPose::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result)
 {
     if(result.result)
@@ -80,10 +78,9 @@ void GoToBallPose::nav_to_pose_result_callback(const GoalHandleNav::WrappedResul
         done_flag=true;
     }
 }
-// void GoToBallPose::nav_to_pose_feedback_callback(const GoalHandleNav::Feedback feedback)
-// {
-//     // std::stringstream ss;
-//     // ss<<feedback.current_pose;
-//     RCLCPP_INFO(node_ptr_->get_logger()," Navigating..");
-
-// }
+void GoToBallPose::nav_to_pose_feedback_callback(
+    GoalHandleNav::SharedPtr,
+    const std::shared_ptr<const NavigateToPose::Feedback> feedback)
+{
+    RCLCPP_INFO(node_ptr_->get_logger()," Navigating..");
+}

@@ -3,15 +3,14 @@
     <BehaviorTree ID="MainTree">
         <Sequence name="root_sequence">
             <ReactiveSequence name="navigate_to_ball_pos">
-                <RecoveryNode number_of_retries="1">
+                <RecoveryNode number_of_retries="1" name="RecoveryNode">
                     <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
                     <Sequence name="spin_sequence">
-                        <Spin spin_dist="1.57" server_name="spin_1" server_timeout="10" 
-                            is_recovery="false" error_code_id="{spin_error_code}"/>
-                        <Spin spin_dist="-3.14" server_name="spin_2" server_timeout="10" 
-                            is_recovery="false" error_code_id="{spin_error_code}"/>
-                        <Spin spin_dist="1.57" server_name="spin_3" server_timeout="10" 
-                            is_recovery="false" error_code_id="{spin_error_code}"/>
+                    <!-- <Spin spin_dist="1.57"/> -->
+                    <!-- <Spin name="spin" spin_dist="1.57" server_timeout="10" is_recovery="true"/> -->
+                    <spinActionClient name="spin1" In_angle="0.78"/>
+                    <spinActionClient name="spin2" In_angle="-1.57"/>
+                    <spinActionClient name="spin3" In_angle="0.78"/>
                     </Sequence>
                 </RecoveryNode>
                 <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>

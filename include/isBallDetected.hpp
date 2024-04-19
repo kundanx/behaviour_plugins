@@ -10,16 +10,17 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/subscription.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "behaviortree_cpp/bt_factory.h"
+#include "behaviortree_cpp_v3/bt_factory.h"
 
 
 using namespace BT;
 class isBallDetected : public BT::SyncActionNode
 {
     public:
-    isBallDetected(const std::string &name,
-             const BT::NodeConfiguration &config,
-             rclcpp::Node::SharedPtr node_ptr);
+    isBallDetected(
+        const std::string &name,
+        const BT::NodeConfiguration &config,
+        rclcpp::Node::SharedPtr node_ptr);
 
     rclcpp::Node::SharedPtr node_ptr_;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Bool>> subscription_;
