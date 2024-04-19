@@ -14,12 +14,14 @@
 #include "GetBallPose.hpp"
 #include "GoToBallPose.h"
 #include "fib_behaviour.h"
+#include "spinActionClient.hpp"
+
+#include "control/pipeline_sequence.hpp"
+#include "control/recovery_node.hpp"
+#include "control/round_robin_node.hpp"
 
 #include "nav2_behavior_tree/plugins/action/spin_action.hpp"
-#include "nav2_behavior_tree/behavior_tree_engine.hpp"
-#include "nav2_behavior_tree/plugins/control/pipeline_sequence.hpp"
-#include "nav2_behavior_tree/plugins/control/recovery_node.hpp"
-#include "nav2_behavior_tree/plugins/control/round_robin_node.hpp"
+
 
 class autonomy : public rclcpp::Node
 {
@@ -28,10 +30,13 @@ class autonomy : public rclcpp::Node
     void setup(); // to initiallize everything
     void create_behavior_tree();
     void update_behavior_tree();
+    void register_control_nodes();
+    void register_action_nodes();
 
     private:
     rclcpp::TimerBase::SharedPtr timer_;
     BT::Tree tree_;
+    BT::BehaviorTreeFactory factory;
 };
 
 #endif

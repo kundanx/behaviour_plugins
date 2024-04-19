@@ -14,15 +14,15 @@
 
 
 using namespace BT;
-class isBallDetected : public BT::SyncActionNode, rclcpp::Node
+class isBallDetected : public BT::SyncActionNode
 {
     public:
     isBallDetected(
         const std::string &name,
-        const BT::NodeConfiguration &config);
-            //  rclcpp::Node::SharedPtr node_ptr);
+        const BT::NodeConfiguration &config,
+        rclcpp::Node::SharedPtr node_ptr);
 
-    // rclcpp::Node::SharedPtr node_ptr_;
+    rclcpp::Node::SharedPtr node_ptr_;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Bool>> subscription_;
     
     std_msgs::msg::Bool isDetected;

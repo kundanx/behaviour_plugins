@@ -45,7 +45,7 @@ class GoToBallPose : public BT::StatefulActionNode
     void nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result);
 
     // // Action client feedback callback
-    // void nav_to_pose_feedback_callback(const GoalHandleNav::Feedback feedback);
+    void nav_to_pose_feedback_callback(GoalHandleNav::SharedPtr, const std::shared_ptr<const NavigateToPose::Feedback> feedback);
     
 };
 

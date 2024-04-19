@@ -28,21 +28,18 @@ void autonomy::setup()
 }
 
 void autonomy::create_behavior_tree()
-{
-   
-    BT::BehaviorTreeFactory factory;
+{   
+    // register_action_nodes();
+    register_control_nodes();
 
     /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_1  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {   
-        RCLCPP_INFO(get_logger(),"inside builder");
         return std::make_unique<Fib>(name, config, shared_from_this());
     };
-    RCLCPP_INFO(get_logger(),"Outside builder");
     factory.registerBuilder<Fib>("Fib",builder_1);
 
-    RCLCPP_INFO(get_logger(),"kuns1");
 
     /* Register GoToBallPose node */
     BT::NodeBuilder builder_2 =
@@ -51,8 +48,6 @@ void autonomy::create_behavior_tree()
         return std::make_unique<GoToBallPose>(name, config, shared_from_this());
     };
     factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_2);
-
-        RCLCPP_INFO(get_logger(),"kuns2");
 
 
     /* Register GetBallPose node */ 
@@ -72,26 +67,15 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<isBallDetected>("isBallDetected",builder_4);
 
-    RCLCPP_INFO(get_logger(),"kuns3");
 
-    // /* Register isBallDetected node */ 
-    // BT::NodeBuilder builder_5  =
-    //     [=](const std::string &name, const BT::NodeConfiguration &config)
-    // {
-    //     return std::make_unique<Spin>(name, config, shared_from_this());
-    // };
-    // factory.registerBuilder<nav2_behaviors::Spin>("Spin",builder_5);
+    /* Register spinActionClient node */ 
+    BT::NodeBuilder builder_5  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<spinActionClient>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<spinActionClient>("spinActionClient",builder_5);
 
-    // /* Register isBallDetected node */ 
-    // BT::NodeBuilder builder_6  =
-    //     [=](const std::string &name, const BT::NodeConfiguration &config)
-    // {
-    //     return std::make_unique<RecoveryNode>(name, config, shared_from_this());
-    // };
-    // factory.registerBuilder<nav2_behavior_tree::RecoveryNode>("RecoveryNode",builder_6);
-
-    // factory.registerNodeType<nav2_behaviors::Spin>("ApproachObject");
-    // factory.registerNodeType<nav2_behavior_tree::RecoveryNode>("RecoveryNode");
 
 
     /* create BT */
@@ -122,6 +106,28 @@ void autonomy::update_behavior_tree()
         RCLCPP_INFO(this->get_logger(),"Navigation failed");
         // timer_->cancel();
     }
+
+}
+
+
+void autonomy::register_action_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::SpinAction>(name,"Spin",config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::SpinAction>("Spin",builder_1);
+}
+
+void autonomy::register_control_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::RecoveryNode>(name,config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::RecoveryNode>("RecoveryNode",builder_1);
 
 }
 
