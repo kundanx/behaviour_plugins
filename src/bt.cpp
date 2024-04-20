@@ -31,6 +31,7 @@ void autonomy::create_behavior_tree()
 {   
     register_actionClient_nodes();
     register_control_nodes();
+    register_action_nodes();
 
     /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_1  =
@@ -98,6 +99,50 @@ void autonomy::update_behavior_tree()
 
 }
 
+void autonomy::register_action_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<TurnOnRoller>(name,config);
+    };
+    factory.registerBuilder<TurnOnRoller>("TurnOnRoller",builder_1);
+
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<TurnOnConveyer>(name,config);
+    };
+    factory.registerBuilder<TurnOnConveyer>("TurnOnConveyer",builder_2);
+
+    BT::NodeBuilder builder_3  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<TurnOnRoller>(name,config);
+    };
+    factory.registerBuilder<TurnOffRoller>("TurnOffRoller",builder_3);
+
+    BT::NodeBuilder builder_4  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<TurnOnConveyer>(name,config);
+    };
+    factory.registerBuilder<TurnOffConveyer>("TurnOffConveyer",builder_4);
+
+    BT::NodeBuilder builder_5  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<PneumaticOn>(name,config);
+    };
+    factory.registerBuilder<PneumaticOn>("PneumaticOn",builder_5);
+
+    BT::NodeBuilder builder_6  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<PneumaticOff>(name,config);
+    };
+    factory.registerBuilder<PneumaticOff>("PneumaticOff",builder_6);
+}
 
 void autonomy::register_actionClient_nodes()
 {

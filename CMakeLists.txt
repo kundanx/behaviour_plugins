@@ -39,6 +39,14 @@ src/GetBallPose.cpp
 src/isBallDetected.cpp
 src/spinActionClient.cpp
 src/waitActionClient.cpp
+
+src/actions/TurnOnRoller.cpp
+src/actions/TurnOnConveyer.cpp
+src/actions/TurnOffRoller.cpp
+src/actions/TurnOffConveyer.cpp
+src/actions/PneumaticOff.cpp
+src/actions/PneumaticOn.cpp
+
 src/control/pipeline_sequence.cpp
 src/control/recovery_node.cpp
 src/control/round_robin_node.cpp

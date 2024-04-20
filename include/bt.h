@@ -17,6 +17,14 @@
 #include "spinActionClient.hpp"
 #include "waitActionClient.hpp"   
 
+#include "actions/TurnOnRoller.hpp"
+#include "actions/TurnOffRoller.hpp"
+
+#include "actions/TurnOnConveyer.hpp"
+#include "actions/TurnOffConveyer.hpp"
+
+#include "actions/PneumaticOn.hpp"
+#include "actions/PneumaticOff.hpp"
 
 #include "control/pipeline_sequence.hpp"
 #include "control/recovery_node.hpp"
@@ -32,6 +40,8 @@ class autonomy : public rclcpp::Node
     void setup(); // to initiallize everything
     void create_behavior_tree();
     void update_behavior_tree();
+
+    void register_action_nodes();
     void register_control_nodes();
     void register_actionClient_nodes();
 
