@@ -7,7 +7,7 @@ PacketPublisher::PacketPublisher(
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
     publisher_ = node_ptr_->create_publisher<std_msgs::msg::Float32MultiArray>( "/Bt_State_topic", 10);
-    RCLCPP_INFO(node_ptr_->get_logger(),"PacketPublisher node created..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"PacketPublisher node Ready..");
 }
 
 BT::PortsList PacketPublisher::providedPorts()

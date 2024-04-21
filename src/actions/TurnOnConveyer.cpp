@@ -7,6 +7,8 @@ TurnOnConveyer::TurnOnConveyer(
 {
      // Mechanism is turnedOff intially
     setOutput<bool>("Op_ConveyerStatus", false);
+    std::cout<<"Conveyer On action ready.."<<std::endl;
+
 }
 
 BT::PortsList TurnOnConveyer::providedPorts()

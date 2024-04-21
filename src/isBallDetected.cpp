@@ -7,7 +7,7 @@ isBallDetected::isBallDetected(
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
     subscription_ = node_ptr_->create_subscription<std_msgs::msg::Bool>( "/is_ball_tracked", 10, std::bind(&isBallDetected::subscriber_callback,this,std::placeholders::_1));
-    RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected node created..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected node Ready..");
     isDetected.data = false;
 }
 

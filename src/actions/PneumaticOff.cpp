@@ -7,6 +7,8 @@ PneumaticOff::PneumaticOff(
 {
     // Mechanism is turnedOff intially
     setOutput<bool>("Op_PneumaticStatus", false);
+    std::printf("PneumaticOn action ready.. \n");
+
 }
 
 BT::PortsList PneumaticOff::providedPorts()

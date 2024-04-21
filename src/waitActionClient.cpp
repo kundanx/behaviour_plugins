@@ -7,7 +7,7 @@ waitActionClient::waitActionClient(
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
     action_client_ptr_ = rclcpp_action::create_client<Wait>(node_ptr_, "/wait");
-    RCLCPP_INFO(node_ptr_->get_logger(),"waitActionClient node created..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"waitActionClient node Ready..");
     done_flag = false;
 }
 

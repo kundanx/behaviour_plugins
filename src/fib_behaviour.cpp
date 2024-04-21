@@ -2,9 +2,10 @@
 
 Fib::Fib(const std::string &name,
             const BT::NodeConfiguration &config,
-            rclcpp::Node::SharedPtr node_ptr) : BT::StatefulActionNode(name,config), node_ptr__(node_ptr)
+            rclcpp::Node::SharedPtr node_ptr) : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
-    action_client_ptr_ = rclcpp_action::create_client<Fibonacci>(node_ptr__, "fibonacci");
+    RCLCPP_INFO(node_ptr_->get_logger(),"Fib action node Ready..");
+    action_client_ptr_ = rclcpp_action::create_client<Fibonacci>(node_ptr_, "fibonacci");
     done_flag = false;
 }
 BT::PortsList Fib::providedPorts()
@@ -15,7 +16,7 @@ BT::PortsList Fib::providedPorts()
 BT::NodeStatus Fib::onStart()
 {
     BT::Optional<std::string> goal = getInput<std::string>("order");
-    const std::string config_file = node_ptr__->get_parameter("location_file").as_string();
+    const std::string config_file = node_ptr_->get_parameter("location_file").as_string();
 
     YAML::Node config = YAML::LoadFile(config_file);
     int32_t order = config[goal.value()].as<int32_t>();
@@ -31,14 +32,14 @@ BT::NodeStatus Fib::onStart()
     //send goal
     done_flag = false;
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
-    RCLCPP_INFO(node_ptr__->get_logger(), "Fib goal sent");
+    RCLCPP_INFO(node_ptr_->get_logger(), "Fib goal sent");
     return BT::NodeStatus::RUNNING;
 }
 BT::NodeStatus Fib::onRunning()
 {
     if(done_flag)
     {
-        RCLCPP_INFO(node_ptr__->get_logger(), "Goal completed");
+        RCLCPP_INFO(node_ptr_->get_logger(), "Goal completed");
         return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::RUNNING;
@@ -52,7 +53,7 @@ void Fib::feedback_callback(GoalHandleFibonacci::SharedPtr, const std::shared_pt
             {
                 ss<<number<<" ";
             }
-            RCLCPP_INFO(node_ptr__->get_logger(), ss.str().c_str());
+            RCLCPP_INFO(node_ptr_->get_logger(), ss.str().c_str());
         }
 void Fib::result_callback(const GoalHandleFibonacci::WrappedResult &result)
 {

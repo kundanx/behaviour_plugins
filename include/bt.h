@@ -9,6 +9,8 @@
 #include "behaviortree_cpp_v3/xml_parsing.h"
 #include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
 #include "behaviortree_cpp_v3/utils/shared_library.h"
+#include "behaviortree_cpp_v3/controls/parallel_node.h"
+#include "behaviortree_cpp_v3/controls/while_do_else_node.h"
 
 #include "isBallDetected.hpp"
 #include "GetBallPose.hpp"
@@ -19,12 +21,13 @@
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"
-
 #include "actions/TurnOnConveyer.hpp"
 #include "actions/TurnOffConveyer.hpp"
-
 #include "actions/PneumaticOn.hpp"
 #include "actions/PneumaticOff.hpp"
+
+#include "conditions/isBallInside.hpp"
+#include "conditions/isOnlyBall.hpp"
 
 #include "control/pipeline_sequence.hpp"
 #include "control/recovery_node.hpp"
@@ -41,7 +44,8 @@ class autonomy : public rclcpp::Node
     void create_behavior_tree();
     void update_behavior_tree();
 
-    void register_action_nodes();
+    void register_custom_action_nodes();
+    void register_condition_nodes();
     void register_control_nodes();
     void register_actionClient_nodes();
 
@@ -49,6 +53,7 @@ class autonomy : public rclcpp::Node
     rclcpp::TimerBase::SharedPtr timer_;
     BT::Tree tree_;
     BT::BehaviorTreeFactory factory;
+    
 };
 
 #endif

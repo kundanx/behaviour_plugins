@@ -7,18 +7,18 @@ const std::string bt_xml_dir = ament_index_cpp::get_package_share_directory("beh
 autonomy::autonomy(const std::string &nodeName): Node(nodeName)
 {   
     this->declare_parameter("location_file","none");
-    RCLCPP_INFO(this->get_logger(),"Init_done");
-    RCLCPP_INFO(get_logger(),"Constructor");
+    // RCLCPP_INFO(this->get_logger(),"Init_done");
+    // RCLCPP_INFO(get_logger(),"Constructor");
 }
 
 void autonomy::setup()
 {   
-    RCLCPP_INFO(get_logger(),"Inside setup");
+    // RCLCPP_INFO(get_logger(),"Inside setup");
     // initial BT setup
     create_behavior_tree();
-    RCLCPP_INFO(get_logger(),"BT created");
+    // RCLCPP_INFO(get_logger(),"BT created");
 
-    const auto timer_period = 500ms;
+    const auto timer_period = 50ms;
     timer_ = this->create_wall_timer(
         timer_period,
         std::bind(&autonomy::update_behavior_tree, this)
@@ -31,7 +31,14 @@ void autonomy::create_behavior_tree()
 {   
     register_actionClient_nodes();
     register_control_nodes();
-    register_action_nodes();
+    register_custom_action_nodes();
+    register_condition_nodes();
+
+
+    // factory.registerSimpleCondition("isBallDetected",  std::bind(&ballDetection::isBallDetected, ballDetection_));
+    // factory.registerSimpleCondition("isBallInside",  std::bind(&ballDetection::isBallInside, ballDetection_));
+    // factory.registerSimpleCondition("isOnlyBall",  std::bind(&ballDetection::isOnlyBall, ballDetection_));
+
 
     /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_1  =
@@ -70,7 +77,6 @@ void autonomy::create_behavior_tree()
 
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
-    RCLCPP_INFO(get_logger(),"kuns4");
 
 
     // Connect the Groot2Publisher. This will allow Groot2 to
@@ -99,7 +105,7 @@ void autonomy::update_behavior_tree()
 
 }
 
-void autonomy::register_action_nodes()
+void autonomy::register_custom_action_nodes()
 {
     BT::NodeBuilder builder_1  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -184,6 +190,23 @@ void autonomy::register_control_nodes()
     };
     factory.registerBuilder<nav2_behavior_tree::RoundRobinNode>("RoundRobin",builder_3);
 
+}
+
+void autonomy::register_condition_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<isBallInside>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<isBallInside>("isBallInside",builder_1);
+
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<isOnlyBall>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<isOnlyBall>("isOnlyBall",builder_2);
 }
 
 int main(int argc, char **argv)

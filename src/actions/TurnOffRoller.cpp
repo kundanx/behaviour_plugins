@@ -7,6 +7,8 @@ TurnOffRoller::TurnOffRoller(
 {
     // Mechanism is turnedOff intially
     setOutput<bool>("Op_RollerStatus", false);
+    std::cout<<"Roller Off action ready.."<<std::endl;
+
 }
 
 BT::PortsList TurnOffRoller::providedPorts()

@@ -19,7 +19,7 @@ class Fib : public BT::StatefulActionNode
     using Fibonacci = action_pkg::action::Action;
     using GoalHandleFibonacci = rclcpp_action::ClientGoalHandle<Fibonacci>;
 
-    rclcpp::Node::SharedPtr node_ptr__;
+    rclcpp::Node::SharedPtr node_ptr_;
     rclcpp_action::Client<Fibonacci>::SharedPtr action_client_ptr_;
     bool done_flag;
 
