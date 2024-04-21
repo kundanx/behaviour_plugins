@@ -2,22 +2,59 @@
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
         <Sequence name="root_sequence">
-            <ReactiveSequence name="navigate_to_ball_pos">
-                <RecoveryNode number_of_retries="1" name="RecoveryNode">
+            <!-- <isBallInside name="isBallInside" OP_IsBallInside="{IsBallInside}"/> -->
+            <!-- <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{Conveyer_status}"/> -->
+            <!-- <TurnOnConveyer name = "Keep_conveyer_running"/> -->
+            <!-- <PneumaticOn name="Lower_pneumatic"/> -->
+            <!-- <TurnOnConveyer name = "Stop_conveyer"/> -->
+            <!-- <TurnOffConveyer name = "Keep_conveyer_running"/> -->
+            <!-- <PneumaticOff name="Lower_pneumatic"/> -->
+            <!-- <ReactiveSequence name="navigate_to_ball_pos"> -->
+                <!-- <RecoveryNode number_of_retries="1" name="RecoveryNode">
                     <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
                     <RoundRobin name="spin_sequence">
-                    <!-- <Spin spin_dist="1.57"/> -->
-                    <!-- <Spin name="spin" spin_dist="1.57" server_timeout="10" is_recovery="true"/> -->
-                    <!-- <spinActionClient name="spin1" In_angle="0.78"/> -->
-                    <!-- <waitActionClient name="wait1" In_sec="0.5" In_nanosec="1"/> -->
+                    <spinActionClient name="spin1" In_angle="0.78"/>
+                    <waitActionClient name="wait1" In_sec="0.5" In_nanosec="1"/>
                     <spinActionClient name="spin2" In_angle="-1.57"/>
                     <spinActionClient name="spin3" In_angle="0.78"/>
                     </RoundRobin>
-                </RecoveryNode>
-                <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
-                <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-            </ReactiveSequence>
-            <Fib     name="calc_fibonacci"  order="order"    />
+                </RecoveryNode> -->
+                <!-- <GetBallPose name="GetBallPose_node" op_pose="{pose}"/> -->
+                <!-- <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/> -->
+            <!-- </ReactiveSequence> -->
+            <SubTree ID="Ball_Intake"    />
         </Sequence>
     </BehaviorTree>
+
+    <BehaviorTree ID="Ball_Intake">
+        <Sequence name="Ball_Intake_Sequence">
+            <SubTree ID="Start_mechanisms"/>
+            <SubTree ID="Retrieve _balls"/>
+        </Sequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="Start_mechanisms">
+        <Sequence name = "Starting sequence">
+            <PneumaticOn name="Lower_pneumatic"/>
+            <TurnOnRoller name="Start intake roller"/>
+            <TurnOffConveyer name="Start conveyer"/>
+        </Sequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID="Retrieve _balls">
+        <WhileDoElse name = "Ball_intake_">
+            <isBallInside name="isBallInside"/>
+            <Sequence name = "Remove_Extra_balls">
+                <TurnOffRoller name = "Stop_intake_roller"/>
+                <WhileDoElse name = "Remove_Extra_balls">
+                    <isOnlyBall name = "is_required_ball_only"/>
+                    <TurnOffConveyer name = "Stop_conveyer"/>
+                    <TurnOnConveyer name = "Keep_conveyer_running"/>
+                </WhileDoElse>
+            </Sequence>
+            <!-- <MoveForwar name ="Forward_small_Dist"/> -->
+        </WhileDoElse>
+    </BehaviorTree>
+
 </root>
+
