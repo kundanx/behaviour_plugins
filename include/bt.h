@@ -17,7 +17,9 @@
 #include "GoToBallPose.h"
 #include "fib_behaviour.h"
 #include "spinActionClient.hpp"
-#include "waitActionClient.hpp"   
+#include "waitActionClient.hpp"  
+#include "PacketPublisher.hpp" 
+#include "InitiallizeActuators.hpp"
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"

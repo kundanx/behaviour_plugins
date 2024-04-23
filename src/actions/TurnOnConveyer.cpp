@@ -7,29 +7,28 @@ TurnOnConveyer::TurnOnConveyer(
 {
      // Mechanism is turnedOff intially
     setOutput<bool>("Op_ConveyerStatus", false);
-    std::cout<<"Conveyer On action ready.."<<std::endl;
-
+    setOutput<int>("Op_ConveyerSpeed", 1);
+    RCLCPP_INFO(rclcpp::get_logger("TurnOnConveyer"),"TurnOnConveyer action Ready..");
 }
 
 BT::PortsList TurnOnConveyer::providedPorts()
 {
     return {
         BT::OutputPort<bool>("Op_ConveyerStatus"),
-        BT::OutputPort<uint8_t>("Op_ConveyerSpeed"),
-        BT::InputPort<uint8_t>("Ip_ConveyerSpeed")
+        BT::OutputPort<int>("Op_ConveyerSpeed"),
+        BT::InputPort<int>("Ip_ConveyerSpeed")
     };   
 }
 BT::NodeStatus TurnOnConveyer::tick() 
 {
-    auto speed = getInput<uint8_t>("Ip_ConveyerSpeed");
-    if(!speed)
-    { 
-        std::cout<<"Input Port Error: [In_ConveyerSpeed]"<<std::endl;
-        return BT::NodeStatus::FAILURE;
-    }
+    auto speed = getInput<int>("Ip_ConveyerSpeed");
+    // if(!speed)
+    // { 
+    //     RCLCPP_INFO(rclcpp::get_logger("TurnOnConveyer"),"Input Port Error: [In_ConveyerSpeed]");
+    //     return BT::NodeStatus::FAILURE;
+    // }
     setOutput<bool>("Op_ConveyerStatus", true);
-    setOutput<uint8_t>("Op_ConveyerSpeed", speed.value());
-    std::cout<<"Conveyer Turned On: Speed["<<speed.value()<<"]"<<std::endl;
-
+    setOutput<int>("Op_ConveyerSpeed", speed.value());
+    RCLCPP_INFO(rclcpp::get_logger("TurnOnConveyer"),"Conveyer Turned Speed[%i]",speed.value());
     return BT::NodeStatus::SUCCESS;
 }

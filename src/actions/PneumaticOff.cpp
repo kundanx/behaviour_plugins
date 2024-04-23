@@ -7,7 +7,8 @@ PneumaticOff::PneumaticOff(
 {
     // Mechanism is turnedOff intially
     setOutput<bool>("Op_PneumaticStatus", false);
-    std::printf("PneumaticOn action ready.. \n");
+    RCLCPP_INFO(rclcpp::get_logger("PneumaticOff"),"PneumaticOff action Ready..");
+    // std::cout<<"PneumaticOn  ready.. "<<std::endl;
 
 }
 
@@ -20,6 +21,6 @@ return {
 BT::NodeStatus PneumaticOff::tick() 
 {
     setOutput<bool>("Op_PneumaticStatus", false);
-    std::cout<<"Pneumatic Turned Off"<<std::endl;
+    RCLCPP_INFO(rclcpp::get_logger("PneumaticOff"),"Pneumatic Turned Off");
     return BT::NodeStatus::SUCCESS;
 }

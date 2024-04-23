@@ -39,7 +39,8 @@ src/GetBallPose.cpp
 src/isBallDetected.cpp
 src/spinActionClient.cpp
 src/waitActionClient.cpp
-# src/ballDetection.cpp
+src/PacketPublisher.cpp
+src/InitiallizeActuators.cpp
 
 src/actions/TurnOnRoller.cpp
 src/actions/TurnOnConveyer.cpp

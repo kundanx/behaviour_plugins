@@ -6,7 +6,7 @@ isBallInside::isBallInside(
     rclcpp::Node::SharedPtr node_ptr)
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "/ColorSensor_status", 10, std::bind(&isBallInside::subscriber_callback,this,std::placeholders::_1));
+    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "Ball_status", 10, std::bind(&isBallInside::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"isBallInside node Ready..");
     inside = false;
 }

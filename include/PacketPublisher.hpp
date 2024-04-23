@@ -1,5 +1,5 @@
-#ifndef IS_BALL_DETECTED_H
-#define IS_BALL_DETECTED_H
+#ifndef PACKET_PUBLISHER_H
+#define PACKET_PUBLISHER_H
 
 #include <string>
 #include <memory>
@@ -12,8 +12,20 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
-
 using namespace BT;
+
+/*
+    Struct to define Serial data packet for actuators states
+*/
+// struct data
+// {
+//     uint8_t penumaticOn = 0x00000001;
+//     uint8_t penumaticOff = 0x0000000;
+//     uint8_t rollerOn = 0x0000010;
+//     uint8_t rollerOn = 0x000000;
+    
+// }
+
 class PacketPublisher : public BT::SyncActionNode
 {
     // private:
@@ -28,7 +40,7 @@ class PacketPublisher : public BT::SyncActionNode
         rclcpp::Node::SharedPtr node_ptr);
 
     rclcpp::Node::SharedPtr node_ptr_;
-    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float32MultiArray>> publisher_;
+    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Int8MultiArray>> publisher_;
     
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();

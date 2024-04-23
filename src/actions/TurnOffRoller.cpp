@@ -7,8 +7,7 @@ TurnOffRoller::TurnOffRoller(
 {
     // Mechanism is turnedOff intially
     setOutput<bool>("Op_RollerStatus", false);
-    std::cout<<"Roller Off action ready.."<<std::endl;
-
+    RCLCPP_INFO(rclcpp::get_logger("TurnOffRoller"),"TurnOffRoller action Ready..");
 }
 
 BT::PortsList TurnOffRoller::providedPorts()
@@ -20,6 +19,6 @@ return {
 BT::NodeStatus TurnOffRoller::tick() 
 {
     setOutput<bool>("Op_RollerStatus", false);
-    std::cout<<"Roller Turned Off"<<std::endl;
+    RCLCPP_INFO(rclcpp::get_logger("TurnOffRoller"),"Roller Turned Off..");
     return BT::NodeStatus::SUCCESS;
 }

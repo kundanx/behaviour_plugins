@@ -6,7 +6,7 @@ PacketPublisher::PacketPublisher(
     rclcpp::Node::SharedPtr node_ptr)
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
-    publisher_ = node_ptr_->create_publisher<std_msgs::msg::Float32MultiArray>( "/Bt_State_topic", 10);
+    publisher_ = node_ptr_->create_publisher<std_msgs::msg::Int8MultiArray>( "/act_vel", 10);
     RCLCPP_INFO(node_ptr_->get_logger(),"PacketPublisher node Ready..");
 }
 
@@ -14,29 +14,30 @@ BT::PortsList PacketPublisher::providedPorts()
 {
     return {
         BT::InputPort<bool>("Ip_RollerStatus"),
-        BT::InputPort<uint8_t>("Ip_RollerSpeed"),   
+        BT::InputPort<int>("Ip_RollerSpeed"),   
         BT::InputPort<bool>("Ip_ConveyerStatus"),
-        BT::InputPort<uint8_t>("Ip_ConveyerSpeed"), 
+        BT::InputPort<int>("Ip_ConveyerSpeed"), 
         BT::InputPort<bool>("Ip_PneumaticStatus")
     };
 }
 
  BT::NodeStatus PacketPublisher::tick()
  {  
-    auto ConveyerStatus = getInput<uint8_t>("Ip_ConveyerStatus");
-    auto ConveyerSpeed = getInput<uint8_t>("Ip_ConveyerSpeed");
-    auto RollerStatus = getInput<uint8_t>("Ip_RollerStatus");
-    auto RollerSpeed = getInput<uint8_t>("Ip_RollerSpeed");
-    auto PneumaticStatus = getInput<uint8_t>("Ip_PneumaticStatus");
+    auto ConveyerStatus = getInput<bool>("Ip_ConveyerStatus");
+    auto ConveyerSpeed = getInput<int>("Ip_ConveyerSpeed");
+    auto RollerStatus = getInput<bool>("Ip_RollerStatus");
+    auto RollerSpeed = getInput<int>("Ip_RollerSpeed");
+    auto PneumaticStatus = getInput<bool>("Ip_PneumaticStatus");
 
     std_msgs::msg::Int8MultiArray msg;
-    msg.data[0] = Ip_RollerSpeed.value();
-    msg.data[1] = Ip_RollerStatus.value();
+    
+    msg.data[0] = RollerSpeed.value();
+    msg.data[1] = RollerStatus.value();
     msg.data[2] = ConveyerSpeed.value();
     msg.data[3] =  ConveyerStatus.value();
     msg.data[4] = PneumaticStatus.value();
 
-    publisher_->publish(msg);
+    // publisher_->publish(msg);
 
     return BT::NodeStatus::SUCCESS;
  }

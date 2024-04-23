@@ -7,7 +7,7 @@ TurnOffConveyer::TurnOffConveyer(
 {
     // Mechanism is turnedOff intially
     setOutput<bool>("Op_ConveyerStatus", false);
-    std::cout<<"Conveyer Off action ready.."<<std::endl;
+    RCLCPP_INFO(rclcpp::get_logger("TurnOffConveyer"),"TurnOffConveyer action Ready..");
 }
 
 BT::PortsList TurnOffConveyer::providedPorts()
@@ -19,6 +19,6 @@ return {
 BT::NodeStatus TurnOffConveyer::tick() 
 {
     setOutput<bool>("Op_ConveyerStatus", false);
-    std::cout<<"Conveyer Turned Off"<<std::endl;
+    RCLCPP_INFO(rclcpp::get_logger("TurnOffConveyer"),"Conveyer Turned Off..");
     return BT::NodeStatus::SUCCESS;
 }

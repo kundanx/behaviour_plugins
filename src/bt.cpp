@@ -75,6 +75,20 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<isBallDetected>("isBallDetected",builder_4);
 
+    BT::NodeBuilder builder_5  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<PacketPublisher>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<PacketPublisher>("PacketPublisher",builder_5);
+
+     BT::NodeBuilder builder_6  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<InitiallizeActuators>(name, config);
+    };
+    factory.registerBuilder<InitiallizeActuators>("InitiallizeActuators",builder_6);
+
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
 
@@ -96,11 +110,13 @@ void autonomy::update_behavior_tree()
     else if(tree_status == BT::NodeStatus::SUCCESS)
     {
         RCLCPP_INFO(this->get_logger(),"Finished behaviour");
+        timer_->cancel();
+
     }
     else
     {
-        RCLCPP_INFO(this->get_logger(),"Navigation failed");
-        // timer_->cancel();
+        RCLCPP_INFO(this->get_logger(),"Tree Failed");
+        timer_->cancel();
     }
 
 }
@@ -124,14 +140,14 @@ void autonomy::register_custom_action_nodes()
     BT::NodeBuilder builder_3  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<TurnOnRoller>(name,config);
+        return std::make_unique<TurnOffRoller>(name,config);
     };
     factory.registerBuilder<TurnOffRoller>("TurnOffRoller",builder_3);
 
     BT::NodeBuilder builder_4  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<TurnOnConveyer>(name,config);
+        return std::make_unique<TurnOffConveyer>(name,config);
     };
     factory.registerBuilder<TurnOffConveyer>("TurnOffConveyer",builder_4);
 

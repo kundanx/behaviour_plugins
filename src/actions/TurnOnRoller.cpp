@@ -7,28 +7,27 @@ TurnOnRoller::TurnOnRoller(
 {
     // Mechanism is turnedOff intially
     setOutput<bool>("Op_RollerStatus", false);
-    std::cout<<"Roller On action ready.."<<std::endl;
-
+    RCLCPP_INFO(rclcpp::get_logger("TurnOnRoller"),"TurnOnRoller action Ready..");
 }
 
 BT::PortsList TurnOnRoller::providedPorts()
 {
 return {
     BT::OutputPort<bool>("Op_RollerStatus"),
-    BT::OutputPort<uint8_t>("Op_RollerSpeed"),
-    BT::InputPort<uint8_t>("Ip_RollerSpeed")
+    BT::OutputPort<int>("Op_RollerSpeed"),
+    BT::InputPort<int>("Ip_RollerSpeed")
 };   
 }
 BT::NodeStatus TurnOnRoller::tick() 
 {
-    auto speed = getInput<uint8_t>("Ip_RollerSpeed");
+    auto speed = getInput<int>("Ip_RollerSpeed");
     if(!speed)
     { 
-        std::cout<<"Input Port Error: [In_RollerSpeed] \n";
+        RCLCPP_INFO(rclcpp::get_logger("TurnOnRoller"),"Input Port Error: [In_RollerSpeed]");
         return BT::NodeStatus::FAILURE;
     }
     setOutput<bool>("Op_RollerStatus", true);
-    setOutput<uint8_t>("Op_RollerSpeed", speed.value());
-    std::cout<<"Roller Turned On: Speed["<<speed.value()<<"]"<<std::endl;
+    setOutput<int>("Op_RollerSpeed", speed.value());
+    RCLCPP_INFO(rclcpp::get_logger("TurnOnRoller"),"Roller Turned On: Speed[%i]",speed.value());
     return BT::NodeStatus::SUCCESS;
 }
