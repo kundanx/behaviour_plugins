@@ -5,7 +5,7 @@
 #include <memory>
 #include <tf2/LinearMath/Quaternion.h>
 
-#include "std_msgs/msg/int8_multi_array.hpp"
+#include "std_msgs/msg/u_int8_multi_array.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/publisher.hpp"
@@ -40,7 +40,7 @@ class PacketPublisher : public BT::SyncActionNode
         rclcpp::Node::SharedPtr node_ptr);
 
     rclcpp::Node::SharedPtr node_ptr_;
-    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Int8MultiArray>> publisher_;
+    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::UInt8MultiArray>> publisher_;
     
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
