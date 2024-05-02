@@ -6,7 +6,7 @@ PacketPublisher::PacketPublisher(
     rclcpp::Node::SharedPtr node_ptr)
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
-    publisher_ = node_ptr_->create_publisher<std_msgs::msg::Int8MultiArray>( "/act_vel", 10);
+    publisher_ = node_ptr_->create_publisher<std_msgs::msg::UInt8MultiArray>( "act_vel", 10);
     RCLCPP_INFO(node_ptr_->get_logger(),"PacketPublisher node Ready..");
 }
 
@@ -23,21 +23,42 @@ BT::PortsList PacketPublisher::providedPorts()
 
  BT::NodeStatus PacketPublisher::tick()
  {  
-    auto ConveyerStatus = getInput<bool>("Ip_ConveyerStatus");
-    auto ConveyerSpeed = getInput<int>("Ip_ConveyerSpeed");
-    auto RollerStatus = getInput<bool>("Ip_RollerStatus");
-    auto RollerSpeed = getInput<int>("Ip_RollerSpeed");
-    auto PneumaticStatus = getInput<bool>("Ip_PneumaticStatus");
 
-    std_msgs::msg::Int8MultiArray msg;
+    auto ConveyerStatus_ = getInput<bool>("Ip_ConveyerStatus");
+    auto ConveyerSpeed_ = getInput<int>("Ip_ConveyerSpeed");
+    auto RollerStatus_ = getInput<bool>("Ip_RollerStatus");
+    auto RollerSpeed_ = getInput<int>("Ip_RollerSpeed");
+    auto PneumaticStatus_ = getInput<bool>("Ip_PneumaticStatus");
+
+    if ( !(RollerSpeed_ && ConveyerStatus_ && ConveyerSpeed_ && RollerStatus_ && PneumaticStatus_) )
+    {
+        throw BT::RuntimeError("[Packet Publisher] error reading port");
+    }
+    auto ConveyerStatus = ConveyerStatus_.value();
+    auto ConveyerSpeed = ConveyerSpeed_.value();
+    auto RollerStatus = RollerStatus_.value();
+    auto RollerSpeed = RollerSpeed_.value();
+    auto PneumaticStatus = PneumaticStatus_.value();
+    std_msgs::msg::UInt8MultiArray msg;
+    // msg.layout.dim =  (std_msgs::MultiArrayDimension *)malloc(sizeof(std_msgs::MultiArrayDimension)*3)
+    // msg.data = (uint8_t *)malloc(sizeof(uint8_t)*3);
+    msg.data.resize(3);
+    msg.data[0]= RollerSpeed;
+    msg.data[1]= ConveyerSpeed;
+    msg.data[2]=0x00;
+
+    if (RollerStatus)
+        msg.data[2] = msg.data[2] | 0b00000001 ;
     
-    msg.data[0] = RollerSpeed.value();
-    msg.data[1] = RollerStatus.value();
-    msg.data[2] = ConveyerSpeed.value();
-    msg.data[3] =  ConveyerStatus.value();
-    msg.data[4] = PneumaticStatus.value();
+    if (ConveyerStatus)
+        msg.data[2] = msg.data[2] | 0b00000010;
+    
+    if (PneumaticStatus)
+        msg.data[2] = msg.data[2] | 0b00000100;
 
-    // publisher_->publish(msg);
+    RCLCPP_INFO(rclcpp::get_logger("PacketPublisher"),"%i", (int)RollerStatus);
+
+    publisher_->publish(msg);
 
     return BT::NodeStatus::SUCCESS;
  }
