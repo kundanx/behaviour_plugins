@@ -9,8 +9,6 @@
 #include "behaviortree_cpp_v3/xml_parsing.h"
 #include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
 #include "behaviortree_cpp_v3/utils/shared_library.h"
-#include "behaviortree_cpp_v3/controls/parallel_node.h"
-#include "behaviortree_cpp_v3/controls/while_do_else_node.h"
 
 #include "isBallDetected.hpp"
 #include "GetBallPose.hpp"
@@ -27,6 +25,9 @@
 #include "actions/TurnOffConveyer.hpp"
 #include "actions/PneumaticOn.hpp"
 #include "actions/PneumaticOff.hpp"
+
+#include "decorator/returnFailureNode.hpp"
+#include "decorator/returnSuccessNode.hpp"
 
 #include "conditions/isBallInside.hpp"
 #include "conditions/isOnlyBall.hpp"
@@ -49,6 +50,7 @@ class autonomy : public rclcpp::Node
     void register_custom_action_nodes();
     void register_condition_nodes();
     void register_control_nodes();
+    void register_decorator_nodes();
     void register_actionClient_nodes();
 
     private:

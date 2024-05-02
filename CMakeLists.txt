@@ -49,6 +49,9 @@ src/actions/TurnOffConveyer.cpp
 src/actions/PneumaticOff.cpp
 src/actions/PneumaticOn.cpp
 
+src/decorator/returnFailureNode.cpp
+src/decorator/returnSuccessNode.cpp
+
 src/conditions/isBallInside.cpp
 src/conditions/isOnlyBall.cpp
 

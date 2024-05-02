@@ -31,6 +31,7 @@ void autonomy::create_behavior_tree()
 {   
     register_actionClient_nodes();
     register_control_nodes();
+    register_decorator_nodes();
     register_custom_action_nodes();
     register_condition_nodes();
 
@@ -111,7 +112,6 @@ void autonomy::update_behavior_tree()
     {
         RCLCPP_INFO(this->get_logger(),"Finished behaviour");
         timer_->cancel();
-
     }
     else
     {
@@ -206,6 +206,13 @@ void autonomy::register_control_nodes()
     };
     factory.registerBuilder<nav2_behavior_tree::RoundRobinNode>("RoundRobin",builder_3);
 
+    // BT::NodeBuilder builder_4  =
+    //     [=](const std::string &name, const BT::NodeConfiguration &config)
+    // {
+    //     return std::make_unique<ParallelNode>(name,config);
+    // };
+    // factory.registerBuilder<ParallelNode>("ParallelNode",builder_4);
+
 }
 
 void autonomy::register_condition_nodes()
@@ -224,6 +231,24 @@ void autonomy::register_condition_nodes()
     };
     factory.registerBuilder<isOnlyBall>("isOnlyBall",builder_2);
 }
+
+void autonomy::register_decorator_nodes()
+{   
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<returnSuccess>(name,config);
+    };
+    factory.registerBuilder<returnSuccess>("returnSuccess",builder_1);
+
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<returnFailure>(name,config);
+    };
+    factory.registerBuilder<returnFailure>("returnFailure",builder_2);
+}
+
 
 int main(int argc, char **argv)
 {
