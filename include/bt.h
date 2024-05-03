@@ -15,6 +15,22 @@
 #include "GoToBallPose.h"
 #include "fib_behaviour.h"
 #include "spinActionClient.hpp"
+#include "waitActionClient.hpp"  
+#include "PacketPublisher.hpp" 
+#include "InitiallizeActuators.hpp"
+
+#include "actions/TurnOnRoller.hpp"
+#include "actions/TurnOffRoller.hpp"
+#include "actions/TurnOnConveyer.hpp"
+#include "actions/TurnOffConveyer.hpp"
+#include "actions/PneumaticOn.hpp"
+#include "actions/PneumaticOff.hpp"
+
+#include "decorator/returnFailureNode.hpp"
+#include "decorator/returnSuccessNode.hpp"
+
+#include "conditions/isBallInside.hpp"
+#include "conditions/isOnlyBall.hpp"
 
 #include "control/pipeline_sequence.hpp"
 #include "control/recovery_node.hpp"
@@ -30,13 +46,18 @@ class autonomy : public rclcpp::Node
     void setup(); // to initiallize everything
     void create_behavior_tree();
     void update_behavior_tree();
+
+    void register_custom_action_nodes();
+    void register_condition_nodes();
     void register_control_nodes();
-    void register_action_nodes();
+    void register_decorator_nodes();
+    void register_actionClient_nodes();
 
     private:
     rclcpp::TimerBase::SharedPtr timer_;
     BT::Tree tree_;
     BT::BehaviorTreeFactory factory;
+    
 };
 
 #endif

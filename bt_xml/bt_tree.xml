@@ -1,11 +1,10 @@
 <!-- Behaviour Tree that sequentially navigates locations naively -->
 <root>
-    <BehaviorTree ID="MainTree">
-        <Sequence name="root_sequence">
-            <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
-            <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
-            <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-            <Fib     name="calc_fibonacci"  order="order"/>
-        </Sequence>
+    <BehaviorTree ID="ball_intake">
+        <SequenceWithMemory name="root_sequence">
+            <WhileDoElse name="Take_Required_ball_In">
+                <isRequiredBallIn name="isRequiredBallIn">
+            </WhileDoElse>
+        </SequenceWithMemory>
     </BehaviorTree>
 </root>

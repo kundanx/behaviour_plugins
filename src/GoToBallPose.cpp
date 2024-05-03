@@ -7,7 +7,7 @@ GoToBallPose::GoToBallPose(
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
-    RCLCPP_INFO(node_ptr_->get_logger(),"GoToBallPose node created..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"GoToBallPose node Ready..");
     done_flag = false;
 }
 

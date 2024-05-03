@@ -11,7 +11,7 @@ GetBallPose::GetBallPose(
         10,
         std::bind(&GetBallPose::ball_pose_callback,this,std::placeholders::_1)
     );
-    RCLCPP_INFO(node_ptr_->get_logger(),"Ball_pose subscriber node created..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"GetBallPose node Ready..");
     pose_recieved_flag = false;
 }
 

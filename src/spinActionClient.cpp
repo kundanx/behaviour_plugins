@@ -7,7 +7,7 @@ spinActionClient::spinActionClient(
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
     action_client_ptr_ = rclcpp_action::create_client<Spin>(node_ptr_, "/spin");
-    RCLCPP_INFO(node_ptr_->get_logger(),"spinActionClient node created..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"spinActionClient node Ready..");
     done_flag = false;
 }
 

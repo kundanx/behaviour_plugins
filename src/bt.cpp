@@ -7,18 +7,18 @@ const std::string bt_xml_dir = ament_index_cpp::get_package_share_directory("beh
 autonomy::autonomy(const std::string &nodeName): Node(nodeName)
 {   
     this->declare_parameter("location_file","none");
-    RCLCPP_INFO(this->get_logger(),"Init_done");
-    RCLCPP_INFO(get_logger(),"Constructor");
+    // RCLCPP_INFO(this->get_logger(),"Init_done");
+    // RCLCPP_INFO(get_logger(),"Constructor");
 }
 
 void autonomy::setup()
 {   
-    RCLCPP_INFO(get_logger(),"Inside setup");
+    // RCLCPP_INFO(get_logger(),"Inside setup");
     // initial BT setup
     create_behavior_tree();
-    RCLCPP_INFO(get_logger(),"BT created");
+    // RCLCPP_INFO(get_logger(),"BT created");
 
-    const auto timer_period = 500ms;
+    const auto timer_period = 50ms;
     timer_ = this->create_wall_timer(
         timer_period,
         std::bind(&autonomy::update_behavior_tree, this)
@@ -29,8 +29,17 @@ void autonomy::setup()
 
 void autonomy::create_behavior_tree()
 {   
-    // register_action_nodes();
+    register_actionClient_nodes();
     register_control_nodes();
+    register_decorator_nodes();
+    register_custom_action_nodes();
+    register_condition_nodes();
+
+
+    // factory.registerSimpleCondition("isBallDetected",  std::bind(&ballDetection::isBallDetected, ballDetection_));
+    // factory.registerSimpleCondition("isBallInside",  std::bind(&ballDetection::isBallInside, ballDetection_));
+    // factory.registerSimpleCondition("isOnlyBall",  std::bind(&ballDetection::isOnlyBall, ballDetection_));
+
 
     /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_1  =
@@ -67,20 +76,22 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<isBallDetected>("isBallDetected",builder_4);
 
-
-    /* Register spinActionClient node */ 
     BT::NodeBuilder builder_5  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<spinActionClient>(name, config, shared_from_this());
+        return std::make_unique<PacketPublisher>(name, config, shared_from_this());
     };
-    factory.registerBuilder<spinActionClient>("spinActionClient",builder_5);
+    factory.registerBuilder<PacketPublisher>("PacketPublisher",builder_5);
 
-
+     BT::NodeBuilder builder_6  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<InitiallizeActuators>(name, config);
+    };
+    factory.registerBuilder<InitiallizeActuators>("InitiallizeActuators",builder_6);
 
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
-    RCLCPP_INFO(get_logger(),"kuns4");
 
 
     // Connect the Groot2Publisher. This will allow Groot2 to
@@ -100,24 +111,76 @@ void autonomy::update_behavior_tree()
     else if(tree_status == BT::NodeStatus::SUCCESS)
     {
         RCLCPP_INFO(this->get_logger(),"Finished behaviour");
+        timer_->cancel();
     }
     else
     {
-        RCLCPP_INFO(this->get_logger(),"Navigation failed");
-        // timer_->cancel();
+        RCLCPP_INFO(this->get_logger(),"Tree Failed");
+        timer_->cancel();
     }
 
 }
 
-
-void autonomy::register_action_nodes()
+void autonomy::register_custom_action_nodes()
 {
     BT::NodeBuilder builder_1  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<nav2_behavior_tree::SpinAction>(name,"Spin",config);
+        return std::make_unique<TurnOnRoller>(name,config);
     };
-    factory.registerBuilder<nav2_behavior_tree::SpinAction>("Spin",builder_1);
+    factory.registerBuilder<TurnOnRoller>("TurnOnRoller",builder_1);
+
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<TurnOnConveyer>(name,config);
+    };
+    factory.registerBuilder<TurnOnConveyer>("TurnOnConveyer",builder_2);
+
+    BT::NodeBuilder builder_3  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<TurnOffRoller>(name,config);
+    };
+    factory.registerBuilder<TurnOffRoller>("TurnOffRoller",builder_3);
+
+    BT::NodeBuilder builder_4  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<TurnOffConveyer>(name,config);
+    };
+    factory.registerBuilder<TurnOffConveyer>("TurnOffConveyer",builder_4);
+
+    BT::NodeBuilder builder_5  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<PneumaticOn>(name,config);
+    };
+    factory.registerBuilder<PneumaticOn>("PneumaticOn",builder_5);
+
+    BT::NodeBuilder builder_6  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<PneumaticOff>(name,config);
+    };
+    factory.registerBuilder<PneumaticOff>("PneumaticOff",builder_6);
+}
+
+void autonomy::register_actionClient_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<spinActionClient>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<spinActionClient>("spinActionClient",builder_1);
+
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<waitActionClient>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<waitActionClient>("waitActionClient",builder_2);
 }
 
 void autonomy::register_control_nodes()
@@ -129,7 +192,63 @@ void autonomy::register_control_nodes()
     };
     factory.registerBuilder<nav2_behavior_tree::RecoveryNode>("RecoveryNode",builder_1);
 
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::PipelineSequence>(name,config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::PipelineSequence>("PipelineSequence",builder_2);
+
+    BT::NodeBuilder builder_3  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::RoundRobinNode>(name,config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::RoundRobinNode>("RoundRobin",builder_3);
+
+    // BT::NodeBuilder builder_4  =
+    //     [=](const std::string &name, const BT::NodeConfiguration &config)
+    // {
+    //     return std::make_unique<ParallelNode>(name,config);
+    // };
+    // factory.registerBuilder<ParallelNode>("ParallelNode",builder_4);
+
 }
+
+void autonomy::register_condition_nodes()
+{
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<isBallInside>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<isBallInside>("isBallInside",builder_1);
+
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<isOnlyBall>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<isOnlyBall>("isOnlyBall",builder_2);
+}
+
+void autonomy::register_decorator_nodes()
+{   
+    BT::NodeBuilder builder_1  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<returnSuccess>(name,config);
+    };
+    factory.registerBuilder<returnSuccess>("returnSuccess",builder_1);
+
+    BT::NodeBuilder builder_2  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<returnFailure>(name,config);
+    };
+    factory.registerBuilder<returnFailure>("returnFailure",builder_2);
+}
+
 
 int main(int argc, char **argv)
 {
