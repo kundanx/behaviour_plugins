@@ -86,7 +86,7 @@ void autonomy::create_behavior_tree()
      BT::NodeBuilder builder_6  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<InitiallizeActuators>(name, config);
+        return std::make_unique<InitiallizeActuators>(name, config,shared_from_this());
     };
     factory.registerBuilder<InitiallizeActuators>("InitiallizeActuators",builder_6);
 

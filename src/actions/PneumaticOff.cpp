@@ -22,5 +22,5 @@ BT::NodeStatus PneumaticOff::tick()
 {
     setOutput<bool>("Op_PneumaticStatus", false);
     RCLCPP_INFO(rclcpp::get_logger("PneumaticOff"),"Pneumatic Turned Off");
-    return BT::NodeStatus::RUNNING;
+    return BT::NodeStatus::SUCCESS;
 }

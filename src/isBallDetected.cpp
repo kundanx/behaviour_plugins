@@ -30,7 +30,6 @@ BT::PortsList isBallDetected::providedPorts()
 
 void isBallDetected::subscriber_callback(std_msgs::msg::Bool msg)
 {   
-    RCLCPP_INFO(node_ptr_->get_logger(),"isball Detected subs callback");
     if(msg.data)
         isDetected.data = true;    
     else

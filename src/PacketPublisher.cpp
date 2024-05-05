@@ -30,10 +30,23 @@ BT::PortsList PacketPublisher::providedPorts()
     auto RollerSpeed_ = getInput<int>("Ip_RollerSpeed");
     auto PneumaticStatus_ = getInput<bool>("Ip_PneumaticStatus");
 
-    if ( !(RollerSpeed_ && ConveyerStatus_ && ConveyerSpeed_ && RollerStatus_ && PneumaticStatus_) )
-    {
-        throw BT::RuntimeError("[Packet Publisher] error reading port");
-    }
+    // if ( !(RollerSpeed_ && ConveyerStatus_ && ConveyerSpeed_ && RollerStatus_ && PneumaticStatus_) )
+    // {
+    //     throw BT::RuntimeError("[Packet Publisher] error reading port");
+    // }
+    // if(!RollerSpeed_)
+        // throw BT::RuntimeError("[Packet Publisher] error reading RollerSpeed");
+    if(!ConveyerSpeed_)
+        throw BT::RuntimeError("[Packet Publisher] error reading ConveyerSpeed_");
+    if(!RollerStatus_)
+        throw BT::RuntimeError("[Packet Publisher] error reading RollerStatus_");
+    if(!ConveyerStatus_)
+        throw BT::RuntimeError("[Packet Publisher] error reading ConveyerStatus_");
+    if(!PneumaticStatus_)
+        throw BT::RuntimeError("[Packet Publisher] error reading PneumaticStatus_");
+    
+
+
     auto ConveyerStatus = ConveyerStatus_.value();
     auto ConveyerSpeed = ConveyerSpeed_.value();
     auto RollerStatus = RollerStatus_.value();
@@ -48,10 +61,10 @@ BT::PortsList PacketPublisher::providedPorts()
     msg.data[2]=0x00;
 
     if (RollerStatus)
-        msg.data[2] = msg.data[2] | 0b00000001 ;
+        msg.data[2] = msg.data[2] | 0b00000010 ;
     
     if (ConveyerStatus)
-        msg.data[2] = msg.data[2] | 0b00000010;
+        msg.data[2] = msg.data[2] | 0b00000001;
     
     if (PneumaticStatus)
         msg.data[2] = msg.data[2] | 0b00000100;

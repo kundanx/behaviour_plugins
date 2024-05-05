@@ -30,7 +30,7 @@ BT::PortsList isBallInside::providedPorts()
 
 void isBallInside::subscriber_callback(std_msgs::msg::UInt8 msg)
 {   
-    if(msg.data == 0xA1)
+    if(msg.data == 1)
         inside = true;    
     else
         inside = false;
