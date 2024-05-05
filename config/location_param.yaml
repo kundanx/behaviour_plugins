@@ -6,5 +6,11 @@ location_2: [1.0,-1.0,0.0]
 location_3: [1.50,-1.0,0.0]
 
 location_4: [1.50,-0.50,0.00]
-
 order: 10
+
+# Location of silo w.r.t origin at Y junction
+silo_one: [-4.164, -1.5]
+silo_two: [-4.164, -0.75]
+silo_three: [-4.164, 0.0]
+silo_four: [-4.164, 0.75]
+silo_five: [-4.164, 1.5]
