@@ -39,15 +39,15 @@ BT::PortsList InitiallizeActuators::providedPorts()
     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"InitiallizeActuators subs callback..");
     switch (msg.data)
     {
-        case 1: 
+        case '1': 
             RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Red Ball detected");
             setOutput<bool>("OP_IsBallInside", true);
             break;
-        case 2:
+        case '2':
             RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Blue Ball detected");
             setOutput<bool>("OP_IsBallInside", false);
             break;
-        case 3:
+        case '3':
             RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"purple Ball detected");
             setOutput<bool>("OP_IsBallInside", false);
             break;

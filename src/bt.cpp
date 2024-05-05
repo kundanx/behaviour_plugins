@@ -35,12 +35,6 @@ void autonomy::create_behavior_tree()
     register_custom_action_nodes();
     register_condition_nodes();
 
-
-    // factory.registerSimpleCondition("isBallDetected",  std::bind(&ballDetection::isBallDetected, ballDetection_));
-    // factory.registerSimpleCondition("isBallInside",  std::bind(&ballDetection::isBallInside, ballDetection_));
-    // factory.registerSimpleCondition("isOnlyBall",  std::bind(&ballDetection::isOnlyBall, ballDetection_));
-
-
     /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_1  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -89,6 +83,14 @@ void autonomy::create_behavior_tree()
         return std::make_unique<InitiallizeActuators>(name, config,shared_from_this());
     };
     factory.registerBuilder<InitiallizeActuators>("InitiallizeActuators",builder_6);
+    
+     BT::NodeBuilder builder_7 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<GoToSiloPose>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<GoToSiloPose>("GoToSiloPose",builder_7);
+
 
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");

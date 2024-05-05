@@ -34,6 +34,7 @@ DESTINATION share/${PROJECT_NAME}
 
 set(BEHAVIOUR_SOURCES
 src/GoToBallPose.cpp
+src/GoToSiloPose.cpp
 src/fib_behaviour.cpp
 src/GetBallPose.cpp
 src/isBallDetected.cpp

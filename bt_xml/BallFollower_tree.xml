@@ -115,7 +115,27 @@
                     Ip_ConveyerStatus="{ConveyerStatus}"
                     Ip_ConveyerSpeed="{ConveyerSpeed}"
                     Ip_PneumaticStatus="{PneumaticStatus}"/>
-
+            <!-- <GoToSiloPose name="goToSilo"/> -->
+            <waitActionClient  In_sec="1" In_nanosec="0"/>
+            <TurnOnConveyer name = "Keep_conveyer_running" 
+                    Op_ConveyerStatus="{ConveyerStatus}"
+                    Op_ConveyerSpeed="{ConveyerSpeed}" 
+                    Ip_ConveyerSpeed="100"/>
+            <PacketPublisher name="packetPublisher"
+                Ip_RollerStatus="{RollerStatus}"
+                Ip_RollerSpeed="{RollerSpeed}"
+                Ip_ConveyerStatus="{ConveyerStatus}"
+                Ip_ConveyerSpeed="{ConveyerSpeed}"
+                Ip_PneumaticStatus="{PneumaticStatus}"/>
+            <waitActionClient  In_sec="1" In_nanosec="0"/>
+            <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/>
+            <PacketPublisher name="packetPublisher"
+                Ip_RollerStatus="{RollerStatus}"
+                Ip_RollerSpeed="{RollerSpeed}"
+                Ip_ConveyerStatus="{ConveyerStatus}"
+                Ip_ConveyerSpeed="{ConveyerSpeed}"
+                Ip_PneumaticStatus="{PneumaticStatus}"/>
+            
             <!-- Ball sorting tree -->
             <!-- <Inverter>
                 <KeepRunningUntilFailure>

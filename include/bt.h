@@ -13,6 +13,7 @@
 #include "isBallDetected.hpp"
 #include "GetBallPose.hpp"
 #include "GoToBallPose.h"
+#include "GoToSiloPose.hpp"
 #include "fib_behaviour.h"
 #include "spinActionClient.hpp"
 #include "waitActionClient.hpp"  

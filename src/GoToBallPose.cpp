@@ -82,5 +82,6 @@ void GoToBallPose::nav_to_pose_feedback_callback(
     GoalHandleNav::SharedPtr,
     const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
+    (void)feedback;
     RCLCPP_INFO(node_ptr_->get_logger()," Navigating..");
 }

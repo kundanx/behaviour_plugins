@@ -9,8 +9,9 @@ location_4: [1.50,-0.50,0.00]
 order: 10
 
 # Location of silo w.r.t origin at Y junction
-silo_one: [-4.164, -1.5]
-silo_two: [-4.164, -0.75]
-silo_three: [-4.164, 0.0]
-silo_four: [-4.164, 0.75]
-silo_five: [-4.164, 1.5]
+# X co-oridinate of each silo = 4.164
+silo_one: [-3.264, -1.5]
+silo_two: [-3.664, -0.285]
+silo_three: [-3.264, 0.0]
+silo_four: [-3.264, 0.75]
+silo_five: [-3.264, 1.5]
