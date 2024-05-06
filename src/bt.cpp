@@ -70,30 +70,31 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<isBallDetected>("isBallDetected",builder_4);
 
-    BT::NodeBuilder builder_5  =
-        [=](const std::string &name, const BT::NodeConfiguration &config)
-    {
-        return std::make_unique<PacketPublisher>(name, config, shared_from_this());
-    };
-    factory.registerBuilder<PacketPublisher>("PacketPublisher",builder_5);
-
-     BT::NodeBuilder builder_6  =
+     BT::NodeBuilder builder_5  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
         return std::make_unique<InitiallizeActuators>(name, config,shared_from_this());
     };
-    factory.registerBuilder<InitiallizeActuators>("InitiallizeActuators",builder_6);
+    factory.registerBuilder<InitiallizeActuators>("InitiallizeActuators",builder_5);
     
-     BT::NodeBuilder builder_7 =
+     BT::NodeBuilder builder_6 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
         return std::make_unique<GoToSiloPose>(name, config, shared_from_this());
     };
-    factory.registerBuilder<GoToSiloPose>("GoToSiloPose",builder_7);
+    factory.registerBuilder<GoToSiloPose>("GoToSiloPose",builder_6);
 
 
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
+    // initialize some values before ticking the tree's root
+    auto blackboard = tree_.rootBlackboard();
+    blackboard->set("RollerStatus", "false");
+    blackboard->set("RollerSpeed", "0");
+    blackboard->set("ConveyerStatus", "false");
+    blackboard->set("ConveyerSpeed", "0");
+    blackboard->set("PneumaticStatus", "false");
+
 
 
     // Connect the Groot2Publisher. This will allow Groot2 to
@@ -222,14 +223,14 @@ void autonomy::register_condition_nodes()
     BT::NodeBuilder builder_1  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<isBallInside>(name, config, shared_from_this());
+        return std::make_unique<isBallInside>(name, config);
     };
     factory.registerBuilder<isBallInside>("isBallInside",builder_1);
 
     BT::NodeBuilder builder_2  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
-        return std::make_unique<isOnlyBall>(name, config, shared_from_this());
+        return std::make_unique<isOnlyBall>(name, config);
     };
     factory.registerBuilder<isOnlyBall>("isOnlyBall",builder_2);
 }

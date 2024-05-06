@@ -2,36 +2,30 @@
 
 isBallInside::isBallInside(
     const std::string &name,
-    const BT::NodeConfiguration &config,
-    rclcpp::Node::SharedPtr node_ptr)
-    : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
+    const BT::NodeConfiguration &config)
+    : BT::SyncActionNode(name,config)
 {
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "Ball_status", 10, std::bind(&isBallInside::subscriber_callback,this,std::placeholders::_1));
-    RCLCPP_INFO(node_ptr_->get_logger(),"isBallInside node Ready..");
+    RCLCPP_INFO(rclcpp::get_logger("isBallInside"),"isBallInside node Ready..");
     inside = false;
 }
 BT::PortsList isBallInside::providedPorts()
 {
-    return {BT::OutputPort<bool>("OP_IsBallInside")};
+    return {BT::InputPort<bool>("Ip_IsBallInside")};
 }
 
  BT::NodeStatus isBallInside::tick()
  {  
+    auto inside_ = getInput<bool>("Ip_IsBallInside");
+    if(!inside_)
+    {
+        throw BT::RuntimeError("[isBallInside] error reading port");
+    }
+    inside = inside_.value();
     if(inside){
-        RCLCPP_INFO(node_ptr_->get_logger(),"Ball Inside.");
-        setOutput<bool>("OP_IsBallInside", inside);
-
+        RCLCPP_INFO(rclcpp::get_logger("isBallInside"),"Ball Inside.");
         inside = false;
         return BT::NodeStatus::SUCCESS;
     }
-    RCLCPP_INFO(node_ptr_->get_logger(),"Ball not Inside.");
+    RCLCPP_INFO(rclcpp::get_logger("isBallInside"),"Ball not Inside.");
     return BT::NodeStatus::FAILURE;
  }
-
-void isBallInside::subscriber_callback(std_msgs::msg::UInt8 msg)
-{   
-    if(msg.data == 1)
-        inside = true;    
-    else
-        inside = false;
-}

@@ -6,17 +6,14 @@
             <Inverter>
                     <SequenceStar>
                         <InitiallizeActuators name = "initiallize_actutatos"
-                            Op_RollerStatus="{RollerStatus}"
-                            Op_RollerSpeed="{RollerSpeed}"
-                            Op_ConveyerStatus="{ConveyerStatus}"
-                            Op_ConveyerSpeed="{ConveyerSpeed}"
-                            Op_PneumaticStatus="{PneumaticStatus}"/>
-                        <PacketPublisher name="packetPublisher"
                             Ip_RollerStatus="{RollerStatus}"
                             Ip_RollerSpeed="{RollerSpeed}"
                             Ip_ConveyerStatus="{ConveyerStatus}"
                             Ip_ConveyerSpeed="{ConveyerSpeed}"
-                            Ip_PneumaticStatus="{PneumaticStatus}"/>
+                            Ip_PneumaticStatus="{PneumaticStatus}"
+                            Op_IsBallInside="{IsBallInside}"
+                            Op_IsOnlyBall="{IsOnlyBall"/>
+            
                         <SequenceStar>
                             <Inverter>
                                 <KeepRunningUntilFailure>
@@ -49,12 +46,13 @@
                             RollerSpeed="{RollerSpeed}"
                             ConveyerStatus="{ConveyerStatus}"
                             ConveyerSpeed="{ConveyerSpeed}"
-                            PneumaticStatus="{PneumaticStatus}"/>
+                            PneumaticStatus="{PneumaticStatus}"
+                            IsBallInside="IsBallInside"
+                            IsOnlyBall="IsOnlyBall"/>
                     </SequenceStar>
             </Inverter>
         </KeepRunningUntilFailure>
     </Inverter>
-        
     </BehaviorTree>
 
     <BehaviorTree ID="Ball_Intake">
@@ -75,12 +73,7 @@
                     Op_ConveyerStatus="{ConveyerStatus}"
                     Op_ConveyerSpeed="{ConveyerSpeed}" 
                     Ip_ConveyerSpeed="60"/>
-            <PacketPublisher name="packetPublisher"
-                            Ip_RollerStatus="{RollerStatus}"
-                            Ip_RollerSpeed="{RollerSpeed}"
-                            Ip_ConveyerStatus="{ConveyerStatus}"
-                            Ip_ConveyerSpeed="{ConveyerSpeed}"
-                            Ip_PneumaticStatus="{PneumaticStatus}"/>
+          
         </Sequence>
     </BehaviorTree>
 
@@ -91,16 +84,10 @@
                 <KeepRunningUntilFailure>
                     <Inverter>
                         <IfThenElse>                            
-                            <isBallInside name = "isBallInside"/>
+                            <isBallInside name = "isBallInside" Ip_IsBallInside="{IsBallInside}"/>
                             <SequenceStar>
                                 <TurnOffRoller name = "Stop_roller" Op_RollerStatus="{RollerStatus}"/> 
                                 <PneumaticOff name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/>
-                                <PacketPublisher name="packetPublisher"
-                                    Ip_RollerStatus="{RollerStatus}"
-                                    Ip_RollerSpeed="{RollerSpeed}"
-                                    Ip_ConveyerStatus="{ConveyerStatus}"
-                                    Ip_ConveyerSpeed="{ConveyerSpeed}"
-                                    Ip_PneumaticStatus="{PneumaticStatus}"/>
                             </SequenceStar>
                         </IfThenElse>
                     </Inverter>
@@ -109,39 +96,13 @@
             <!-- test tree -->
             <waitActionClient  In_sec="1" In_nanosec="0"/>
             <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/>
-            <PacketPublisher name="packetPublisher"
-                    Ip_RollerStatus="{RollerStatus}"
-                    Ip_RollerSpeed="{RollerSpeed}"
-                    Ip_ConveyerStatus="{ConveyerStatus}"
-                    Ip_ConveyerSpeed="{ConveyerSpeed}"
-                    Ip_PneumaticStatus="{PneumaticStatus}"/>
-            <!-- <GoToSiloPose name="goToSilo"/> -->
-            <waitActionClient  In_sec="1" In_nanosec="0"/>
-            <TurnOnConveyer name = "Keep_conveyer_running" 
-                    Op_ConveyerStatus="{ConveyerStatus}"
-                    Op_ConveyerSpeed="{ConveyerSpeed}" 
-                    Ip_ConveyerSpeed="100"/>
-            <PacketPublisher name="packetPublisher"
-                Ip_RollerStatus="{RollerStatus}"
-                Ip_RollerSpeed="{RollerSpeed}"
-                Ip_ConveyerStatus="{ConveyerStatus}"
-                Ip_ConveyerSpeed="{ConveyerSpeed}"
-                Ip_PneumaticStatus="{PneumaticStatus}"/>
-            <waitActionClient  In_sec="1" In_nanosec="0"/>
-            <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/>
-            <PacketPublisher name="packetPublisher"
-                Ip_RollerStatus="{RollerStatus}"
-                Ip_RollerSpeed="{RollerSpeed}"
-                Ip_ConveyerStatus="{ConveyerStatus}"
-                Ip_ConveyerSpeed="{ConveyerSpeed}"
-                Ip_PneumaticStatus="{PneumaticStatus}"/>
-            
+           
             <!-- Ball sorting tree -->
             <!-- <Inverter>
                 <KeepRunningUntilFailure>
                     <Inverter>
                         <IfThenElse>
-                            <isOnlyBall name="isOnlyBall"/>
+                            <isOnlyBall name="isOnlyBall" Ip_IsOnlyBall="{IsOnlyBall}"/>
                             <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/>
                             <PacketPublisher name="packetPublisher"
                                     Ip_RollerStatus="{RollerStatus}"
@@ -153,32 +114,18 @@
                     </Inverter>
                 </KeepRunningUntilFailure>
             </Inverter> -->
+
+             <!-- <GoToSiloPose name="goToSilo"/> -->
+            <waitActionClient  In_sec="1" In_nanosec="0"/>
+            <TurnOnConveyer name = "Keep_conveyer_running" 
+                    Op_ConveyerStatus="{ConveyerStatus}"
+                    Op_ConveyerSpeed="{ConveyerSpeed}" 
+                    Ip_ConveyerSpeed="100"/>
+            
+            <waitActionClient  In_sec="1" In_nanosec="0"/>
+            <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/>
         </SequenceStar>
     </BehaviorTree> 
 
 </root>
-
-
-<!-- 
-    <InitiallizeActuators name = "initiallize_actutatos"
-        Op_RollerStatus="{RollerStatus}"
-        Op_RollerSpeed="{RollerSpeed}"
-        Op_ConveyerStatus="{ConveyerStatus}"
-        Op_ConveyerSpeed="{ConveyerSpeed}"
-        Op_PneumaticStatus="{PneumaticStatus}" />
-
-    <PneumaticOff name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/>
-    <TurnOffRoller name = "Stop_roller" Op_RollerStatus="{RollerStatus}"/> 
-    <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/> 
-    <TurnOnConveyer name = "Keep_conveyer_running" 
-        Op_ConveyerStatus="{ConveyerStatus}"
-        Op_ConveyerSpeed="{ConveyerSpeed}" 
-        Ip_ConveyerSpeed="50"/>
-    <TurnOnRoller name = "Keep_Roller_running" 
-        Op_RollerStatus="{RollerStatus}"
-        Op_RollerSpeed="{RollerSpeed}"
-        Ip_RollerSpeed="50"/>
-    <PneumaticOn name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/> -->
-
-
 
