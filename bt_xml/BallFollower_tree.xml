@@ -26,9 +26,9 @@
                                         </Inverter>
                                         <Sequence >
                                             <spinActionClient  In_angle="0.05"/>
-                                            <waitActionClient  In_sec="0.5" In_nanosec="1"/>
-                                            <spinActionClient  In_angle="-0.2"/>
-                                            <waitActionClient  In_sec="0.5" In_nanosec="1"/>
+                                            <waitActionClient  In_sec="1" In_nanosec="1"/>
+                                            <spinActionClient  In_angle="-0.1"/>
+                                            <waitActionClient  In_sec="1" In_nanosec="1"/>
                                             <spinActionClient  In_angle="0.05"/>
                                         </Sequence>
                                         <returnFailure/>
