@@ -27,7 +27,7 @@
                                         <Sequence >
                                             <spinActionClient  In_angle="0.05"/>
                                             <waitActionClient  In_sec="0.5" In_nanosec="1"/>
-                                            <spinActionClient  In_angle="-0.1"/>
+                                            <spinActionClient  In_angle="-0.2"/>
                                             <waitActionClient  In_sec="0.5" In_nanosec="1"/>
                                             <spinActionClient  In_angle="0.05"/>
                                         </Sequence>
@@ -74,7 +74,7 @@
             <TurnOnConveyer name = "Keep_conveyer_running" 
                     Op_ConveyerStatus="{ConveyerStatus}"
                     Op_ConveyerSpeed="{ConveyerSpeed}" 
-                    Ip_ConveyerSpeed="60"/>
+                    Ip_ConveyerSpeed="80"/>
             <PacketPublisher name="packetPublisher"
                             Ip_RollerStatus="{RollerStatus}"
                             Ip_RollerSpeed="{RollerSpeed}"
@@ -115,7 +115,7 @@
                     Ip_ConveyerStatus="{ConveyerStatus}"
                     Ip_ConveyerSpeed="{ConveyerSpeed}"
                     Ip_PneumaticStatus="{PneumaticStatus}"/>
-            <GoToSiloPose name="goToSilo"/>
+            <!-- <GoToSiloPose name="goToSilo"/> -->
             <waitActionClient  In_sec="1" In_nanosec="0"/>
             <TurnOnConveyer name = "Keep_conveyer_running" 
                     Op_ConveyerStatus="{ConveyerStatus}"

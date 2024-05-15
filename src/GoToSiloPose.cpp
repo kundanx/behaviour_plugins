@@ -8,7 +8,7 @@ GoToSiloPose::GoToSiloPose(
 {
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
     subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( 
-        "/silo_detection",
+        "/silo_number",
         10,
         std::bind(&GoToSiloPose::subscriber_callback,this,std::placeholders::_1)
     );
