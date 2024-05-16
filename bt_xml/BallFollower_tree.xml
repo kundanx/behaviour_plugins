@@ -25,11 +25,13 @@
                                             <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
                                         </Inverter>
                                         <Sequence >
-                                            <spinActionClient  In_angle="0.05"/>
+                                            <spinActionClient  In_angle="1.57"/>
                                             <waitActionClient  In_sec="1" In_nanosec="1"/>
-                                            <spinActionClient  In_angle="-0.1"/>
+                                            <spinActionClient  In_angle="-3.14"/>
                                             <waitActionClient  In_sec="1" In_nanosec="1"/>
-                                            <spinActionClient  In_angle="0.05"/>
+                                            <spinActionClient  In_angle="1.57"/>
+                                            <waitActionClient  In_sec="1" In_nanosec="1"/>
+
                                         </Sequence>
                                         <returnFailure/>
                                     </WhileDoElse>  
@@ -115,7 +117,7 @@
                     Ip_ConveyerStatus="{ConveyerStatus}"
                     Ip_ConveyerSpeed="{ConveyerSpeed}"
                     Ip_PneumaticStatus="{PneumaticStatus}"/>
-            <!-- <GoToSiloPose name="goToSilo"/> -->
+            <GoToSiloPose name="goToSilo"/>
             <waitActionClient  In_sec="1" In_nanosec="0"/>
             <TurnOnConveyer name = "Keep_conveyer_running" 
                     Op_ConveyerStatus="{ConveyerStatus}"
