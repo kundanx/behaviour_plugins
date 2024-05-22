@@ -14,11 +14,13 @@
 #include "GetBallPose.hpp"
 #include "GoToBallPose.h"
 #include "GoToSiloPose.hpp"
+#include "GoToOrigin.hpp"
 #include "fib_behaviour.h"
 #include "spinActionClient.hpp"
 #include "waitActionClient.hpp"  
 #include "PacketPublisher.hpp" 
 #include "InitiallizeActuators.hpp"
+#include "LineFollower.hpp"
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"

@@ -1,5 +1,5 @@
-#ifndef GO_TO_OTIGIN_H
-#define GO_TO_OTIGIN_H
+#ifndef GO_TO_ORIFIN_H
+#define GO_TO_ORIGIN_H
 
 #include <string>
 #include <memory>

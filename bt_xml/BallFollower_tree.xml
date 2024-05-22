@@ -1,10 +1,13 @@
 <!-- Behaviour Tree that sequentially navigates locations naively -->
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
-    <Inverter>
-        <KeepRunningUntilFailure>
-            <Inverter>
+        <Repeat num_cycles="5">
+        <Inverter>
+            <KeepRunningUntilFailure>
+                <Inverter>
                     <SequenceStar>
+                        <GoToOrigin/>
+                        <LineFollower name = "line_follow" Ip_action_type="0"/>
                         <InitiallizeActuators name = "initiallize_actutatos"
                             Op_RollerStatus="{RollerStatus}"
                             Op_RollerSpeed="{RollerSpeed}"
@@ -53,9 +56,10 @@
                             ConveyerSpeed="{ConveyerSpeed}"
                             PneumaticStatus="{PneumaticStatus}"/>
                     </SequenceStar>
-            </Inverter>
-        </KeepRunningUntilFailure>
-    </Inverter>
+                </Inverter>
+            </KeepRunningUntilFailure>
+        </Inverter>
+        </Repeat>
         
     </BehaviorTree>
 
@@ -137,6 +141,7 @@
                 Ip_ConveyerStatus="{ConveyerStatus}"
                 Ip_ConveyerSpeed="{ConveyerSpeed}"
                 Ip_PneumaticStatus="{PneumaticStatus}"/>
+            <waitActionClient  In_sec="1" In_nanosec="0"/>
             
             <!-- Ball sorting tree -->
             <!-- <Inverter>
@@ -159,28 +164,5 @@
     </BehaviorTree> 
 
 </root>
-
-
-<!-- 
-    <InitiallizeActuators name = "initiallize_actutatos"
-        Op_RollerStatus="{RollerStatus}"
-        Op_RollerSpeed="{RollerSpeed}"
-        Op_ConveyerStatus="{ConveyerStatus}"
-        Op_ConveyerSpeed="{ConveyerSpeed}"
-        Op_PneumaticStatus="{PneumaticStatus}" />
-
-    <PneumaticOff name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/>
-    <TurnOffRoller name = "Stop_roller" Op_RollerStatus="{RollerStatus}"/> 
-    <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/> 
-    <TurnOnConveyer name = "Keep_conveyer_running" 
-        Op_ConveyerStatus="{ConveyerStatus}"
-        Op_ConveyerSpeed="{ConveyerSpeed}" 
-        Ip_ConveyerSpeed="50"/>
-    <TurnOnRoller name = "Keep_Roller_running" 
-        Op_RollerStatus="{RollerStatus}"
-        Op_RollerSpeed="{RollerSpeed}"
-        Ip_RollerSpeed="50"/>
-    <PneumaticOn name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/> -->
-
 
 

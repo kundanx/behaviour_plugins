@@ -91,6 +91,19 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GoToSiloPose>("GoToSiloPose",builder_7);
 
+     BT::NodeBuilder builder_8 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<LineFollower>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<LineFollower>("LineFollower",builder_8);
+      BT::NodeBuilder builder_9 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<GoToOrigin>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<GoToOrigin>("GoToOrigin",builder_9);
+
 
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
