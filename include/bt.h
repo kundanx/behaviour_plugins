@@ -21,6 +21,7 @@
 #include "PacketPublisher.hpp" 
 #include "InitiallizeActuators.hpp"
 #include "LineFollower.hpp"
+#include "ResetOdom.hpp"
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"

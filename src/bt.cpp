@@ -97,12 +97,20 @@ void autonomy::create_behavior_tree()
         return std::make_unique<LineFollower>(name, config, shared_from_this());
     };
     factory.registerBuilder<LineFollower>("LineFollower",builder_8);
-      BT::NodeBuilder builder_9 =
+
+    BT::NodeBuilder builder_9 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
         return std::make_unique<GoToOrigin>(name, config, shared_from_this());
     };
     factory.registerBuilder<GoToOrigin>("GoToOrigin",builder_9);
+
+    BT::NodeBuilder builder_10 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<ResetOdom>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<ResetOdom>("ResetOdom",builder_10);
 
 
     /* create BT */
