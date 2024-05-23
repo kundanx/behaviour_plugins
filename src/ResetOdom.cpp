@@ -6,6 +6,7 @@ ResetOdom::ResetOdom(
     rclcpp::Node::SharedPtr node_ptr) 
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
+    publisher_ = node_ptr->create_publisher<std_msgs::msg::UInt8>("alignedSilo_number", 10);
     RCLCPP_INFO(node_ptr_->get_logger(),"ResetOdom node Ready..");
 }
 
