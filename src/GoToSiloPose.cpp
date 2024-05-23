@@ -39,6 +39,11 @@ void GoToSiloPose::junction_subscriber_callback(std_msgs::msg::UInt8 msg)
     }
 }
 
+BT::PortsList GoToSiloPose::providedPorts()
+{
+    return {BT::OutputPort<uint8_t>("Op_SiloNumber")};
+}
+
 BT::NodeStatus GoToSiloPose::onStart()
 {
     const std::string location_file = node_ptr_->get_parameter("location_file").as_string();
@@ -90,6 +95,9 @@ BT::NodeStatus GoToSiloPose::onStart()
     done_flag = false;
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to nav2\n");
+
+    // update silo_number
+    setOutput<uint8_t>("Op_SiloNumber", silo_number);
     
     return BT::NodeStatus::RUNNING;
 }

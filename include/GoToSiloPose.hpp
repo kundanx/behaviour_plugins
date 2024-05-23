@@ -55,7 +55,7 @@ class GoToSiloPose : public BT::StatefulActionNode
     std::vector<float> pose;
 
     // Methods override (uncomment if you have ports to I/O data)
-    // static BT::PortsList providedPorts();
+    static BT::PortsList providedPorts();
 
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
