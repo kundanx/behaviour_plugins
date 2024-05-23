@@ -1,13 +1,22 @@
 <!-- Behaviour Tree that sequentially navigates locations naively -->
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
-        <Repeat num_cycles="5">
+        <SequenceStar>
+            <LineFollower name = "line_follow" Ip_action_type="0"/>
+            <Repeat num_cycles="5">
+                <SequenceStar>
+                    <SubTree ID = "FindBall_AND_StoreInSilo"/>
+                    <GoToOrigin/>
+                </SequenceStar>
+            </Repeat>
+        </SequenceStar>
+    </BehaviorTree>
+
+    <BehaviorTree ID="FindBall_AND_StoreInSilo">
         <Inverter>
             <KeepRunningUntilFailure>
                 <Inverter>
                     <SequenceStar>
-                        <GoToOrigin/>
-                        <LineFollower name = "line_follow" Ip_action_type="0"/>
                         <InitiallizeActuators name = "initiallize_actutatos"
                             Op_RollerStatus="{RollerStatus}"
                             Op_RollerSpeed="{RollerSpeed}"
@@ -20,47 +29,64 @@
                             Ip_ConveyerStatus="{ConveyerStatus}"
                             Ip_ConveyerSpeed="{ConveyerSpeed}"
                             Ip_PneumaticStatus="{PneumaticStatus}"/>
-                        <SequenceStar>
-                            <Inverter>
-                                <KeepRunningUntilFailure>
-                                    <WhileDoElse> 
-                                        <Inverter>
-                                            <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
-                                        </Inverter>
-                                        <Sequence >
-                                            <spinActionClient  In_angle="1.57"/>
-                                            <waitActionClient  In_sec="1" In_nanosec="1"/>
-                                            <spinActionClient  In_angle="-3.14"/>
-                                            <waitActionClient  In_sec="1" In_nanosec="1"/>
-                                            <spinActionClient  In_angle="1.57"/>
-                                            <waitActionClient  In_sec="1" In_nanosec="1"/>
+                        <Inverter>
+                            <KeepRunningUntilFailure>
+                                <WhileDoElse> 
+                                    <Inverter>
+                                        <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
+                                    </Inverter>
+                                    <Sequence >
+                                        <spinActionClient  In_angle="1.57"/>
+                                        <waitActionClient  In_sec="1" In_nanosec="1"/>
+                                        <spinActionClient  In_angle="-3.14"/>
+                                        <waitActionClient  In_sec="1" In_nanosec="1"/>
+                                        <spinActionClient  In_angle="1.57"/>
+                                        <waitActionClient  In_sec="1" In_nanosec="1"/>
+                                    </Sequence>
+                                    <returnFailure/>
+                                </WhileDoElse>  
+                            </KeepRunningUntilFailure>
+                        </Inverter>
 
-                                        </Sequence>
-                                        <returnFailure/>
-                                    </WhileDoElse>  
-                                </KeepRunningUntilFailure>
-                            </Inverter>
-                            <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
-                            <SubTree ID="Start_mechanisms"
-                                RollerStatus="{RollerStatus}"
-                                RollerSpeed="{RollerSpeed}"
-                                ConveyerStatus="{ConveyerStatus}"
-                                ConveyerSpeed="{ConveyerSpeed}"
-                                PneumaticStatus="{PneumaticStatus}"/>
-                            <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-                        </SequenceStar>
+                        <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
+                        <SubTree ID="Start_mechanisms"
+                            RollerStatus="{RollerStatus}"
+                            RollerSpeed="{RollerSpeed}"
+                            ConveyerStatus="{ConveyerStatus}"
+                            ConveyerSpeed="{ConveyerSpeed}"
+                            PneumaticStatus="{PneumaticStatus}"/>
+                        <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
                         <SubTree ID="Retrieve_balls" 
                             RollerStatus="{RollerStatus}"
                             RollerSpeed="{RollerSpeed}"
                             ConveyerStatus="{ConveyerStatus}"
                             ConveyerSpeed="{ConveyerSpeed}"
                             PneumaticStatus="{PneumaticStatus}"/>
+                        <SubTree ID="Go_TO_SILO"/>
+                        <waitActionClient  In_sec="1" In_nanosec="0"/>
+                        <TurnOnConveyer name = "Keep_conveyer_running" 
+                                Op_ConveyerStatus="{ConveyerStatus}"
+                                Op_ConveyerSpeed="{ConveyerSpeed}" 
+                                Ip_ConveyerSpeed="100"/>
+                        <PacketPublisher name="packetPublisher"
+                            Ip_RollerStatus="{RollerStatus}"
+                            Ip_RollerSpeed="{RollerSpeed}"
+                            Ip_ConveyerStatus="{ConveyerStatus}"
+                            Ip_ConveyerSpeed="{ConveyerSpeed}"
+                            Ip_PneumaticStatus="{PneumaticStatus}"/>
+                        <waitActionClient  In_sec="1" In_nanosec="0"/>
+                        <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/>
+                        <PacketPublisher name="packetPublisher"
+                            Ip_RollerStatus="{RollerStatus}"
+                            Ip_RollerSpeed="{RollerSpeed}"
+                            Ip_ConveyerStatus="{ConveyerStatus}"
+                            Ip_ConveyerSpeed="{ConveyerSpeed}"
+                            Ip_PneumaticStatus="{PneumaticStatus}"/>
+                        <waitActionClient  In_sec="1" In_nanosec="0"/>
                     </SequenceStar>
                 </Inverter>
             </KeepRunningUntilFailure>
         </Inverter>
-        </Repeat>
-        
     </BehaviorTree>
 
     <BehaviorTree ID="Ball_Intake">
@@ -89,6 +115,15 @@
                             Ip_PneumaticStatus="{PneumaticStatus}"/>
         </Sequence>
     </BehaviorTree>
+
+    <BehaviorTree ID="Go_TO_SILO">
+         <SequenceStar>
+            <GoToSiloPose name="goToSilo" Op_SiloNumber="{SiloNumber"/>
+            <LineFollower name = "line_follow" Ip_action_type="1"/>
+            <ResetOdom name = "Reset" Ip_SiloNumber="{SiloNumber}"/>
+        </SequenceStar>
+    </BehaviorTree>
+
 
     <BehaviorTree ID="Retrieve_balls">
         <SequenceStar name ="IntakeBalls">
@@ -121,27 +156,7 @@
                     Ip_ConveyerStatus="{ConveyerStatus}"
                     Ip_ConveyerSpeed="{ConveyerSpeed}"
                     Ip_PneumaticStatus="{PneumaticStatus}"/>
-            <GoToSiloPose name="goToSilo"/>
-            <waitActionClient  In_sec="1" In_nanosec="0"/>
-            <TurnOnConveyer name = "Keep_conveyer_running" 
-                    Op_ConveyerStatus="{ConveyerStatus}"
-                    Op_ConveyerSpeed="{ConveyerSpeed}" 
-                    Ip_ConveyerSpeed="100"/>
-            <PacketPublisher name="packetPublisher"
-                Ip_RollerStatus="{RollerStatus}"
-                Ip_RollerSpeed="{RollerSpeed}"
-                Ip_ConveyerStatus="{ConveyerStatus}"
-                Ip_ConveyerSpeed="{ConveyerSpeed}"
-                Ip_PneumaticStatus="{PneumaticStatus}"/>
-            <waitActionClient  In_sec="1" In_nanosec="0"/>
-            <TurnOffConveyer name = "Stop_conveyer" Op_ConveyerStatus="{ConveyerStatus}"/>
-            <PacketPublisher name="packetPublisher"
-                Ip_RollerStatus="{RollerStatus}"
-                Ip_RollerSpeed="{RollerSpeed}"
-                Ip_ConveyerStatus="{ConveyerStatus}"
-                Ip_ConveyerSpeed="{ConveyerSpeed}"
-                Ip_PneumaticStatus="{PneumaticStatus}"/>
-            <waitActionClient  In_sec="1" In_nanosec="0"/>
+           
             
             <!-- Ball sorting tree -->
             <!-- <Inverter>
