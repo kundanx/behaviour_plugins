@@ -63,10 +63,10 @@ BT::PortsList PacketPublisher::providedPorts()
     msg.data[2]=0x00;
 
     if (RollerStatus)
-        msg.data[2] = msg.data[2] | 0b00000010 ;
+        msg.data[2] = msg.data[2] | 0b00000001 ;
     
     if (ConveyerStatus)
-        msg.data[2] = msg.data[2] | 0b00000001;
+        msg.data[2] = msg.data[2] | 0b00000010;
     
     if (PneumaticStatus)
         msg.data[2] = msg.data[2] | 0b00000100;

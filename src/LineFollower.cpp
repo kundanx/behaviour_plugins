@@ -48,6 +48,7 @@ BT::NodeStatus LineFollower::onStart()
     send_goal_options.result_callback = std::bind(&LineFollower::result_callback, this, _1);
     
     auto goal_msg = LineFollow::Goal();
+    done_flag = false;
     switch (action_type)
     {
         case NAVIGATE:
@@ -127,12 +128,14 @@ void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & w
       RCLCPP_INFO(node_ptr_->get_logger(),"Reached Area 3");
       std_msgs::msg::UInt8 msg;
       msg.data = 0xA5;
+       done_flag = true;
     //   node_ptr_->odom_reset_publisher->publish(msg); 
     }
     else if (wrappedresult.result->robot_state == wrappedresult.result->ALIGNED_W_SILO )
     {
       RCLCPP_INFO(node_ptr_->get_logger(),"Aligned With silo");
+       done_flag = true;
     }
-    done_flag = true;
+   
       
 }
