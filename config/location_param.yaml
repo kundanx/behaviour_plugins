@@ -11,7 +11,7 @@ order: 10
 # Location of silo w.r.t origin at Y junction
 # X co-oridinate of each silo = 4.164
 silo_one: [-3.264, -1.5]
-silo_two: [-3.600, -0.700]
+silo_two: [0.36, -3.300]
 silo_three: [-3.264, 0.0]
 silo_four: [-3.264, 0.75]
 silo_five: [-3.264, 1.5]

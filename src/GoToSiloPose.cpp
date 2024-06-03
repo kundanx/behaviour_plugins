@@ -1,16 +1,24 @@
 #include "GoToSiloPose.hpp"   
 #include <math.h>
 
+/**********************************************************************************************************************
+ * @brief ActionClient BT node to navigate to silo 
+ * @brief Subscribed topics : silo_number [silo to navigate to] 
+ *                          : junction_type [Abort navigation when landmark is reached and silo align action is called]
+************************************************************************************************************************/
+
 GoToSiloPose::GoToSiloPose(
     const std::string &name,
     const BT::NodeConfiguration &config,
     rclcpp::Node::SharedPtr node_ptr) 
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
     subscription_silonumber = node_ptr_->create_subscription<std_msgs::msg::UInt8>( 
         "/silo_number",
-        10,
+        qos_profile,
         std::bind(&GoToSiloPose::silo_subscriber_callback,this,std::placeholders::_1)
     );
     subscription_junctiontype = node_ptr_->create_subscription<std_msgs::msg::UInt8>( 
@@ -87,8 +95,8 @@ BT::NodeStatus GoToSiloPose::onStart()
 
     goal_msg.pose.pose.orientation.x = 0.0;
     goal_msg.pose.pose.orientation.y = 0.0;
-    goal_msg.pose.pose.orientation.z = 0.0;
-    goal_msg.pose.pose.orientation.w = 1.0;
+    goal_msg.pose.pose.orientation.z = 0.7071068;
+    goal_msg.pose.pose.orientation.w = 0.7071068;
 
     // send pose
     y_coordinate = fabs(this->pose[1]);
@@ -133,22 +141,36 @@ void GoToSiloPose::result_callback(const GoalHandleNav::WrappedResult &result)
         done_flag=true;
     }
 }
+
+
+/*****************************************************************************************************************
+ * @brief Received feedback from server
+ * @brief Abort navigation when robot crosses X_HORZ line and y-pose threashold
+******************************************************************************************************************/
+
 void GoToSiloPose::feedback_callback(
     GoalHandleNav::SharedPtr,
     const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
-    if(this->x_horiz_line_detected  && feedback->current_pose.pose.position.x <= -3.5 )
+    if(this->x_horiz_line_detected  || feedback->current_pose.pose.position.y >= -2.75 )
     {
-        if( feedback->current_pose.pose.position.y >= fabs(this->y_coordinate) )
-        {
-            cancel_goal();
-            this->done_flag = true;
+        // if( feedback->current_pose.pose.position.y >= fabs(this->y_coordinate - 20.0) )
+        // {
+        //     cancel_goal();
+        //     this->done_flag = true;
+        //     this->x_horiz_line_detected = false;
+        // }
+            // cancel_goal();
+            // this->done_flag = true;
             this->x_horiz_line_detected = false;
-        }
 
     }
     RCLCPP_INFO(node_ptr_->get_logger()," Navigating to silo %i",this->silo_number);
 }
+
+/*****************************************************************************************************************
+ * @brief Cancle navigation action
+******************************************************************************************************************/
 
  void GoToSiloPose::cancel_goal()
   {

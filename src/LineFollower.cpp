@@ -1,4 +1,11 @@
 #include "LineFollower.hpp"   
+/*****************************************************************************************************************
+ * @brief ActionClient BT node to call Linerfollower action server
+ * @brief Available actions : Naviagte to area 3 
+ *                          : Align with silo
+ * @brief Published topics : area_topic [For landmark localization and odometry reset]
+******************************************************************************************************************/
+
 
 LineFollower::LineFollower(
     const std::string &name,
@@ -6,6 +13,9 @@ LineFollower::LineFollower(
     rclcpp::Node::SharedPtr node_ptr) 
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+    area3_reached_publisher = node_ptr_->create_publisher<std_msgs::msg::UInt8>("area_topic", qos_profile);
     action_client_ptr_ = rclcpp_action::create_client<LineFollow>(node_ptr_, "LineFollower");
     RCLCPP_INFO(node_ptr_->get_logger(),"LineFollower node Ready..");
     done_flag = false;
@@ -57,7 +67,7 @@ BT::NodeStatus LineFollower::onStart()
             return BT::NodeStatus::FAILURE;
     }
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
-    RCLCPP_INFO(node_ptr_->get_logger(), "goal sent");
+    RCLCPP_INFO(node_ptr_->get_logger(), "LINEFOLLOWER::goal sent");
     return BT::NodeStatus::RUNNING;
 }
 BT::NodeStatus LineFollower::onRunning()
@@ -93,9 +103,9 @@ void LineFollower::cancel_goal()
 void LineFollower::goal_response_callback(const GoalHandleLineFollow::SharedPtr & goal_handle)
 {
     if (!goal_handle) {
-        RCLCPP_ERROR(node_ptr_->get_logger(), "Goal was rejected by server");
+        RCLCPP_ERROR(node_ptr_->get_logger(), "LINEFOLLOWER::Goal was rejected by server");
     } else {
-        RCLCPP_INFO(node_ptr_->get_logger(), "Goal accepted by server, waiting for result");
+        RCLCPP_INFO(node_ptr_->get_logger(), "LINEFOLLOWER::Goal accepted by server, waiting for result");
     }
     this->goal_handle = goal_handle;
 }
@@ -105,12 +115,24 @@ void LineFollower::feedback_callback(
     const std::shared_ptr<const LineFollow::Feedback> feedback)
 {
     (void)feedback;
-    RCLCPP_INFO(node_ptr_->get_logger(),"Executing line follower task");
 }
 
-void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & result)
+/*****************************************************************************************************************
+ * @brief Publish on area_topic once when naviagtion from start zone to area 3 is finished
+******************************************************************************************************************/
+void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & wrappedresult)
 {
-    (void)result;
-    RCLCPP_INFO(node_ptr_->get_logger(),"Goal Reacched");
+    if(wrappedresult.result->robot_state == wrappedresult.result->NAVIGATION_FINISHED)
+    {
+      RCLCPP_INFO(node_ptr_->get_logger(),"Reached Area 3");
+      std_msgs::msg::UInt8 msg;
+      msg.data = 0xA5;
+    //   node_ptr_->odom_reset_publisher->publish(msg); 
+    }
+    else if (wrappedresult.result->robot_state == wrappedresult.result->ALIGNED_W_SILO )
+    {
+      RCLCPP_INFO(node_ptr_->get_logger(),"Aligned With silo");
+    }
     done_flag = true;
+      
 }

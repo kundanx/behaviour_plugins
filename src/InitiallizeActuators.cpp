@@ -1,11 +1,18 @@
 #include "InitiallizeActuators.hpp"   
 
+/*****************************************************************************************************************
+ * @brief Initiallize actuators to resest state
+ * @brief Start publisher to publish actutator commands
+ * @brief Publisher : act_vel_cmd
+******************************************************************************************************************/
+
 InitiallizeActuators::InitiallizeActuators(
     const std::string &name,
     const BT::NodeConfiguration &config,
-    rclcpp::Node::SharedPtr node_ptr)
-    : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
+    rclcpp::Node::SharedPtr node_ptr) : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "/ball_roller_status", 10, std::bind(&InitiallizeActuators::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"InitiallizeActuators node Ready..");
 }

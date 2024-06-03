@@ -26,6 +26,7 @@ class isBallInside : public BT::SyncActionNode
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_;
     
     bool inside;
+    bool node_called_once;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();

@@ -8,6 +8,8 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "action_pkg/action/line_follow.hpp"
+#include "std_msgs/msg/u_int8.hpp"
+#include "std_msgs/msg/float32_multi_array.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/subscription.hpp"
@@ -36,6 +38,7 @@ class LineFollower : public BT::StatefulActionNode
     bool done_flag;
 
     rclcpp::Node::SharedPtr node_ptr_;
+    rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr area3_reached_publisher;
     rclcpp_action::Client<LineFollow>::SharedPtr action_client_ptr_;
     std::shared_ptr<GoalHandleLineFollow> goal_handle;
     

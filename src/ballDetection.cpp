@@ -3,9 +3,11 @@
 ballDetection::ballDetection(rclcpp::Node::SharedPtr node_ptr)
 : is_detected(false), ball_inside(false), only_ball(false),node_ptr_(node_ptr)
 {
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     ballDetection_ = std::make_unique<ballDetection>(shared_from_this());
-    subscription_1 = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "/ColorSensor_status", 10, std::bind(&ballDetection::subscriber1_callback,this,std::placeholders::_1));
-    subscription_2 = node_ptr_->create_subscription<std_msgs::msg::Bool>( "/is_ball_tracked", 10, std::bind(&ballDetection::subscriber2_callback,this,std::placeholders::_1));
+    subscription_1 = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "/ColorSensor_status", qos_profile, std::bind(&ballDetection::subscriber1_callback,this,std::placeholders::_1));
+    subscription_2 = node_ptr_->create_subscription<std_msgs::msg::Bool>( "/is_ball_tracked", qos_profile, std::bind(&ballDetection::subscriber2_callback,this,std::placeholders::_1));
 }
 
 

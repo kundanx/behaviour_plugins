@@ -1,5 +1,9 @@
 #include "spinActionClient.hpp"   
 
+/*****************************************************************************************************************
+ * @brief ActionClient BT node to call nav2_behaior spin action
+******************************************************************************************************************/
+
 spinActionClient::spinActionClient(
     const std::string &name,
     const BT::NodeConfiguration &config,

@@ -6,6 +6,8 @@ PacketPublisher::PacketPublisher(
     rclcpp::Node::SharedPtr node_ptr)
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
     publisher_ = node_ptr_->create_publisher<std_msgs::msg::UInt8MultiArray>( "act_vel", 10);
     RCLCPP_INFO(node_ptr_->get_logger(),"PacketPublisher node Ready..");
 }
@@ -69,7 +71,7 @@ BT::PortsList PacketPublisher::providedPorts()
     if (PneumaticStatus)
         msg.data[2] = msg.data[2] | 0b00000100;
 
-    RCLCPP_INFO(rclcpp::get_logger("PacketPublisher"),"%i", (int)RollerStatus);
+    RCLCPP_INFO(rclcpp::get_logger("PacketPublisher"),"Roller:%i,conveyer: %i, pneumatic: %i", (int)RollerStatus, (int)ConveyerStatus, (int)PneumaticStatus);
 
     publisher_->publish(msg);
 

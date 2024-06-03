@@ -1,31 +1,41 @@
+
+
 #include "bt.h"
 
 using namespace std::chrono_literals;
 
 const std::string bt_xml_dir = ament_index_cpp::get_package_share_directory("behaviour_plugins") + "/bt_xml";
 
+/*******************************************************************************************************************
+ * @class autonomy
+ * @brief A class to create and handle behavior trees
+ *******************************************************************************************************************/
+
 autonomy::autonomy(const std::string &nodeName): Node(nodeName)
 {   
     this->declare_parameter("location_file","none");
-    // RCLCPP_INFO(this->get_logger(),"Init_done");
-    // RCLCPP_INFO(get_logger(),"Constructor");
 }
+
+/*******************************************************************************************************************
+ * @brief create behavior tree
+ * @brief Update behavior tree every 50ms
+********************************************************************************************************************/
 
 void autonomy::setup()
 {   
-    // RCLCPP_INFO(get_logger(),"Inside setup");
-    // initial BT setup
     create_behavior_tree();
-    // RCLCPP_INFO(get_logger(),"BT created");
-
     const auto timer_period = 50ms;
     timer_ = this->create_wall_timer(
         timer_period,
         std::bind(&autonomy::update_behavior_tree, this)
     );
     RCLCPP_INFO(get_logger(),"Setup_done");
-
 }
+
+/*******************************************************************************************************************
+ * @brief Register tree nodes and Create tree 
+ * @brief Register action client nodes
+********************************************************************************************************************/
 
 void autonomy::create_behavior_tree()
 {   
@@ -43,7 +53,6 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Fib>("Fib",builder_1);
 
-
     /* Register GoToBallPose node */
     BT::NodeBuilder builder_2 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -52,7 +61,6 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_2);
 
-
     /* Register GetBallPose node */ 
     BT::NodeBuilder builder_3  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
@@ -60,7 +68,6 @@ void autonomy::create_behavior_tree()
         return std::make_unique<GetBallPose>(name, config, shared_from_this());
     };
     factory.registerBuilder<GetBallPose>("GetBallPose",builder_3);
-
 
     /* Register isBallDetected node */ 
     BT::NodeBuilder builder_4  =
@@ -112,16 +119,18 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<ResetOdom>("ResetOdom",builder_10);
 
-
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
-
 
     // Connect the Groot2Publisher. This will allow Groot2 to
     // get the tree and poll status updates.
     // const unsigned port = 1667;
     // BT::Groot2Publisher publisher(tree_, port);
 }
+
+/*******************************************************************************************************************
+ * @brief Tick tree nodes
+********************************************************************************************************************/
 
 void autonomy::update_behavior_tree()
 {
@@ -141,8 +150,11 @@ void autonomy::update_behavior_tree()
         RCLCPP_INFO(this->get_logger(),"Tree Failed");
         timer_->cancel();
     }
-
 }
+
+/*******************************************************************************************************************
+ * @brief Register custom action nodes
+********************************************************************************************************************/
 
 void autonomy::register_custom_action_nodes()
 {
@@ -189,6 +201,10 @@ void autonomy::register_custom_action_nodes()
     factory.registerBuilder<PneumaticOff>("PneumaticOff",builder_6);
 }
 
+/******************************************************************************************************************
+ * @brief Register action client nodes
+*******************************************************************************************************************/
+
 void autonomy::register_actionClient_nodes()
 {
     BT::NodeBuilder builder_1  =
@@ -205,6 +221,11 @@ void autonomy::register_actionClient_nodes()
     };
     factory.registerBuilder<waitActionClient>("waitActionClient",builder_2);
 }
+
+
+/******************************************************************************************************************
+ * @brief Register control node from nav2_behavior_tree
+*******************************************************************************************************************/
 
 void autonomy::register_control_nodes()
 {
@@ -238,6 +259,11 @@ void autonomy::register_control_nodes()
 
 }
 
+
+/******************************************************************************************************************
+ * @brief Register condition nodes
+*******************************************************************************************************************/
+
 void autonomy::register_condition_nodes()
 {
     BT::NodeBuilder builder_1  =
@@ -254,6 +280,11 @@ void autonomy::register_condition_nodes()
     };
     factory.registerBuilder<isOnlyBall>("isOnlyBall",builder_2);
 }
+
+
+/******************************************************************************************************************
+ * @brief Register decorator nodes
+*******************************************************************************************************************/
 
 void autonomy::register_decorator_nodes()
 {   
@@ -273,6 +304,9 @@ void autonomy::register_decorator_nodes()
 }
 
 
+/******************************************************************************************************************
+ * @brief Main function 
+*******************************************************************************************************************/
 int main(int argc, char **argv)
 {
     rclcpp::init(argc,argv);

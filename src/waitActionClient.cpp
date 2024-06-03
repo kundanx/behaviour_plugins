@@ -1,5 +1,9 @@
 #include "waitActionClient.hpp"   
 
+/*****************************************************************************************************************
+ * @brief ActionCient BT node to call nav2_behavior wait action
+******************************************************************************************************************/
+
 waitActionClient::waitActionClient(
     const std::string &name,
     const BT::NodeConfiguration &config,
@@ -73,7 +77,7 @@ void waitActionClient::wait_feedback_callback(
     GoalHandleWait::SharedPtr,
     const std::shared_ptr<const Wait::Feedback> feedback)
 {
-    RCLCPP_INFO(node_ptr_->get_logger(),"[angular_distance_travelled: %i]",feedback->time_left.sec);
+    RCLCPP_INFO(node_ptr_->get_logger(),"[WAITACTIONCLIENT::waiting:..]");
 }
 
 //  Implemented from documentation: Generic port

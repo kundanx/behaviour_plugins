@@ -1,5 +1,9 @@
 #include "GoToOrigin.hpp"   
 
+/*****************************************************************************************************************
+ * @brief Tree Node to bring robot back to origin to intake new ball after ball is stored in silo
+******************************************************************************************************************/
+
 GoToOrigin::GoToOrigin(
     const std::string &name,
     const BT::NodeConfiguration &config,
@@ -28,8 +32,8 @@ BT::NodeStatus GoToOrigin::onStart()
 
     goal_msg.pose.pose.orientation.x = 0.0;
     goal_msg.pose.pose.orientation.y = 0.0;
-    goal_msg.pose.pose.orientation.z = 0.0;
-    goal_msg.pose.pose.orientation.w = 1.0;
+    goal_msg.pose.pose.orientation.z = 0.7071068;
+    goal_msg.pose.pose.orientation.w = 0.7071068;
     // send pose
     done_flag = false;
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);

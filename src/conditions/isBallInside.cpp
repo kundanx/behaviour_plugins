@@ -6,7 +6,9 @@ isBallInside::isBallInside(
     rclcpp::Node::SharedPtr node_ptr)
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "Ball_status", 10, std::bind(&isBallInside::subscriber_callback,this,std::placeholders::_1));
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "is_ball_inside", qos_profile, std::bind(&isBallInside::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"isBallInside node Ready..");
     inside = false;
 }
@@ -17,11 +19,17 @@ BT::PortsList isBallInside::providedPorts()
 
  BT::NodeStatus isBallInside::tick()
  {  
+    if(node_called_once)
+    {
+        inside = false;
+        node_called_once = false;
+    }
     if(inside){
         RCLCPP_INFO(node_ptr_->get_logger(),"Ball Inside.");
         setOutput<bool>("OP_IsBallInside", inside);
 
         inside = false;
+        node_called_once = true;
         return BT::NodeStatus::SUCCESS;
     }
     RCLCPP_INFO(node_ptr_->get_logger(),"Ball not Inside.");

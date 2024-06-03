@@ -1,5 +1,9 @@
 #include "GoToBallPose.h"   
 
+/*****************************************************************************************************************
+ * @brief Navigate to ball position after ball position is recieved 
+******************************************************************************************************************/
+
 GoToBallPose::GoToBallPose(
     const std::string &name,
     const BT::NodeConfiguration &config,
