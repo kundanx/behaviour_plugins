@@ -14,8 +14,8 @@ LineFollower::LineFollower(
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
     rclcpp::QoS qos_profile(10);
-    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
-    area3_reached_publisher = node_ptr_->create_publisher<std_msgs::msg::UInt8>("area_topic", qos_profile);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+    area3_reached_publisher = node_ptr_->create_publisher<std_msgs::msg::UInt8>("area_reached", qos_profile);
     action_client_ptr_ = rclcpp_action::create_client<LineFollow>(node_ptr_, "LineFollower");
     RCLCPP_INFO(node_ptr_->get_logger(),"LineFollower node Ready..");
     done_flag = false;
@@ -91,7 +91,7 @@ void LineFollower::cancel_goal()
     if (goal_handle) 
     {
       RCLCPP_INFO(node_ptr_->get_logger(), "Sending cancel request");
-      auto cancel_future= action_client_ptr_->async_cancel_goal(goal_handle);
+      auto cancel_future= action_client_ptr_->async_cancel_all_goals();
       RCLCPP_INFO(node_ptr_->get_logger(), "Goal canceled");
     } 
     else 
@@ -125,11 +125,11 @@ void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & w
 {
     if(wrappedresult.result->robot_state == wrappedresult.result->NAVIGATION_FINISHED)
     {
-      RCLCPP_INFO(node_ptr_->get_logger(),"Reached Area 3");
-      std_msgs::msg::UInt8 msg;
-      msg.data = 0xA5;
-       done_flag = true;
-    //   node_ptr_->odom_reset_publisher->publish(msg); 
+        RCLCPP_INFO(node_ptr_->get_logger(),"Reached Area 3");
+        std_msgs::msg::UInt8 msg;
+        msg.data = 0xA5;
+        area3_reached_publisher->publish(msg); 
+        done_flag = true;
     }
     else if (wrappedresult.result->robot_state == wrappedresult.result->ALIGNED_W_SILO )
     {

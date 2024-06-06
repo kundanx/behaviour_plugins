@@ -26,6 +26,11 @@ GoToSiloPose::GoToSiloPose(
         10,
         std::bind(&GoToSiloPose::junction_subscriber_callback,this,std::placeholders::_1)
     );
+    subscription_isOnLine = node_ptr_->create_subscription<std_msgs::msg::UInt8>( 
+        "is_on_line",
+        10,
+        std::bind(&GoToSiloPose::line_subscriber_callback,this,std::placeholders::_1)
+    );
     done_flag = false;
     this->silo_number = 0;
     this->x_horiz_line_detected = false;
@@ -45,6 +50,10 @@ void GoToSiloPose::junction_subscriber_callback(std_msgs::msg::UInt8 msg)
     {
         this->x_horiz_line_detected = true;
     }
+}
+void GoToSiloPose::line_subscriber_callback(std_msgs::msg::UInt8 msg)
+{
+    this->is_on_line = msg.data;
 }
 
 BT::PortsList GoToSiloPose::providedPorts()
@@ -101,6 +110,8 @@ BT::NodeStatus GoToSiloPose::onStart()
     // send pose
     y_coordinate = fabs(this->pose[1]);
     done_flag = false;
+    x_horiz_line_detected = false;
+    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to nav2\n");
 
@@ -126,12 +137,14 @@ void GoToSiloPose::onHalted()
 
 void GoToSiloPose::goal_response_callback(const GoalHandleNav::SharedPtr &goal_handle)
   {
-      if (!goal_handle) {
+    if (!goal_handle) {
           RCLCPP_ERROR(node_ptr_->get_logger(), "Goal was rejected by server");
-      } else {
+    } 
+      else
+    {
           RCLCPP_INFO(node_ptr_->get_logger(), "Goal accepted by server, waiting for result");
-      }
-      this->goal_handle = goal_handle;
+        this->goal_handle = goal_handle;
+    }
   }
 
 void GoToSiloPose::result_callback(const GoalHandleNav::WrappedResult &result)
@@ -152,18 +165,15 @@ void GoToSiloPose::feedback_callback(
     GoalHandleNav::SharedPtr,
     const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
-    if(this->x_horiz_line_detected  || feedback->current_pose.pose.position.y >= -2.75 )
+    if(this->x_horiz_line_detected ) //|| feedback->current_pose.pose.position.y >= -2.50
     {
-        // if( feedback->current_pose.pose.position.y >= fabs(this->y_coordinate - 20.0) )
-        // {
-        //     cancel_goal();
-        //     this->done_flag = true;
-        //     this->x_horiz_line_detected = false;
-        // }
-            // cancel_goal();
-            // this->done_flag = true;
+        if(is_on_line)
+        {
+            cancel_goal();
+            this->done_flag = true;
+            this->is_on_line = false;
             this->x_horiz_line_detected = false;
-
+        }
     }
     RCLCPP_INFO(node_ptr_->get_logger()," Navigating to silo %i",this->silo_number);
 }
@@ -177,7 +187,7 @@ void GoToSiloPose::feedback_callback(
      if (goal_handle) 
     {
       RCLCPP_INFO(node_ptr_->get_logger(), "Sending cancel request");
-      auto cancel_future= action_client_ptr_->async_cancel_goal(goal_handle);
+      auto cancel_future= action_client_ptr_->async_cancel_all_goals();
       RCLCPP_INFO(node_ptr_->get_logger(), "Goal canceled");
     } 
     else 

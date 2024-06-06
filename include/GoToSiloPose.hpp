@@ -46,12 +46,14 @@ class GoToSiloPose : public BT::StatefulActionNode
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_silonumber;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_junctiontype;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_isOnLine;    
     std::shared_ptr<GoalHandleNav> goal_handle;
 
     double y_coordinate;
     bool done_flag;
     uint8_t silo_number;
     bool x_horiz_line_detected;
+    bool is_on_line;
     std::vector<float> pose;
 
     // Methods override (uncomment if you have ports to I/O data)
@@ -64,6 +66,7 @@ class GoToSiloPose : public BT::StatefulActionNode
     // Subscriber callback
     void silo_subscriber_callback(std_msgs::msg::UInt8);
     void junction_subscriber_callback(std_msgs::msg::UInt8);
+    void line_subscriber_callback(std_msgs::msg::UInt8);
 
     // cancel naviagtion goal
     void cancel_goal();

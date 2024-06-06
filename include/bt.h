@@ -22,6 +22,7 @@
 #include "InitiallizeActuators.hpp"
 #include "LineFollower.hpp"
 #include "ResetOdom.hpp"
+#include "BackUpActionClient.hpp"
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"
@@ -41,6 +42,7 @@
 #include "control/round_robin_node.hpp"
 
 #include "nav2_behavior_tree/plugins/action/spin_action.hpp"
+#include "nav2_behavior_tree/plugins/action/back_up_action.hpp"
 
 
 class autonomy : public rclcpp::Node

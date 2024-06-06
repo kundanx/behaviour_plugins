@@ -38,6 +38,7 @@ BT::NodeStatus spinActionClient::onStart()
 
     // send goal::target_yaw
     done_flag = false;
+    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
     action_client_ptr_->async_send_goal(goal_spin_yaw, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to SpinActionServer [%f] \n", goal_spin_yaw.target_yaw);
     return BT::NodeStatus::RUNNING;

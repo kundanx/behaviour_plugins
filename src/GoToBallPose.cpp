@@ -56,6 +56,7 @@ BT::NodeStatus GoToBallPose::onStart()
 
     // send pose
     done_flag = false;
+    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to nav2\n");
     return BT::NodeStatus::RUNNING;

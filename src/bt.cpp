@@ -119,6 +119,15 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<ResetOdom>("ResetOdom",builder_10);
 
+
+    BT::NodeBuilder builder_11 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<BackUpActionClient>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<BackUpActionClient>("BackUpActionClient",builder_11);
+
+
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
 
@@ -220,6 +229,13 @@ void autonomy::register_actionClient_nodes()
         return std::make_unique<waitActionClient>(name, config, shared_from_this());
     };
     factory.registerBuilder<waitActionClient>("waitActionClient",builder_2);
+
+    BT::NodeBuilder builder_3  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::BackUpAction>(name, "backUp", config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::BackUpAction>("BackUp",builder_3);
 }
 
 

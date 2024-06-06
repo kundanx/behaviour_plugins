@@ -45,6 +45,7 @@ src/PacketPublisher.cpp
 src/InitiallizeActuators.cpp
 src/LineFollower.cpp
 src/ResetOdom.cpp
+src/BackUpActionClient.cpp
 
 src/actions/TurnOnRoller.cpp
 src/actions/TurnOnConveyer.cpp
