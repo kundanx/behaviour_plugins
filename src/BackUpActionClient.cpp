@@ -67,7 +67,8 @@ BT::NodeStatus BackUpActionClient::onRunning()
 
 void BackUpActionClient::onHalted() 
 {
-     RCLCPP_WARN(node_ptr_->get_logger(),"backUp aborted");
+    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+    RCLCPP_WARN(node_ptr_->get_logger(),"backUp aborted");
 }
 
 void BackUpActionClient::backUp_result_callback(const GoalHandleBackUp::WrappedResult &result)

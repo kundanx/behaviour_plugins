@@ -3,15 +3,27 @@
 
 #include <string>
 #include <memory>
+#include "behaviour_plugins/bezier.h"
 #include <tf2/LinearMath/Quaternion.h>
 
 #include "geometry_msgs/msg/pose.hpp"
-#include "nav2_msgs/action/navigate_to_pose.hpp"
+#include "nav_msgs/msg/odometry.hpp"
+#include "nav2_msgs/action/navigate_through_poses.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
+struct Quaternion {
+    double w, x, y, z;
+};
+struct EulerAngles {
+    double roll, pitch, yaw;
+};
+
+ // roll (x), pitch (y), yaw (z), angles are in radians
+Quaternion ToQuaternion(double roll, double pitch, double yaw);
+EulerAngles ToEulerAngles(double w, double x, double y, double z);
 
 class GoToBallPose : public BT::StatefulActionNode
 {
@@ -20,16 +32,20 @@ class GoToBallPose : public BT::StatefulActionNode
              const BT::NodeConfiguration &config,
              rclcpp::Node::SharedPtr node_ptr);
 
-    using NavigateToPose = nav2_msgs::action::NavigateToPose;
-    using GoalHandleNav = rclcpp_action::ClientGoalHandle<NavigateToPose>;
+    using NavigateThroughPoses = nav2_msgs::action::NavigateThroughPoses;
+    using GoalHandleNav = rclcpp_action::ClientGoalHandle<NavigateThroughPoses>;
     using PosMsg = geometry_msgs::msg::PoseStamped;
 
     rclcpp::Node::SharedPtr node_ptr_;
-    rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
+    rclcpp_action::Client<NavigateThroughPoses>::SharedPtr action_client_ptr_;
+    std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_;
+
 
     double xyz[3]; // x, y, z
     double q[4];   // x, y, z , w
     bool done_flag;
+    nav_msgs::msg::Odometry curr_pose;
+    NavigateThroughPoses::Goal goal_msg;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
@@ -38,14 +54,19 @@ class GoToBallPose : public BT::StatefulActionNode
     BT::NodeStatus onRunning() override;
     void onHalted() override;
 
+    void compute_goal();
+    void get_curve_points(double input_points[2][3], double output_points[5][3]);
+
     // Subscriber callback
     // void ball_pose_callback(const geometry_msgs::msg::Pose & msg);
 
+    // Odometry callback
+    void odometry_callback(const nav_msgs::msg::Odometry &msg);
     // Action client result callback
     void nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result);
 
     // // Action client feedback callback
-    void nav_to_pose_feedback_callback(GoalHandleNav::SharedPtr, const std::shared_ptr<const NavigateToPose::Feedback> feedback);
+    void nav_to_pose_feedback_callback(GoalHandleNav::SharedPtr, const std::shared_ptr<const NavigateThroughPoses::Feedback> feedback);
     
 };
 

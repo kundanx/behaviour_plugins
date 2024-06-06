@@ -149,7 +149,7 @@
     <BehaviorTree ID="Go_TO_SILO">
         <SequenceStar>
             <GoToSiloPose name="goToSilo" Op_SiloNumber="{SiloNumber}"/>
-            <LineFollower name = "line_follow" Ip_action_type="1"/>
+            <LineFollower name = "line_follow" Ip_action_type="2"/>
             <ResetOdom name = "Reset" Ip_SiloNumber="{SiloNumber}"/>
         </SequenceStar>
     </BehaviorTree>

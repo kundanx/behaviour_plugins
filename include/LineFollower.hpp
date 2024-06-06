@@ -19,9 +19,10 @@
 using namespace BT;
 enum ActionType
 {
-    NAVIGATE,
+    NAVIGATE_FROM_START_ZONE,
+    NAVIGATE_FROM_RETRY_ZONE,
     ALIGN_W_SILO,
-    ALIGN_W_ORIGIN
+    ALIGN_YAW
 };
 
 class LineFollower : public BT::StatefulActionNode  

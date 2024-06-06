@@ -51,16 +51,20 @@ BT::NodeStatus LineFollower::onStart()
     done_flag = false;
     switch (action_type)
     {
-        case NAVIGATE:
-            goal_msg.task = goal_msg.NAVIGATE;
+        case NAVIGATE_FROM_START_ZONE:
+            goal_msg.task = goal_msg.NAVIGATE_FROM_START_ZONE;
+            break;
+
+        case NAVIGATE_FROM_RETRY_ZONE:
+            RCLCPP_WARN(node_ptr_->get_logger(), "Under maintenance");
             break;
 
         case ALIGN_W_SILO:
             goal_msg.task = goal_msg.ALIGN_W_SILO;
             break;
 
-        case ALIGN_W_ORIGIN:
-            goal_msg.task = goal_msg.ALIGN_W_ORIGIN;
+        case ALIGN_YAW:
+            goal_msg.task = goal_msg.ALIGN_YAW;
             break;
 
         default :
@@ -123,9 +127,17 @@ void LineFollower::feedback_callback(
 ******************************************************************************************************************/
 void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & wrappedresult)
 {
-    if(wrappedresult.result->robot_state == wrappedresult.result->NAVIGATION_FINISHED)
+    if(wrappedresult.result->robot_state == wrappedresult.result->NAVIGATION_START_ZONE_FINISHED)
     {
-        RCLCPP_INFO(node_ptr_->get_logger(),"Reached Area 3");
+        RCLCPP_INFO(node_ptr_->get_logger(),"LINEFOLLOWER:: From start zone to Area 3 reached");
+        std_msgs::msg::UInt8 msg;
+        msg.data = 0xA5;
+        area3_reached_publisher->publish(msg); 
+        done_flag = true;
+    }
+    else if(wrappedresult.result->robot_state == wrappedresult.result->NAVIGATION_RETRY_ZONE_FINISHED)
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(),"LINEFOLLOWER:: From retry zone to Area 3 reached");
         std_msgs::msg::UInt8 msg;
         msg.data = 0xA5;
         area3_reached_publisher->publish(msg); 
@@ -133,9 +145,13 @@ void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & w
     }
     else if (wrappedresult.result->robot_state == wrappedresult.result->ALIGNED_W_SILO )
     {
-      RCLCPP_INFO(node_ptr_->get_logger(),"Aligned With silo");
-       done_flag = true;
+        RCLCPP_INFO(node_ptr_->get_logger(),"Aligned With silo");
+        done_flag = true;
+    }
+    else if (wrappedresult.result->robot_state == wrappedresult.result->ALIGNED_YAW )
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(),"LINEFOLLOWER:: YAW Aligned");
+        done_flag = true;
     }
    
-      
 }

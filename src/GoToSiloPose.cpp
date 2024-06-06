@@ -165,6 +165,7 @@ void GoToSiloPose::feedback_callback(
     GoalHandleNav::SharedPtr,
     const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
+    (void)feedback;
     if(this->x_horiz_line_detected ) //|| feedback->current_pose.pose.position.y >= -2.50
     {
         if(is_on_line)

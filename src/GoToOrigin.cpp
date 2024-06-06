@@ -53,7 +53,8 @@ BT::NodeStatus GoToOrigin::onRunning()
 
 void GoToOrigin::onHalted() 
 {
-     RCLCPP_WARN(node_ptr_->get_logger(),"Navigation aborted");
+    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+    RCLCPP_WARN(node_ptr_->get_logger(),"Navigation aborted");
 }
 
 void GoToOrigin::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result)

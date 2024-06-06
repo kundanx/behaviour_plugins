@@ -56,7 +56,8 @@ BT::NodeStatus spinActionClient::onRunning()
 
 void spinActionClient::onHalted() 
 {
-     RCLCPP_WARN(node_ptr_->get_logger(),"Rotation aborted");
+    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+    RCLCPP_WARN(node_ptr_->get_logger(),"Rotation aborted");
 }
 
 void spinActionClient::spin_result_callback(const GoalHandleSpin::WrappedResult &result)

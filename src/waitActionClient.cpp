@@ -77,6 +77,7 @@ void waitActionClient::wait_feedback_callback(
     GoalHandleWait::SharedPtr,
     const std::shared_ptr<const Wait::Feedback> feedback)
 {
+    (void)feedback;
     RCLCPP_INFO(node_ptr_->get_logger(),"[WAITACTIONCLIENT::waiting:..]");
 }
 
