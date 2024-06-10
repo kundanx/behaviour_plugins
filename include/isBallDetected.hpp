@@ -6,6 +6,8 @@
 #include <tf2/LinearMath/Quaternion.h>
 
 #include "std_msgs/msg/bool.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+#include "action_pkg/msg/ball_pose.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/subscription.hpp"
@@ -23,7 +25,7 @@ class isBallDetected : public BT::SyncActionNode
         rclcpp::Node::SharedPtr node_ptr);
 
     rclcpp::Node::SharedPtr node_ptr_;
-    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Bool>> subscription_;
+    std::shared_ptr<rclcpp::Subscription<action_pkg::msg::BallPose>> subscription_;
     
     std_msgs::msg::Bool isDetected;
 
@@ -33,7 +35,7 @@ class isBallDetected : public BT::SyncActionNode
     BT::NodeStatus tick() override;
 
     // Subscriber callback
-    void subscriber_callback(std_msgs::msg::Bool msg);
+    void subscriber_callback(action_pkg::msg::BallPose);
     
 };
 

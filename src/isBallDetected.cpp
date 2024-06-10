@@ -1,6 +1,5 @@
 #include "isBallDetected.hpp"   
 
-
 /*****************************************************************************************************************
  * @brief BT Node which return true if ball is detected by the camera
  * @brief Subscribed topic : 'is_ball_tracked'
@@ -14,21 +13,20 @@ isBallDetected::isBallDetected(
 {
     rclcpp::QoS qos_profile(10);
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::Bool>( "/is_ball_tracked", qos_profile, std::bind(&isBallDetected::subscriber_callback,this,std::placeholders::_1));
+    subscription_ = node_ptr_->create_subscription<action_pkg::msg::BallPose>( "/ball_tracker", qos_profile, std::bind(&isBallDetected::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected node Ready..");
     isDetected.data = false;
 }
 
 BT::PortsList isBallDetected::providedPorts()
 {
-    return {BT::OutputPort<std_msgs::msg::Bool>("op_ballDetectionFlag")};
+    return {BT::OutputPort<geometry_msgs::msg::PoseStamped>("op_pose")};
 }
 
  BT::NodeStatus isBallDetected::tick()
  {  
     if(isDetected.data){
         RCLCPP_INFO(node_ptr_->get_logger(),"Ball Detected.");
-        setOutput<std_msgs::msg::Bool>("op_ballDetectionFlag", isDetected);
         isDetected.data = false;
         return BT::NodeStatus::SUCCESS;
     }
@@ -36,10 +34,13 @@ BT::PortsList isBallDetected::providedPorts()
     return BT::NodeStatus::FAILURE;
  }
 
-void isBallDetected::subscriber_callback(std_msgs::msg::Bool msg)
+void isBallDetected::subscriber_callback(action_pkg::msg::BallPose ball)
 {   
-    if(msg.data)
+    if(ball.is_tracked.data)
+    {
         isDetected.data = true;    
+        setOutput<geometry_msgs::msg::PoseStamped>("op_pose", ball.goalpose);
+    }
     else
         isDetected.data = false;
 }
