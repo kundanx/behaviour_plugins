@@ -62,6 +62,8 @@ void GoToOrigin::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult 
     if(result.result)
     {
         done_flag=true;
+        RCLCPP_INFO(node_ptr_->get_logger()," GOTOORIGIN:: Result callback..");
+
     }
 }
 void GoToOrigin::nav_to_pose_feedback_callback(

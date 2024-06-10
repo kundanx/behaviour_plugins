@@ -89,7 +89,7 @@
                             ConveyerStatus="{ConveyerStatus}"
                             ConveyerSpeed="{ConveyerSpeed}"
                             PneumaticStatus="{PneumaticStatus}"/>  -->
-                        <!-- <SubTree ID="Go_TO_SILO"/> -->
+                        <SubTree ID="Go_TO_SILO"/>
                         <waitActionClient  In_sec="1" In_nanosec="0"/>
                         <TurnOnConveyer name = "Keep_conveyer_running_1" 
                             Op_ConveyerStatus="{ConveyerStatus}"
@@ -212,11 +212,11 @@
                         </Inverter>
                         
                         <WhileDoElse> 
-                            <isBallDetected name="isBallDetected_node" op_ballDetectionFlag="{ballDetectionFlag}"/>
-                            <ReactiveSequence >
-                                <GetBallPose name="GetBallPose_node" op_pose="{pose}"/>
-                                <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-                            </ReactiveSequence>
+                            <isBallDetected name="isBallDetected_node" op_pose="{pose}"/>
+                            <!-- <ReactiveSequence > -->
+                                <!-- <GetBallPose name="GetBallPose_node" op_pose="{pose}"/> -->
+                            <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
+                            <!-- </ReactiveSequence> -->
                             <Sequence >
                                 <BackUpActionClient In_dist="-0.10" In_speed="1.0" />
                                 <BackUpActionClient In_dist="-0.10" In_speed="1.0" />
