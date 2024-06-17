@@ -138,30 +138,6 @@ void autonomy::create_behavior_tree()
 }
 
 /*******************************************************************************************************************
- * @brief Tick tree nodes
-********************************************************************************************************************/
-
-void autonomy::update_behavior_tree()
-{
-    // tick BT when asked
-    BT::NodeStatus tree_status = tree_.tickRoot();
-    if(tree_status == BT::NodeStatus::RUNNING)
-    {
-        return;
-    }
-    else if(tree_status == BT::NodeStatus::SUCCESS)
-    {
-        RCLCPP_INFO(this->get_logger(),"Finished behaviour");
-        timer_->cancel();
-    }
-    else
-    {
-        RCLCPP_INFO(this->get_logger(),"Tree Failed");
-        timer_->cancel();
-    }
-}
-
-/*******************************************************************************************************************
  * @brief Register custom action nodes
 ********************************************************************************************************************/
 
@@ -319,6 +295,30 @@ void autonomy::register_decorator_nodes()
     factory.registerBuilder<returnFailure>("returnFailure",builder_2);
 }
 
+
+/*******************************************************************************************************************
+ * @brief Tick tree nodes
+********************************************************************************************************************/
+
+void autonomy::update_behavior_tree()
+{
+    // tick BT when asked
+    BT::NodeStatus tree_status = tree_.tickRoot();
+    if(tree_status == BT::NodeStatus::RUNNING)
+    {
+        return;
+    }
+    else if(tree_status == BT::NodeStatus::SUCCESS)
+    {
+        RCLCPP_INFO(this->get_logger(),"Finished behaviour");
+        timer_->cancel();
+    }
+    else
+    {
+        RCLCPP_INFO(this->get_logger(),"Tree Failed");
+        timer_->cancel();
+    }
+}
 
 /******************************************************************************************************************
  * @brief Main function 

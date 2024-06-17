@@ -29,15 +29,16 @@ BT::NodeStatus waitActionClient::onStart()
     auto nanoseconds = getInput<uint32_t>("In_nanosec");
     if( !seconds )
     {
-        throw BT::RuntimeError("error reading port [In_sec]:", seconds.error());
+        throw BT::RuntimeError("waitActionClient::error reading port [In_sec]:", seconds.error());
     }
     if( !nanoseconds)
     {
-        throw BT::RuntimeError("error reading port [In_nanosec]:", nanoseconds.error());
+        throw BT::RuntimeError("waitActionClient::error reading port [In_nanosec]:", nanoseconds.error());
     }
     
     // Setup action client goal
     auto send_goal_options = rclcpp_action::Client<Wait>::SendGoalOptions();
+    send_goal_options.goal_response_callback =std::bind(&waitActionClient::goal_response_callback, this, std::placeholders::_1);
     send_goal_options.result_callback = std::bind(&waitActionClient::wait_result_callback, this, std::placeholders::_1);
     send_goal_options.feedback_callback = std::bind(&waitActionClient::wait_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
@@ -47,8 +48,8 @@ BT::NodeStatus waitActionClient::onStart()
 
     // send goal::target_yaw
     done_flag = false;
-    action_client_ptr_->async_send_goal(wait, send_goal_options);
-    RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to waitActionServer [%i seconds]", wait.time.sec);
+    // action_client_ptr_->async_send_goal(wait, send_goal_options);
+    RCLCPP_INFO(node_ptr_->get_logger(),"waitActionClient::sent goal to waitActionServer [%i seconds]", wait.time.sec);
     return BT::NodeStatus::RUNNING;
 }
 
@@ -64,13 +65,30 @@ BT::NodeStatus waitActionClient::onRunning()
 
 void waitActionClient::onHalted() 
 {
-     RCLCPP_WARN(node_ptr_->get_logger(),"Rotation aborted");
+     RCLCPP_WARN(node_ptr_->get_logger(),"waitActionClient::Wait aborted");
+}
+
+void waitActionClient::goal_response_callback(const rclcpp_action::ClientGoalHandle<Wait>::SharedPtr & goal_handle_)
+{
+     if (!goal_handle_) 
+    {
+        RCLCPP_ERROR(node_ptr_->get_logger(), "waitActionClient::Wait goal rejected ");
+    } 
+    else
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(), "waitActionClient::Waiting ");
+        this->goal_handle = goal_handle_;
+    }
 }
 
 void waitActionClient::wait_result_callback(const GoalHandleWait::WrappedResult &result)
 {
     if(result.result)
+    {
         done_flag=true;
+        RCLCPP_WARN(node_ptr_->get_logger(),"waitActionClient::Wait complete");
+        
+    }
 }
 
 void waitActionClient::wait_feedback_callback(
@@ -78,7 +96,7 @@ void waitActionClient::wait_feedback_callback(
     const std::shared_ptr<const Wait::Feedback> feedback)
 {
     (void)feedback;
-    RCLCPP_INFO(node_ptr_->get_logger(),"[WAITACTIONCLIENT::waiting:..]");
+    // RCLCPP_INFO(node_ptr_->get_logger(),"waitActionClient::waiting]");
 }
 
 //  Implemented from documentation: Generic port
@@ -90,7 +108,7 @@ namespace BT
         auto parts = splitString(str, '\n');
         if (parts.size() != 1)
         {
-            throw RuntimeError("invalid input)");
+            throw RuntimeError("waitActionClient::invalid input)");
         }
         else
         {

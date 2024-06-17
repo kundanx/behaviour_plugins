@@ -7,7 +7,7 @@ PneumaticOn::PneumaticOn(
 {
      // Mechanism is turnedOff intially
     setOutput<bool>("Op_PneumaticStatus", false);
-    RCLCPP_INFO(rclcpp::get_logger("PneumaticOn"),"PneumaticOn action Ready..");
+    RCLCPP_INFO(rclcpp::get_logger("PneumaticOn"),"PneumaticOn::Ready");
    
 }
 

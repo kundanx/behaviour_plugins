@@ -81,7 +81,8 @@ void BackUpActionClient::backUp_feedback_callback(
     GoalHandleBackUp::SharedPtr,
     const std::shared_ptr<const BackUp::Feedback> feedback)
 {
-    RCLCPP_INFO(node_ptr_->get_logger(),"[distance_travelled: %f]",feedback->distance_traveled);
+    (void)feedback;
+    // RCLCPP_INFO(node_ptr_->get_logger(),"[distance_travelled: %f]",feedback->distance_traveled);
 }
 
 namespace BT

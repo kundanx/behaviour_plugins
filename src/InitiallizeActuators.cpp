@@ -13,7 +13,6 @@ InitiallizeActuators::InitiallizeActuators(
 {
     rclcpp::QoS qos_profile(10);
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "/ball_roller_status", 10, std::bind(&InitiallizeActuators::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"InitiallizeActuators node Ready..");
 }
 
@@ -41,29 +40,6 @@ BT::PortsList InitiallizeActuators::providedPorts()
     return BT::NodeStatus::SUCCESS;
  }
 
- void InitiallizeActuators::subscriber_callback(std_msgs::msg::UInt8 msg)
- {
-    RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"InitiallizeActuators subs callback..");
-    switch (msg.data)
-    {
-        case '1': 
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Red Ball detected");
-            setOutput<bool>("OP_IsBallInside", true);
-            break;
-        case '2':
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Blue Ball detected");
-            setOutput<bool>("OP_IsBallInside", false);
-            break;
-        case '3':
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"purple Ball detected");
-            setOutput<bool>("OP_IsBallInside", false);
-            break;
-
-        default:
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"No ball detected");
-            setOutput<bool>("OP_IsBallInside", false);
-    }
- }
 
 
 

@@ -154,7 +154,6 @@ void GoToBallPose::compute_goal()
 }
 
 
-
 Quaternion ToQuaternion(double roll, double pitch, double yaw) // roll (x), pitch (y), yaw (z), angles are in radians
 {
     // Abbreviations for the various angular functions
@@ -176,7 +175,8 @@ Quaternion ToQuaternion(double roll, double pitch, double yaw) // roll (x), pitc
 }
 
 
-EulerAngles ToEulerAngles(double w, double x, double y, double z) {
+EulerAngles ToEulerAngles(double w, double x, double y, double z) 
+{
     EulerAngles angles;
 
     // roll (x-axis rotation)
@@ -196,3 +196,4 @@ EulerAngles ToEulerAngles(double w, double x, double y, double z) {
 
     return angles;
 }
+

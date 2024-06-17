@@ -21,6 +21,7 @@ find_package(yaml-cpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(action_pkg REQUIRED)
+find_package(oakd_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 # find_package(my_bt REQUIRED)
 # find_package(behaviortree_ros2 REQUIRED)
@@ -76,6 +77,7 @@ set(TARGET_DEPENDS
       tf2_geometry_msgs
       tf2
       action_pkg
+      oakd_msgs
       # behaviortree_ros2
 )
 

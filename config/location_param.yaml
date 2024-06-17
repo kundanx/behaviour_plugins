@@ -1,17 +1,24 @@
-# Define robot locations as [x, y, theta]
-location_1: [1.0,-0.50,0.0]
-
-location_2: [1.0,-1.0,0.0]
-
-location_3: [1.50,-1.0,0.0]
-
-location_4: [1.50,-0.50,0.00]
-order: 10
+# set True if testing for naviagtion to  silo 
+testing : True
 
 # Location of silo w.r.t origin at Y junction
 # y co-oridinate of each silo = 4.164
-silo_one: [1.50, -3.30]
-silo_two: [0.90, -3.30]
-silo_three: [0.00, -3.30]
-silo_four: [-0.90, -3.30]
-silo_five: [-1.50, -3.30]
+silo_one: [1.50, -3.00]
+silo_one_left_waypoint: [0.0, 0.0]
+silo_one_right_waypoint: [0.0, 0.0]
+
+silo_two: [0.75, -3.00]
+silo_two_left_waypoint: [0.0, 0.0]
+silo_two_right_waypoint: [0.0, 0.0]
+
+silo_three: [0.00, -3.00]
+silo_three_left_waypoint: [0.0, 0.0]
+silo_three_right_waypoint: [0.0, 0.0]
+
+silo_four: [-0.75, -3.00]
+silo_four_left_waypoint: [0.0, 0.0]
+silo_four_right_waypoint: [0.0, 0.0]
+
+silo_five: [-1.50, -3.00]
+silo_five_left_waypoint: [0.0, 0.0]
+silo_five_right_waypoint: [0.0, 0.0]

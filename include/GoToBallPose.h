@@ -3,8 +3,9 @@
 
 #include <string>
 #include <memory>
-#include "behaviour_plugins/bezier.h"
 #include <tf2/LinearMath/Quaternion.h>
+#include "behaviour_plugins/bezier.h"
+// #include "behaviour_plugins/angle_conversions.hpp"
 
 #include "geometry_msgs/msg/pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -14,16 +15,15 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
+
 struct Quaternion {
     double w, x, y, z;
 };
 struct EulerAngles {
     double roll, pitch, yaw;
 };
-
- // roll (x), pitch (y), yaw (z), angles are in radians
-Quaternion ToQuaternion(double roll, double pitch, double yaw);
-EulerAngles ToEulerAngles(double w, double x, double y, double z);
+Quaternion ToQuaternion(double roll, double pitch, double yaw); // roll (x), pitch (y), yaw (z), angles are in radians
+EulerAngles ToEulerAngles(double w, double x, double y, double z) ;
 
 class GoToBallPose : public BT::StatefulActionNode
 {

@@ -11,7 +11,7 @@ GoToOrigin::GoToOrigin(
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
-    RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin node Ready..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin::Ready");
     done_flag = false;
 }
 
@@ -19,6 +19,7 @@ BT::NodeStatus GoToOrigin::onStart()
 {
     // Setup action client goal
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
+    send_goal_options.goal_response_callback =std::bind(&GoToOrigin::goal_response_callback, this, std::placeholders::_1);
     send_goal_options.result_callback = std::bind(&GoToOrigin::nav_to_pose_result_callback, this, std::placeholders::_1);
     send_goal_options.feedback_callback = std::bind(&GoToOrigin::nav_to_pose_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
@@ -34,11 +35,13 @@ BT::NodeStatus GoToOrigin::onStart()
     goal_msg.pose.pose.orientation.y = 0.0;
     goal_msg.pose.pose.orientation.z = 0.7071068;
     goal_msg.pose.pose.orientation.w = 0.7071068;
+
+    // auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+
     // send pose
     done_flag = false;
-    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
-    RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to nav2\n");
+    RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin::sent goal to nav2\n");
     return BT::NodeStatus::RUNNING;
 }
 BT::NodeStatus GoToOrigin::onRunning()
@@ -54,15 +57,20 @@ BT::NodeStatus GoToOrigin::onRunning()
 void GoToOrigin::onHalted() 
 {
     auto cancel_future= action_client_ptr_->async_cancel_all_goals();
-    RCLCPP_WARN(node_ptr_->get_logger(),"Navigation aborted");
+    RCLCPP_WARN(node_ptr_->get_logger(),"GoToOrigin::Navigation aborted");
 }
 
-void GoToOrigin::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result)
+void GoToOrigin::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)
 {
-    if(result.result)
+    if(wrappedresult.result)
     {
         done_flag=true;
-        RCLCPP_INFO(node_ptr_->get_logger()," GOTOORIGIN:: Result callback..");
+        RCLCPP_INFO(node_ptr_->get_logger()," GoToOrigin:: Result sucessfull");
+
+    }
+    else
+    {
+        RCLCPP_INFO(node_ptr_->get_logger()," GoToOrigin:: Result ERROR..");
 
     }
 }
@@ -71,5 +79,18 @@ void GoToOrigin::nav_to_pose_feedback_callback(
     const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
     (void)feedback;
-    RCLCPP_INFO(node_ptr_->get_logger()," Navigating to origin..");
+    // RCLCPP_INFO(node_ptr_->get_logger()," GoToOrigin::Navigating to origin..");
+}
+
+void GoToOrigin::goal_response_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::SharedPtr & goal_handle_)
+{
+    if (!goal_handle_) 
+    {
+        RCLCPP_ERROR(node_ptr_->get_logger(), "GoToOrigin::Nav to origin goal rejected ");
+    } 
+    else
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(), "GoToOrigin::Nav to origin Goal accepted ");
+        this->goal_handle = goal_handle_;
+    }
 }

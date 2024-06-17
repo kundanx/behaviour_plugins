@@ -5,11 +5,11 @@ returnFailure::returnFailure(
     const BT::NodeConfiguration &config)
     : BT::SyncActionNode(name,config)
 {
-    RCLCPP_INFO(rclcpp::get_logger("returnFailure"),"returnFailure action Ready..");
+    RCLCPP_INFO(rclcpp::get_logger("returnFailure"),"returnFailure::Ready");
 }
 
 BT::NodeStatus returnFailure::tick() 
 {
-    RCLCPP_INFO(rclcpp::get_logger("returnFailure"),"......");
+    RCLCPP_INFO(rclcpp::get_logger("returnFailure"),"FAILURE");
     return BT::NodeStatus::FAILURE;
 }
