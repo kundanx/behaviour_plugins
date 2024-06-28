@@ -1,4 +1,4 @@
-#ifndef GO_TO_ORIFIN_H
+#ifndef GO_TO_ORIGIN_H
 #define GO_TO_ORIGIN_H
 
 #include <string>

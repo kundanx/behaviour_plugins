@@ -23,18 +23,37 @@ LineFollower::LineFollower(
 
 BT::PortsList LineFollower::providedPorts()
 {
-    return {BT::InputPort<int>("Ip_action_type")};
+    return {BT::InputPort<int>("Ip_action_type"),
+            BT::InputPort<geometry_msgs::msg::PoseStamped>("In_pose")};
 }
 
 BT::NodeStatus LineFollower::onStart()
 {
+    double goal_yaw = 1.57;
     auto action_type_ = getInput<int>("Ip_action_type");
+    auto goal_pose_ = getInput<geometry_msgs::msg::PoseStamped>("In_pose");
+
     if( !action_type_ )
     {
         throw BT::RuntimeError("error reading port [In_action_type]:", action_type_.error());
     }
-    auto action_type = action_type_.value();
+    if( goal_pose_)
+    {
+        auto goal_pose = goal_pose_.value();
+        EulerAngles e;
+        e = ToEulerAngles(goal_pose.pose.orientation.w,
+                          goal_pose.pose.orientation.x,
+                          goal_pose.pose.orientation.y,
+                          goal_pose.pose.orientation.z);
+        goal_yaw = e.yaw;
+    }
+    else 
+    {
+        RCLCPP_WARN(node_ptr_->get_logger(),"LineFollower::Ball not tracked yet");
+    }
 
+    auto action_type = action_type_.value();
+   
     // make pose
     if (!this->action_client_ptr_->wait_for_action_server()) {
       RCLCPP_ERROR(node_ptr_->get_logger(), "LineFollower::Action server not available after waiting");
@@ -53,18 +72,31 @@ BT::NodeStatus LineFollower::onStart()
     {
         case NAVIGATE_FROM_START_ZONE:
             goal_msg.task = goal_msg.NAVIGATE_FROM_START_ZONE;
+            goal_msg.rotate_to_angle = 0;
             break;
 
         case NAVIGATE_FROM_RETRY_ZONE:
-            RCLCPP_WARN(node_ptr_->get_logger(), "LineFollower::Under maintenance");
+            RCLCPP_WARN(node_ptr_->get_logger(), "LineFollower::NAv form retry zone");
+            goal_msg.task = goal_msg.NAVIGATE_FROM_RETRY_ZONE;
+            goal_msg.rotate_to_angle = 0;
+
             break;
 
         case ALIGN_W_SILO:
             goal_msg.task = goal_msg.ALIGN_W_SILO;
+            goal_msg.rotate_to_angle = 0;
+
             break;
 
         case ALIGN_YAW:
             goal_msg.task = goal_msg.ALIGN_YAW;
+            goal_msg.rotate_to_angle = 0;
+
+            break;
+        case ROTATE_TO_BALL:
+            goal_msg.task = goal_msg.ROTATE_TO_BALL;
+            goal_msg.rotate_to_angle = goal_yaw;
+
             break;
 
         default :
@@ -87,24 +119,27 @@ BT::NodeStatus LineFollower::onRunning()
 
 void LineFollower::onHalted() 
 {
+    // (void);
     cancel_goal();    
+    RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::HALTED");
+
 }
 
 void LineFollower::cancel_goal()
   {
     if (goal_handle) 
     {
-      auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+      auto cancel_future= action_client_ptr_->async_cancel_goal(goal_handle);
       RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::Goal canceled");
     } 
     else 
     {
       RCLCPP_WARN(node_ptr_->get_logger(), "LineFollower::No active goal to cancel");
     } 
-    rclcpp::shutdown();
+    // rclcpp::shutdown();
   }
 
-void LineFollower::goal_response_callback(const GoalHandleLineFollow::SharedPtr & goal_handle)
+void LineFollower::goal_response_callback(const GoalHandleLineFollow::SharedPtr & goal_handle_)
 {
     if (!goal_handle)
     {
@@ -112,7 +147,7 @@ void LineFollower::goal_response_callback(const GoalHandleLineFollow::SharedPtr 
     } else
     {
         RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::Goal accepted by server, waiting for result");
-        this->goal_handle = goal_handle;
+        this->goal_handle = goal_handle_;
     }
 }
 

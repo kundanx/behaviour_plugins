@@ -34,12 +34,13 @@ BT::NodeStatus GoToBallPose::onStart()
 
     // Setup action client goal
     auto send_goal_options = rclcpp_action::Client<NavigateThroughPoses>::SendGoalOptions();
-    send_goal_options.result_callback = std::bind(&GoToBallPose::nav_to_pose_result_callback, this, std::placeholders::_1);
-    send_goal_options.feedback_callback = std::bind(&GoToBallPose::nav_to_pose_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
+    send_goal_options.goal_response_callback = std::bind(&GoToBallPose::goal_response_callback, this, std::placeholders::_1);
+    send_goal_options.result_callback = std::bind(&GoToBallPose::goal_result_callback, this, std::placeholders::_1);
+    send_goal_options.feedback_callback = std::bind(&GoToBallPose::goal_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
     // send pose
     done_flag = false;
-    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+    // auto cancel_future= action_client_ptr_->async_cancel_all_goals();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to nav2\n");
     return BT::NodeStatus::RUNNING;
@@ -57,18 +58,32 @@ BT::NodeStatus GoToBallPose::onRunning()
 
 void GoToBallPose::onHalted() 
 {
-    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
-    RCLCPP_WARN(node_ptr_->get_logger(),"Navigation aborted");
+    // auto cancel_future= action_client_ptr_->async_cancel_goal(goal_handle);
+    RCLCPP_WARN(node_ptr_->get_logger(),"Navigation halted");
 }
 
-void GoToBallPose::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result)
+void GoToBallPose::goal_response_callback(const GoalHandleNav::SharedPtr &goal_handle_)
+{
+    if (!goal_handle_)
+    {
+        RCLCPP_ERROR(node_ptr_->get_logger(), "GoToBallPose::Navigate to ball pose rejected");
+    }
+    else
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(), "GoToBallPose::Navigating to ball pose ");
+        this->goal_handle = goal_handle_;
+    }
+}
+
+
+void GoToBallPose::goal_result_callback(const GoalHandleNav::WrappedResult &result)
 {
     if(result.result)
     {
         done_flag=true;
     }
 }
-void GoToBallPose::nav_to_pose_feedback_callback(
+void GoToBallPose::goal_feedback_callback(
     GoalHandleNav::SharedPtr,
     const std::shared_ptr<const NavigateThroughPoses::Feedback> feedback)
 {
@@ -153,47 +168,4 @@ void GoToBallPose::compute_goal()
     goal_msg.poses[4].pose.orientation.w = goal_pose.pose.orientation.w; 
 }
 
-
-Quaternion ToQuaternion(double roll, double pitch, double yaw) // roll (x), pitch (y), yaw (z), angles are in radians
-{
-    // Abbreviations for the various angular functions
-
-    double cr = cos(roll * 0.5);
-    double sr = sin(roll * 0.5);
-    double cp = cos(pitch * 0.5);
-    double sp = sin(pitch * 0.5);
-    double cy = cos(yaw * 0.5);
-    double sy = sin(yaw * 0.5);
-
-    Quaternion q;
-    q.w = cr * cp * cy + sr * sp * sy;
-    q.x = sr * cp * cy - cr * sp * sy;
-    q.y = cr * sp * cy + sr * cp * sy;
-    q.z = cr * cp * sy - sr * sp * cy;
-
-    return q;
-}
-
-
-EulerAngles ToEulerAngles(double w, double x, double y, double z) 
-{
-    EulerAngles angles;
-
-    // roll (x-axis rotation)
-    double sinr_cosp = 2 * (w * x + y * z);
-    double cosr_cosp = 1 - 2 * (x * x + y * y);
-    angles.roll = std::atan2(sinr_cosp, cosr_cosp);
-
-    // pitch (y-axis rotation)
-    double sinp = std::sqrt(1 + 2 * (w * y - x * z));
-    double cosp = std::sqrt(1 - 2 * (w * y - x * z));
-    angles.pitch = 2 * std::atan2(sinp, cosp) - M_PI / 2;
-
-    // yaw (z-axis rotation)
-    double siny_cosp = 2 * (w * z + x * y);
-    double cosy_cosp = 1 - 2 * (y * y + z * z);
-    angles.yaw = std::atan2(siny_cosp, cosy_cosp);
-
-    return angles;
-}
 

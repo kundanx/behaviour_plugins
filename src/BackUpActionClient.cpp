@@ -37,6 +37,8 @@ BT::NodeStatus BackUpActionClient::onStart()
     
     // Setup action client goal
     auto send_goal_options = rclcpp_action::Client<BackUp>::SendGoalOptions();
+    send_goal_options.goal_response_callback = std::bind(&BackUpActionClient::goal_response_callback, this, std::placeholders::_1);
+
     send_goal_options.result_callback = std::bind(&BackUpActionClient::backUp_result_callback, this, std::placeholders::_1);
     send_goal_options.feedback_callback = std::bind(&BackUpActionClient::backUp_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
@@ -49,7 +51,7 @@ BT::NodeStatus BackUpActionClient::onStart()
 
     // send goal::target_yaw
     done_flag = false;
-    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+    // auto cancel_future= action_client_ptr_->async_cancel_all_goals();
     action_client_ptr_->async_send_goal(backUp_dist, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"sent goal to BackUpActionServer [%f] \n", backUp_dist.target.x);
     return BT::NodeStatus::RUNNING;
@@ -67,8 +69,21 @@ BT::NodeStatus BackUpActionClient::onRunning()
 
 void BackUpActionClient::onHalted() 
 {
-    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+    // auto cancel_future= action_client_ptr_->async_cancel_goal(goal_handle);
     RCLCPP_WARN(node_ptr_->get_logger(),"backUp aborted");
+}
+
+void BackUpActionClient::goal_response_callback(const GoalHandleBackUp::SharedPtr &goal_handle_)
+{
+    if (!goal_handle_)
+    {
+        RCLCPP_ERROR(node_ptr_->get_logger(), "BackUpActionClient::goal rejected ");
+    }
+    else
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(), "BackUpActionClient::Goal accepted ");
+        this->goal_handle = goal_handle_;
+    }
 }
 
 void BackUpActionClient::backUp_result_callback(const GoalHandleBackUp::WrappedResult &result)

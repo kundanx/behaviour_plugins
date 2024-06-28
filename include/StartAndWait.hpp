@@ -1,5 +1,5 @@
-#ifndef WAITING_FOR_GO_HPP
-#define WAITING_FOR_GO_HPP
+#ifndef START_AND_WAIT_HPP
+#define START_AND_WAIT_HPP
 
 #include <string>
 #include <memory>
@@ -14,10 +14,10 @@
 
 
 using namespace BT;
-class WaitingForGo : public BT::SyncActionNode
+class StartAndWait : public BT::SyncActionNode
 {
     public:
-    WaitingForGo(
+    StartAndWait(
         const std::string &name,
         const BT::NodeConfiguration &config,
         rclcpp::Node::SharedPtr node_ptr);

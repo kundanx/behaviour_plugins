@@ -1,6 +1,6 @@
 #include "ZoneAndColorConfig.hpp"   
 
-isStartOrRetryZone::isStartOrRetryZone(
+ZoneAndColorConfig::ZoneAndColorConfig(
     const std::string &name,
     const BT::NodeConfiguration &config,
     rclcpp::Node::SharedPtr node_ptr)
@@ -8,25 +8,25 @@ isStartOrRetryZone::isStartOrRetryZone(
 {
     rclcpp::QoS qos_profile(10);
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "robot_config", qos_profile, std::bind(&isStartOrRetryZone::subscriber_callback,this,std::placeholders::_1));
-    RCLCPP_INFO(node_ptr_->get_logger(),"isStartOrRetryZone::Ready..");
+    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "robot_config", qos_profile, std::bind(&ZoneAndColorConfig::subscriber_callback,this,std::placeholders::_1));
+    RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::Ready..");
 }
-BT::PortsList isStartOrRetryZone::providedPorts()
+BT::PortsList ZoneAndColorConfig::providedPorts()
 {
     return {BT::OutputPort<uint8_t>("OP_Team_color")};
 }
 
- BT::NodeStatus isStartOrRetryZone::tick()
+ BT::NodeStatus ZoneAndColorConfig::tick()
  {  
     if(zone == START){
-        RCLCPP_INFO(node_ptr_->get_logger(),"isStartOrRetryZone::START Zone");
+        RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::START Zone");
         return BT::NodeStatus::SUCCESS;
     }
-    RCLCPP_INFO(node_ptr_->get_logger(),"isStartOrRetryZone::RETRY Zone");
+    RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::RETRY Zone");
     return BT::NodeStatus::FAILURE;
  }
 
-void isStartOrRetryZone::subscriber_callback(std_msgs::msg::Uint8 msg)
+void ZoneAndColorConfig::subscriber_callback(std_msgs::msg::UInt8 msg)
 {   
     if(msg.data & 0x01)
         zone = START;    

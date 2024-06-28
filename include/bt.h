@@ -23,6 +23,7 @@
 #include "LineFollower.hpp"
 #include "ResetOdom.hpp"
 #include "BackUpActionClient.hpp"
+#include "RecoveryNode.hpp"
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"
@@ -43,6 +44,7 @@
 
 #include "nav2_behavior_tree/plugins/action/spin_action.hpp"
 #include "nav2_behavior_tree/plugins/action/back_up_action.hpp"
+#include "nav2_behavior_tree/plugins/decorator/rate_controller.hpp"
 
 
 class autonomy : public rclcpp::Node

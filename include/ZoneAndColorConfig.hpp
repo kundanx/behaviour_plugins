@@ -1,5 +1,5 @@
-#ifndef IS_START_RETRY_HPP
-#define IS_START_RETRY_HPP
+#ifndef ZONE_AND_COLOR_HPP
+#define ZONE_AND_COLOR_HPP
 
 #include <string>
 #include <memory>
@@ -24,12 +24,11 @@ enum Zone
 {
     START,
     RETRY
-}
-
-class isStartOrRetryZone : public BT::SyncActionNode
+};
+class ZoneAndColorConfig : public BT::SyncActionNode
 {
     public:
-    isStartOrRetryZone(
+    ZoneAndColorConfig(
         const std::string &name,
         const BT::NodeConfiguration &config,
         rclcpp::Node::SharedPtr node_ptr);

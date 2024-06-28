@@ -48,7 +48,7 @@ BT::NodeStatus waitActionClient::onStart()
 
     // send goal::target_yaw
     done_flag = false;
-    // action_client_ptr_->async_send_goal(wait, send_goal_options);
+    action_client_ptr_->async_send_goal(wait, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"waitActionClient::sent goal to waitActionServer [%i seconds]", wait.time.sec);
     return BT::NodeStatus::RUNNING;
 }

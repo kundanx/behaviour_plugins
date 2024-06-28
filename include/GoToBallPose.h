@@ -5,7 +5,7 @@
 #include <memory>
 #include <tf2/LinearMath/Quaternion.h>
 #include "behaviour_plugins/bezier.h"
-// #include "behaviour_plugins/angle_conversions.hpp"
+#include "behaviour_plugins/angle_conversions.hpp"
 
 #include "geometry_msgs/msg/pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -16,14 +16,9 @@
 #include "behaviortree_cpp_v3/bt_factory.h"
 
 
-struct Quaternion {
-    double w, x, y, z;
-};
-struct EulerAngles {
-    double roll, pitch, yaw;
-};
-Quaternion ToQuaternion(double roll, double pitch, double yaw); // roll (x), pitch (y), yaw (z), angles are in radians
-EulerAngles ToEulerAngles(double w, double x, double y, double z) ;
+
+// Quaternion ToQuaternion(double roll, double pitch, double yaw); // roll (x), pitch (y), yaw (z), angles are in radians
+// EulerAngles ToEulerAngles(double w, double x, double y, double z) ;
 
 class GoToBallPose : public BT::StatefulActionNode
 {
@@ -39,6 +34,8 @@ class GoToBallPose : public BT::StatefulActionNode
     rclcpp::Node::SharedPtr node_ptr_;
     rclcpp_action::Client<NavigateThroughPoses>::SharedPtr action_client_ptr_;
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_;
+    std::shared_ptr<GoalHandleNav> goal_handle;
+   
 
 
     double xyz[3]; // x, y, z
@@ -62,11 +59,15 @@ class GoToBallPose : public BT::StatefulActionNode
 
     // Odometry callback
     void odometry_callback(const nav_msgs::msg::Odometry &msg);
+
+    // Action client goal response
+    void goal_response_callback(const GoalHandleNav::SharedPtr &goal_handle_);
+
     // Action client result callback
-    void nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result);
+    void goal_result_callback(const GoalHandleNav::WrappedResult &result);
 
     // // Action client feedback callback
-    void nav_to_pose_feedback_callback(GoalHandleNav::SharedPtr, const std::shared_ptr<const NavigateThroughPoses::Feedback> feedback);
+    void goal_feedback_callback(GoalHandleNav::SharedPtr, const std::shared_ptr<const NavigateThroughPoses::Feedback> feedback);
     
 };
 

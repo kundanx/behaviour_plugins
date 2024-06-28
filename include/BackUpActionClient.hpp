@@ -31,6 +31,7 @@ class BackUpActionClient : public BT::StatefulActionNode
 
     rclcpp::Node::SharedPtr node_ptr_;
     rclcpp_action::Client<BackUp>::SharedPtr action_client_ptr_;
+    std::shared_ptr<GoalHandleBackUp> goal_handle;
 
     BackUp::Goal backUp_dist;
     bool done_flag;
@@ -42,6 +43,7 @@ class BackUpActionClient : public BT::StatefulActionNode
     BT::NodeStatus onRunning() override;
     void onHalted() override;
 
+    void goal_response_callback(const GoalHandleBackUp::SharedPtr &goal_handle_);
 
     // Action client result callback
     void backUp_result_callback(const GoalHandleBackUp::WrappedResult &result);

@@ -47,6 +47,9 @@ src/InitiallizeActuators.cpp
 src/LineFollower.cpp
 src/ResetOdom.cpp
 src/BackUpActionClient.cpp
+src/RecoveryNode.cpp
+src/StartAndWait.cpp 
+src/ZoneAndColorConfig.cpp
 
 src/actions/TurnOnRoller.cpp
 src/actions/TurnOnConveyer.cpp

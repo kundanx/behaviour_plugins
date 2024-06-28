@@ -24,7 +24,7 @@ autonomy::autonomy(const std::string &nodeName): Node(nodeName)
 void autonomy::setup()
 {   
     create_behavior_tree();
-    const auto timer_period = 50ms;
+    const auto timer_period = 10ms;
     timer_ = this->create_wall_timer(
         timer_period,
         std::bind(&autonomy::update_behavior_tree, this)
@@ -126,6 +126,14 @@ void autonomy::create_behavior_tree()
         return std::make_unique<BackUpActionClient>(name, config, shared_from_this());
     };
     factory.registerBuilder<BackUpActionClient>("BackUpActionClient",builder_11);
+
+    BT::NodeBuilder builder_12 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<RecoveryNode>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<RecoveryNode>("RecoverNode",builder_12);
+
 
 
     /* create BT */
@@ -293,6 +301,14 @@ void autonomy::register_decorator_nodes()
         return std::make_unique<returnFailure>(name,config);
     };
     factory.registerBuilder<returnFailure>("returnFailure",builder_2);
+    
+    BT::NodeBuilder builder_3 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::RateController>(name,config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::RateController>("RateController",builder_3);
+    
 }
 
 

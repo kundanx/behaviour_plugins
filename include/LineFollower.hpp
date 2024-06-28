@@ -16,13 +16,16 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
+#include "behaviour_plugins/angle_conversions.hpp"
+
 using namespace BT;
 enum ActionType
 {
     NAVIGATE_FROM_START_ZONE,
     NAVIGATE_FROM_RETRY_ZONE,
     ALIGN_W_SILO,
-    ALIGN_YAW
+    ALIGN_YAW,
+    ROTATE_TO_BALL
 };
 
 class LineFollower : public BT::StatefulActionNode  
@@ -53,7 +56,7 @@ class LineFollower : public BT::StatefulActionNode
     void onHalted() override;
 
     void cancel_goal();
-    void goal_response_callback(const GoalHandleLineFollow::SharedPtr & goal_handle);
+    void goal_response_callback(const GoalHandleLineFollow::SharedPtr & goal_handle_);
     void feedback_callback( GoalHandleLineFollow::SharedPtr, const std::shared_ptr<const LineFollow::Feedback>);
     void result_callback(const GoalHandleLineFollow::WrappedResult & result);
     
