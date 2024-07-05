@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 #include <tf2/LinearMath/Quaternion.h>
-
+#include "behaviour_plugins/angle_conversions.hpp"
 
 #include "nav2_msgs/action/spin.hpp"
 #include "nav2_msgs/action/navigate_to_pose.hpp"
@@ -15,6 +15,7 @@
 
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "oakd_msgs/msg/state_pose.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
@@ -25,7 +26,14 @@ enum RecoveryState
     NAV,
     BACKUP,
     SPIN,
+    // ALIGN_YAW_,
     HALT
+};
+enum BallDrift
+{
+    CLOCKWISE = 1,
+    ANTI_CLOCKWISE = -1,
+    NO_DRIFT = 100
 };
 
 class RecoveryNode : public BT::StatefulActionNode
@@ -52,6 +60,7 @@ class RecoveryNode : public BT::StatefulActionNode
 
     rclcpp::Node::SharedPtr node_ptr_;
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
+    std::shared_ptr<rclcpp::Subscription<oakd_msgs::msg::StatePose>> subscription_ballpose;
 
     rclcpp_action::Client<NavigateToPose>::SharedPtr nav_action_client_ptr_;
     rclcpp_action::Client<BackUp>::SharedPtr backUp_action_client_ptr_;
@@ -66,9 +75,12 @@ class RecoveryNode : public BT::StatefulActionNode
 
 
     double xyz[3]; // x, y, z
-    double q[4];   // x, y, z , w
+    double previous_ball_theta;
     bool done_flag;
+    RecoveryState recovery_state;
+    BallDrift ball_drift;
     nav_msgs::msg::Odometry odom_msg;
+    oakd_msgs::msg::StatePose ball_pose;
 
     // Methods override (uncomment if you have ports to I/O data)
     // static BT::PortsList providedPorts();
@@ -79,6 +91,8 @@ class RecoveryNode : public BT::StatefulActionNode
 
     // Odometry callback
     void odometry_callback(const nav_msgs::msg::Odometry &msg);
+    void ballpose_callback(const oakd_msgs::msg::StatePose &msg);
+
 
 
     void nav_goal_response_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::SharedPtr & goal_handle_);

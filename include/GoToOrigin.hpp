@@ -26,6 +26,7 @@ class GoToOrigin : public BT::StatefulActionNode
 
     rclcpp::Node::SharedPtr node_ptr_;
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
+    std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::PoseStamped>> updated_goal_publisher_;
     std::shared_ptr<GoalHandleNav> goal_handle;
 
 
@@ -42,6 +43,10 @@ class GoToOrigin : public BT::StatefulActionNode
 
     // Subscriber callback
     // void ball_pose_callback(const geometry_msgs::msg::Pose & msg);
+
+    void cancel_goal();
+
+    void compute_goal_NavTo();
 
     // Action client goal response callback
     void goal_response_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::SharedPtr & goal_handle_);

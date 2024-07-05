@@ -34,11 +34,11 @@ Cv_Config::Cv_Config(
     ball_client_ptr_ =node_ptr_->create_client<lifecycle_msgs::srv::ChangeState>("/oak/yolo/yolov8_node/change_state");
     silo_client_ptr_ =node_ptr_->create_client<lifecycle_msgs::srv::ChangeState>("/silo/yolo/yolov8_node/change_state");
 
-    auto deactive_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
-        deactive_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE;
+    // auto deactive_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
+    //     deactive_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE;
     
-    auto result_1 = ball_client_ptr_->async_send_request(deactive_request).future.share();
-    auto result_2 = silo_client_ptr_->async_send_request(deactive_request).future.share();
+    // auto result_1 = ball_client_ptr_->async_send_request(deactive_request).future.share();
+    // auto result_2 = silo_client_ptr_->async_send_request(deactive_request).future.share();
 
     RCLCPP_INFO(node_ptr_->get_logger(),"Cv_Config::Ready");
 
@@ -58,86 +58,54 @@ BT::NodeStatus Cv_Config::tick()
     }
     vision_type = vision_type_.value();
 
-    auto active_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
-    active_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE;
+  
     
-    auto deactive_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
-    deactive_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE;
+    // auto deactive_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
+    // deactive_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE;
 
     // lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE
 
-    if (!ball_client_ptr_->wait_for_service(50ms)) {
-        RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "ball Service service not available, Returning Failure...");
-        return BT::NodeStatus::FAILURE;
-    }
-    if (!silo_client_ptr_->wait_for_service(50ms)) {
-        RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "silo Service service not available, Returning Failure...");
-        return BT::NodeStatus::FAILURE;
-    }
+    // if (!ball_client_ptr_->wait_for_service(50ms)) {
+    //     RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "ball Service service not available, Returning Failure...");
+    //     return BT::NodeStatus::FAILURE;
+    // }
+    // if (!silo_client_ptr_->wait_for_service(50ms)) {
+    //     RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "silo Service service not available, Returning Failure...");
+    //     return BT::NodeStatus::FAILURE;
+    // }
+    // int ball_detect_status = system("exit $(ros2 lifecycle  get /oak/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
+    // int silo_detect_status = system("exit $(ros2 lifecycle  get /silo/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
     
     if(vision_type == VisionType::EH_BALLZ)
     {
-        auto result_1 = ball_client_ptr_->async_send_request(active_request).future.share();
-        auto result_2 = silo_client_ptr_->async_send_request(deactive_request).future.share();
-
-        // RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "blocking here1");
-        // if (wait_for_result(result_1, 500ms )  == std::future_status::ready)
-        // {
-        //     RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Ball Service success");
-            
-        //     if (wait_for_result( result_2, 500ms )  == std::future_status::ready)
-        //     {
-        //         RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Silo Service success");
-        //         return BT::NodeStatus::SUCCESS;
-    
-        //     }
-        //     else
-        //     {
-        //         RCLCPP_ERROR(rclcpp::get_logger("Cv_Config"), "Silo Service failed");   
-        //     }
-        // }
-        // else
-        // {
-        //     RCLCPP_ERROR(rclcpp::get_logger("Cv_Config"), "Ball Service failed");   
-        // }
-        RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Silo Service success");
-
-        return BT::NodeStatus::SUCCESS;
+        auto active_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
+        active_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE;
+        
+        int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+        int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
 
         
-     
+        RCLCPP_INFO(node_ptr_->get_logger(),"Cv_Config::EH_BALLZ %i , %i", ball_flag, silo_flag);
+
+        if ( !ball_flag )
+        {
+            RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Ball Service success");
+        }
     }
     else if (vision_type == VisionType::SILO_DETECTION)
     {
-        auto result_1 = ball_client_ptr_->async_send_request(deactive_request);
-        auto result_2 = silo_client_ptr_->async_send_request(active_request);
+        int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node deactivate ");
+        int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node activate ");
 
+        
+        RCLCPP_INFO(node_ptr_->get_logger(),"Cv_Config::SILO_DETECTION %i , %i", ball_flag, silo_flag);
 
-        // RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "blocking here2");
-        // if (wait_for_result( result_1, 500ms )  == std::future_status::ready)
-        // {
-        //     RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Ball Service success");
-        //     if (rclcpp::spin_until_future_complete(node_ptr_, result_2) ==
-        //         rclcpp::FutureReturnCode::SUCCESS)
-        //     {
-        //         RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Silo Service success");
-        //         return BT::NodeStatus::SUCCESS;
-        //     }
-        //       else
-        //     {
-        //         RCLCPP_ERROR(rclcpp::get_logger("Cv_Config"), "Silo Service failed");   
-        //     }
-        // }
-        // else
-        // {
-        //     RCLCPP_ERROR(rclcpp::get_logger("Cv_Config"), "Ball Service failed");   
-        // }
-        RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Ball Service success");
-
-        return BT::NodeStatus::SUCCESS;
-       
+        if ( !silo_flag)
+        {
+            RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Silo Service success");
+        }
     }
-    return BT::NodeStatus::FAILURE;
+    return BT::NodeStatus::SUCCESS;
 }
 
 

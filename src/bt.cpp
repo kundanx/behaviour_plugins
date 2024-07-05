@@ -24,7 +24,7 @@ autonomy::autonomy(const std::string &nodeName): Node(nodeName)
 void autonomy::setup()
 {   
     create_behavior_tree();
-    const auto timer_period = 10ms;
+    const auto timer_period = 50ms;
     timer_ = this->create_wall_timer(
         timer_period,
         std::bind(&autonomy::update_behavior_tree, this)
@@ -132,9 +132,36 @@ void autonomy::create_behavior_tree()
     {
         return std::make_unique<RecoveryNode>(name, config, shared_from_this());
     };
-    factory.registerBuilder<RecoveryNode>("RecoverNode",builder_12);
+    factory.registerBuilder<RecoveryNode>("BallRecovery",builder_12);
 
 
+    BT::NodeBuilder builder_13 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<StartAndWait>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<StartAndWait>("StartAndWait",builder_13);
+
+    BT::NodeBuilder builder_14 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<ZoneAndColorConfig>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<ZoneAndColorConfig>("ZoneAndColorConfig",builder_14);
+
+    BT::NodeBuilder builder_15 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<Cv_Config>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<Cv_Config>("CvConfig",builder_15);
+
+     BT::NodeBuilder builder_16 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<GoToMiddle>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<GoToMiddle>("GoToMiddle",builder_16);
 
     /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");

@@ -25,7 +25,7 @@ BT::PortsList BackUpActionClient::providedPorts()
 BT::NodeStatus BackUpActionClient::onStart()
 {
     auto input_data = getInput<float64>("In_dist");
-    auto input_data_speed = getInput<float32>("In_dist");
+    auto input_data_speed = getInput<float32>("In_speed");
     if( !input_data )
     {
         throw BT::RuntimeError("BackUpActionClient::error reading port [In_dist]:", input_data.error());
@@ -69,8 +69,28 @@ BT::NodeStatus BackUpActionClient::onRunning()
 
 void BackUpActionClient::onHalted() 
 {
+    cancel_goal();
     // auto cancel_future= action_client_ptr_->async_cancel_goal(goal_handle);
-    RCLCPP_WARN(node_ptr_->get_logger(),"backUp aborted");
+}
+
+void BackUpActionClient::cancel_goal()
+{
+    if (goal_handle != nullptr)
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(), "BackUpActionClient::Goal canceled");
+        try
+        {
+            auto cancel_future = action_client_ptr_->async_cancel_goal(goal_handle);
+        }
+        catch(rclcpp_action::exceptions::UnknownGoalHandleError)
+        {
+            RCLCPP_WARN(node_ptr_->get_logger(),"BackUpActionClient::cancel_goal::rclcpp_action::exceptions::UnknownGoalHandleError");
+        }
+    }
+    else
+    {
+        RCLCPP_WARN(node_ptr_->get_logger(), "BackUpActionClient::No active goal to cancel");
+    }
 }
 
 void BackUpActionClient::goal_response_callback(const GoalHandleBackUp::SharedPtr &goal_handle_)
@@ -83,7 +103,9 @@ void BackUpActionClient::goal_response_callback(const GoalHandleBackUp::SharedPt
     {
         RCLCPP_INFO(node_ptr_->get_logger(), "BackUpActionClient::Goal accepted ");
         this->goal_handle = goal_handle_;
+
     }
+
 }
 
 void BackUpActionClient::backUp_result_callback(const GoalHandleBackUp::WrappedResult &result)
@@ -97,7 +119,7 @@ void BackUpActionClient::backUp_feedback_callback(
     const std::shared_ptr<const BackUp::Feedback> feedback)
 {
     (void)feedback;
-    // RCLCPP_INFO(node_ptr_->get_logger(),"[distance_travelled: %f]",feedback->distance_traveled);
+    RCLCPP_INFO(node_ptr_->get_logger(),"[distance_travelled: %f]",feedback->distance_traveled);
 }
 
 namespace BT

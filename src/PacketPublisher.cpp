@@ -32,12 +32,9 @@ BT::PortsList PacketPublisher::providedPorts()
     auto RollerSpeed_ = getInput<int>("Ip_RollerSpeed");
     auto PneumaticStatus_ = getInput<bool>("Ip_PneumaticStatus");
 
-    // if ( !(RollerSpeed_ && ConveyerStatus_ && ConveyerSpeed_ && RollerStatus_ && PneumaticStatus_) )
-    // {
-    //     throw BT::RuntimeError("[Packet Publisher] error reading port");
-    // }
-    // if(!RollerSpeed_)
-        // throw BT::RuntimeError("[Packet Publisher] error reading RollerSpeed");
+  
+    if(!RollerSpeed_)
+        throw BT::RuntimeError("[Packet Publisher] error reading RollerSpeed_");
     if(!ConveyerSpeed_)
         throw BT::RuntimeError("[Packet Publisher] error reading ConveyerSpeed_");
     if(!RollerStatus_)

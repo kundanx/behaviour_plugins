@@ -23,6 +23,8 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(action_pkg REQUIRED)
 find_package(oakd_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
+
 # find_package(my_bt REQUIRED)
 # find_package(behaviortree_ros2 REQUIRED)
 
@@ -38,6 +40,7 @@ src/GoToBallPose.cpp
 src/GoToSiloPose.cpp
 src/fib_behaviour.cpp
 src/GoToOrigin.cpp
+src/GoToMiddle.cpp
 src/GetBallPose.cpp
 src/isBallDetected.cpp
 src/spinActionClient.cpp
@@ -50,6 +53,7 @@ src/BackUpActionClient.cpp
 src/RecoveryNode.cpp
 src/StartAndWait.cpp 
 src/ZoneAndColorConfig.cpp
+src/CvConfig.cpp
 
 src/actions/TurnOnRoller.cpp
 src/actions/TurnOnConveyer.cpp
@@ -81,6 +85,7 @@ set(TARGET_DEPENDS
       tf2
       action_pkg
       oakd_msgs
+      lifecycle_msgs
       # behaviortree_ros2
 )
 

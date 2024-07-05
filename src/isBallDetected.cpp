@@ -31,6 +31,8 @@ BT::PortsList isBallDetected::providedPorts()
         return BT::NodeStatus::SUCCESS;
     }
     RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::not Detected.");
+    // rclcpp_action::Client::SharedPtr::async_cancel_all_goals();
+
     return BT::NodeStatus::FAILURE;
  }
 

@@ -24,6 +24,10 @@
 #include "ResetOdom.hpp"
 #include "BackUpActionClient.hpp"
 #include "RecoveryNode.hpp"
+#include "StartAndWait.hpp"
+#include "ZoneAndColorConfig.hpp"
+#include "CvConfig.hpp"
+#include "GoToMiddle.hpp"
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"

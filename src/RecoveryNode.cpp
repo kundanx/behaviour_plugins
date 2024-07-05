@@ -22,8 +22,16 @@ RecoveryNode::RecoveryNode(
         qos_profile,
         std::bind(&RecoveryNode::odometry_callback,this,std::placeholders::_1)
     );
+
+    subscription_ballpose = node_ptr_->create_subscription<oakd_msgs::msg::StatePose>( 
+        "/ball_tracker", 
+        qos_profile, 
+        std::bind(&RecoveryNode::ballpose_callback,this,std::placeholders::_1)
+    );
+
     RCLCPP_INFO(node_ptr_->get_logger(),"RecoveryNode::Ready");
     done_flag = false;
+    recovery_state = HALT;
     // RecoveryState recoveryType = HALT;
 }
 
@@ -61,17 +69,46 @@ BT::NodeStatus RecoveryNode::onStart()
     // make backUp goal distance
     auto  backUp_dist = BackUp::Goal();
 
-    backUp_dist.target.x = 0.5;
+    backUp_dist.target.x = 0.3;
     backUp_dist.target.y = 0.0;
     backUp_dist.target.z = 0.0;
     backUp_dist.speed = 1.0;
 
-    // send goal
-    if ( odom_msg.pose.pose.position.y <= -1.60)
-        nav_action_client_ptr_->async_send_goal(goal_msg, nav_send_goal_options);    
-    else 
-        backUp_action_client_ptr_->async_send_goal(backUp_dist, backUp_send_goal_options);    
+    auto goal_spin = Spin::Goal();
+    goal_spin.target_yaw = 15;
+    
 
+    // send goal
+    if ( odom_msg.pose.pose.position.y <= -1.55)
+    {
+        recovery_state = RecoveryState::NAV;
+    }
+    else if ( ball_drift != NO_DRIFT )
+    {
+        recovery_state = RecoveryState::SPIN;
+    }
+    else 
+    {
+        recovery_state = RecoveryState::BACKUP;
+    }
+    switch (recovery_state)
+    {
+        case NAV:
+            nav_action_client_ptr_->async_send_goal(goal_msg, nav_send_goal_options);   
+            break;
+
+        case SPIN:
+            spin_action_client_ptr_->async_send_goal(goal_spin, spin_send_goal_options);
+
+            break;
+        
+        case BACKUP:
+            backUp_action_client_ptr_->async_send_goal(backUp_dist, backUp_send_goal_options);    
+            break;
+
+        default:    
+        return BT::NodeStatus::SUCCESS;
+    }
 
     done_flag = false;
     RCLCPP_INFO(node_ptr_->get_logger(),"RecoveryNode::Action sent");
@@ -90,13 +127,92 @@ BT::NodeStatus RecoveryNode::onRunning()
 
 void RecoveryNode::onHalted() 
 {
-    // auto cancel_future= action_client_ptr_->async_cancel_all_goals();
-    RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::Halted");
+    switch (recovery_state)
+    {
+        case NAV:
+            if (nav_goal_handle)
+            {
+                try
+                    {
+                        auto cancel_future = nav_action_client_ptr_->async_cancel_goal(nav_goal_handle);
+                    }
+                    catch(rclcpp_action::exceptions::UnknownGoalHandleError)
+                    {
+                        RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted::NAV::rclcpp_action::exceptions::UnknownGoalHandleError");
+                    }
+                    RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::Nav Goal canceled");
+            }
+            break;
+
+        case SPIN:
+         if (spin_goal_handle)
+            {
+                try
+                    {
+                        auto cancel_future = spin_action_client_ptr_->async_cancel_goal(spin_goal_handle);
+                    }
+                    catch(rclcpp_action::exceptions::UnknownGoalHandleError)
+                    {
+                        RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted::SPIN::rclcpp_action::exceptions::UnknownGoalHandleError");
+                    }
+                    RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::Spin Goal canceled");
+            }
+            break;
+
+        case BACKUP:
+        if (backUp_goal_handle)
+            {
+                try
+                    {
+                        auto cancel_future = backUp_action_client_ptr_->async_cancel_goal(backUp_goal_handle);
+                    }
+                    catch(rclcpp_action::exceptions::UnknownGoalHandleError)
+                    {
+                        RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted::BACKUP::rclcpp_action::exceptions::UnknownGoalHandleError");
+                    }
+                    RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::BackUp Goal canceled");
+            }
+            break;
+
+        default:
+            RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted:: No goal to cancel");
+            return ;
+            
+    }
+  
 }
 
 void RecoveryNode::odometry_callback(const nav_msgs::msg::Odometry &msg)
 {
     odom_msg = msg;
+}
+
+void RecoveryNode::ballpose_callback(const oakd_msgs::msg::StatePose &msg)
+{
+    ball_pose = msg;
+    if ( ball_pose.is_tracked.data)
+    {
+        EulerAngles e;
+        e = ToEulerAngles(ball_pose.goalpose.pose.orientation.w,
+                          ball_pose.goalpose.pose.orientation.x,
+                          ball_pose.goalpose.pose.orientation.y,
+                          ball_pose.goalpose.pose.orientation.z);
+        
+        if (e.yaw - previous_ball_theta > 0)
+        {
+            ball_drift = CLOCKWISE;
+        }
+        else if (e.yaw - previous_ball_theta <0)
+        {
+            ball_drift = ANTI_CLOCKWISE;
+        }
+        else 
+        {
+            ball_drift = NO_DRIFT;
+        }
+
+        previous_ball_theta = e.yaw;
+    }
 }
 
 void RecoveryNode::nav_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)

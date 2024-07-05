@@ -11,6 +11,8 @@ GoToOrigin::GoToOrigin(
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
+    updated_goal_publisher_ = node_ptr_->create_publisher<geometry_msgs::msg::PoseStamped>( "/goal_update", 10);
+
     RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin::Ready");
     done_flag = false;
 }
@@ -40,6 +42,7 @@ BT::NodeStatus GoToOrigin::onStart()
 
     // send pose
     done_flag = false;
+    compute_goal_NavTo();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin::sent goal to nav2\n");
     return BT::NodeStatus::RUNNING;
@@ -51,13 +54,38 @@ BT::NodeStatus GoToOrigin::onRunning()
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());
         return BT::NodeStatus::SUCCESS;
     }
+    compute_goal_NavTo();
     return BT::NodeStatus::RUNNING;
 }
 
 void GoToOrigin::onHalted() 
 {
-    auto cancel_future= action_client_ptr_->async_cancel_all_goals();
+    cancel_goal();
     RCLCPP_WARN(node_ptr_->get_logger(),"GoToOrigin::Navigation aborted");
+}
+
+/*****************************************************************************************************************
+ * @brief Cancle navigation action
+ ******************************************************************************************************************/
+
+void GoToOrigin::cancel_goal()
+{
+    if (goal_handle)
+    {
+       try
+        {
+            auto cancel_future = action_client_ptr_->async_cancel_goal(goal_handle);
+        }
+        catch(rclcpp_action::exceptions::UnknownGoalHandleError)
+        {
+            RCLCPP_WARN(node_ptr_->get_logger(),"GoToSiloPose::cancel_goal::rclcpp_action::exceptions::UnknownGoalHandleError");
+        }
+        RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::Goal canceled");
+    }
+    else
+    {
+        RCLCPP_WARN(node_ptr_->get_logger(), "GoToSiloPose::No active goal to cancel");
+    }
 }
 
 void GoToOrigin::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)
@@ -93,4 +121,22 @@ void GoToOrigin::goal_response_callback(const rclcpp_action::ClientGoalHandle<Na
         RCLCPP_INFO(node_ptr_->get_logger(), "GoToOrigin::Nav to origin Goal accepted ");
         this->goal_handle = goal_handle_;
     }
+}
+
+void GoToOrigin::compute_goal_NavTo()
+{
+    geometry_msgs::msg::PoseStamped updated_goal;
+
+    updated_goal.header.frame_id = "map";
+    updated_goal.pose.position.x = 0.0;
+    updated_goal.pose.position.y = 0.0;
+    updated_goal.pose.position.z = 0.0;
+
+    updated_goal.pose.orientation.x = 0.0;
+    updated_goal.pose.orientation.y = 0.0;
+    updated_goal.pose.orientation.z = 0.7071068;
+    updated_goal.pose.orientation.w = 0.7071068;
+
+    updated_goal_publisher_->publish(updated_goal);
+
 }

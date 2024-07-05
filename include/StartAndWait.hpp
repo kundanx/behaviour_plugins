@@ -5,6 +5,8 @@
 #include <memory>
 
 #include "std_msgs/msg/u_int8.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+#include "nav2_msgs/action/navigate_to_pose.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/subscription.hpp"
@@ -22,8 +24,15 @@ class StartAndWait : public BT::SyncActionNode
         const BT::NodeConfiguration &config,
         rclcpp::Node::SharedPtr node_ptr);
 
+    
+    using NavigateToPose = nav2_msgs::action::NavigateToPose;
+    using GoalHandleNav = rclcpp_action::ClientGoalHandle<NavigateToPose>;
+    using PosMsg = geometry_msgs::msg::PoseStamped;
+
     rclcpp::Node::SharedPtr node_ptr_;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_;
+    rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
+
     
     bool start;
     bool wait;

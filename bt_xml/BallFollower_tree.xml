@@ -1,23 +1,48 @@
 <!-- Behaviour Tree that sequentially navigates locations naively -->
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
-        <SequenceStar>
-            <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
-            <!-- <LineFollower name = "from_retry_zone" Ip_action_type="1"/> -->
-            <!-- <waitActionClient  In_sec="1" In_nanosec="0"/> -->
 
-            <!-- <SubTree ID="SILO_TEST"/> -->
-            <!-- <LineFollower name = "Align_yaw" Ip_action_type="3"/> -->
+        <SequenceStar>
+            
+
+            <!-- <GoToOrigin name= "ToOrigin"/>
+            <LineFollower name = "Align_yaw" Ip_action_type="3"/>
+            <GoToSiloPose name="goToSilo" Ip_SiloNumber="1" Op_SiloNumber="{SiloNumber}"/>
+            <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+            <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
+            -->
+
+        
+            <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/>
+            <LineFollower name = "from_retry_zone" Ip_action_type="1"/>
+            <waitActionClient  In_sec="1" In_nanosec="0"/>
+
+            <LineFollower name = "Align_yaw" Ip_action_type="3"/> -->
+            <InitiallizeActuators name = "initiallize_actutatos"
+                Op_RollerStatus="{RollerStatus}"
+                Op_RollerSpeed="{RollerSpeed}"
+                Op_ConveyerStatus="{ConveyerStatus}"
+                Op_ConveyerSpeed="{ConveyerSpeed}"
+                Op_PneumaticStatus="{PneumaticStatus}"/>
+            <PacketPublisher name="packetPublisher"
+                Ip_RollerStatus="{RollerStatus}"
+                Ip_RollerSpeed="{RollerSpeed}"
+                Ip_ConveyerStatus="{ConveyerStatus}"
+                Ip_ConveyerSpeed="{ConveyerSpeed}"
+                Ip_PneumaticStatus="{PneumaticStatus}"/>                
+            <GoToOrigin name= "ToOrigin"/>
 
             <Repeat num_cycles="100">
                 <SequenceStar>
-                    <GoToOrigin name= "ToOrigin"/>
                     <LineFollower name = "Align_yaw" Ip_action_type="3"/>
-                    <!-- <waitActionClient  In_sec="2" In_nanosec="0"/> -->
-                    <SubTree ID = "FindBall_AND_StoreInSilo"/>
-                    <!-- <waitActionClient  In_sec="2" In_nanosec="0"/> -->
+                    <SubTree ID = "FindBall_AND_StoreInSilo"
+                        ballDetectionFlag="{ballDetectionFlag}"
+                        RollerStatus="{RollerStatus}"
+                        RollerSpeed="{RollerSpeed}"
+                        ConveyerStatus="{ConveyerStatus}"
+                        ConveyerSpeed="{ConveyerSpeed}"
+                        PneumaticStatus="{PneumaticStatus}"/>
                 </SequenceStar>
-                </RateController>
             </Repeat>
         </SequenceStar>
 
@@ -29,24 +54,14 @@
             <KeepRunningUntilFailure>
                 <Inverter>
                     <SequenceStar>
-                        <InitiallizeActuators name = "initiallize_actutatos"
-                            Op_RollerStatus="{RollerStatus}"
+                        <TurnOffRoller name = "Stop_roller" 
                             Op_RollerSpeed="{RollerSpeed}"
-                            Op_ConveyerStatus="{ConveyerStatus}"
-                            Op_ConveyerSpeed="{ConveyerSpeed}"
-                            Op_PneumaticStatus="{PneumaticStatus}"/>
-                        <PacketPublisher name="packetPublisher"
-                            Ip_RollerStatus="{RollerStatus}"
-                            Ip_RollerSpeed="{RollerSpeed}"
-                            Ip_ConveyerStatus="{ConveyerStatus}"
-                            Ip_ConveyerSpeed="{ConveyerSpeed}"
-                            Ip_PneumaticStatus="{PneumaticStatus}"/>
-                        <SubTree ID="Start_mechanisms"
-                            RollerStatus="{RollerStatus}"
-                            RollerSpeed="{RollerSpeed}"
-                            ConveyerStatus="{ConveyerStatus}"
-                            ConveyerSpeed="{ConveyerSpeed}"
-                            PneumaticStatus="{PneumaticStatus}"/>
+                            Op_RollerStatus="{RollerStatus}"/> 
+                        <PneumaticOff name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/>
+                        <TurnOffConveyer name = "Stop_conveyer"
+                            Op_ConveyerSpeed="{ConveyerSpeed}" 
+                            Op_ConveyerStatus="{ConveyerStatus}"/>
+                        <SubTree ID="Start_mechanisms"/>
                         <SubTree ID="Retrieve_balls"
                             ballDetectionFlag="{ballDetectionFlag}"
                             RollerStatus="{RollerStatus}"
@@ -54,12 +69,9 @@
                             ConveyerStatus="{ConveyerStatus}"
                             ConveyerSpeed="{ConveyerSpeed}"
                             PneumaticStatus="{PneumaticStatus}"/>
-                        
-                        <!-- <LineFollower name = "line_follow" Ip_action_type="3"/> -->
-                        <!-- <SubTree ID="Go_TO_SILO"/> -->
-                        <GoToOrigin name= "ToOrigin"/>
-                        <!-- <waitActionClient  In_sec="1" In_nanosec="0"/> -->
-                        <TurnOnConveyer name = "Keep_conveyer_running_1" 
+                        <SubTree ID="Go_TO_SILO"/>
+                        <!-- <GoToOrigin name= "ToOrigin"/> -->
+                        <TurnOnConveyer name = "Keep_conveyer_running" 
                             Op_ConveyerStatus="{ConveyerStatus}"
                             Op_ConveyerSpeed="{ConveyerSpeed}" 
                             Ip_ConveyerSpeed="80"/>
@@ -78,9 +90,9 @@
                             Ip_RollerSpeed="{RollerSpeed}"
                             Ip_ConveyerStatus="{ConveyerStatus}"
                             Ip_ConveyerSpeed="{ConveyerSpeed}"
-                            Ip_PneumaticStatus="{PneumaticStatus}"/>
-                        
-                        <!-- <waitActionClient  In_sec="30" In_nanosec="0"/> -->
+                            Ip_PneumaticStatus="{PneumaticStatus}"/>  
+                        <CvConfig name = "ball_detection_activate" In_vision_type="0"/>
+                        <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
                     </SequenceStar>
                 </Inverter>
             </KeepRunningUntilFailure>
@@ -109,39 +121,41 @@
 
     <BehaviorTree ID="Go_TO_SILO">
         <SequenceStar>
+            <CvConfig name = "silo_detection_activate" In_vision_type="1"/>
+            <LineFollower name = "Align_yaw" Ip_action_type="3"/>
+            <GoToMiddle name="goToMiddle" Ip_middle_type="0"/>
+
             <GoToSiloPose name="goToSilo" Ip_SiloNumber="1" Op_SiloNumber="{SiloNumber}"/>
-            <LineFollower name = "line_follow" Ip_action_type="2"/>
-            <ResetOdom name = "Reset" Ip_SiloNumber="{SiloNumber}"/>
+            <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+            <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
         </SequenceStar>
     </BehaviorTree>
 
     <BehaviorTree ID="Retrieve_balls">
         <SequenceStar>
+           
             <Inverter>
                 <KeepRunningUntilFailure>
                     <WhileDoElse> 
                         <Inverter>
                             <isBallInside name = "isBallInside"/>
                         </Inverter>
-                        <RateController hz = "20">
                         <WhileDoElse> 
                             <isBallDetected name="isBallDetected_node" op_pose="{pose}"/>
-                            <!-- <ReactiveSequence > -->
-                                <!-- <GetBallPose name="GetBallPose_node" op_pose="{pose}"/> -->
-                            <!-- <SequenceStar >
+                          
+                            <SequenceStar>
                                 <LineFollower name = "Rotate_to_yaw" Ip_action_type="4" In_pose="{pose}"/>
                                 <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-                            </SequenceStar > -->
-                            <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
+                            </SequenceStar >
+                            <!-- <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/> -->
 
-                            <!-- <RecoverNode/> -->
-                            <!-- </ReactiveSequence> -->
-                            <SequenceStar >
-                                <LineFollower name = "line_follow" Ip_action_type="3"/>
-                                <BackUpActionClient In_dist="-0.5" In_speed="2.0" />
-                            </SequenceStar>
-                        </WhileDoElse>  
-                        </RateController>
+                            <!-- <SequenceStar >
+                                <LineFollower name = "line_follow" Ip_action_type="3" In_pose="{pose}"/>
+                                <BackUpActionClient In_dist="-0.3" In_speed="0.5" />
+                            </SequenceStar> -->
+                            <BallRecovery name="Recovery_node"/>
+                        </WhileDoElse> 
+
                         <returnFailure name="returnFailed"/>
                     </WhileDoElse> 
                 </KeepRunningUntilFailure>
@@ -151,6 +165,10 @@
                 Op_RollerSpeed="{RollerSpeed}"
                 Op_RollerStatus="{RollerStatus}"/> 
             <PneumaticOff name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/>
+             <TurnOnConveyer name = "Keep_conveyer_running" 
+                Op_ConveyerStatus="{ConveyerStatus}"
+                Op_ConveyerSpeed="{ConveyerSpeed}" 
+                Ip_ConveyerSpeed="80"/>
             <PacketPublisher name="packetPublisher"
                 Ip_RollerStatus="{RollerStatus}"
                 Ip_RollerSpeed="{RollerSpeed}"
@@ -189,31 +207,76 @@
 
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="1" Op_SiloNumber="{SiloNumber}"/>
-                    <LineFollower name = "line_follow" Ip_action_type="2"/>
-                    <ResetOdom name = "Reset" Ip_SiloNumber="{SiloNumber}"/>
+                    <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+                    <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
                 </SequenceStar>
                  <GoToOrigin name= "ToOrigin"/>
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="2" Op_SiloNumber="{SiloNumber}"/>
-                    <LineFollower name = "line_follow" Ip_action_type="2"/>
-                    <ResetOdom name = "Reset" Ip_SiloNumber="{SiloNumber}"/>
+                    <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+                    <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
                 </SequenceStar>
                  <GoToOrigin name= "ToOrigin"/>
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="3" Op_SiloNumber="{SiloNumber}"/>
-                    <LineFollower name = "line_follow" Ip_action_type="2"/>
-                    <ResetOdom name = "Reset" Ip_SiloNumber="{SiloNumber}"/>
+                    <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+                    <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
                 </SequenceStar>
                  <GoToOrigin name= "ToOrigin"/>
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="4" Op_SiloNumber="{SiloNumber}"/>
-                    <LineFollower name = "line_follow" Ip_action_type="2"/>
-                    <ResetOdom name = "Reset" Ip_SiloNumber="{SiloNumber}"/>
+                    <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+                    <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
                 </SequenceStar>
             </SequenceStar>
-        </Repeat>
+        </Repeat>        
+    </BehaviorTree>
 
-        
+
+    <BehaviorTree ID="ROOT_TREE">
+        <KeepRunningUntilFailure>
+            <Inverter>
+                <IfThenElse>
+                <ZoneAndColorConfig name="START_ZONE_OR_RETRY_ZONE"/>
+                <SubTree ID = "START_ZONE"/>
+                <SubTree ID = "RETRY_ZONE"/>
+                </IfThenElse>
+            </Inverter>
+        </KeepRunningUntilFailure>
+    </BehaviorTree>
+
+    <BehaviorTree ID = "START_ZONE">
+        <ReactiveSequence>
+            <StartAndWait name="Waiting_for_go_command"/>
+            <SequenceStar>
+                <LineFollower name = "from_start_zone" Ip_action_type="0"/>
+                <SubTree ID = "AREA_3_TASK"/>
+            </SequenceStar>
+        </ReactiveSequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID = "RETRY_ZONE">
+        <ReactiveSequence>
+            <StartAndWait name="Waiting_for_go_command"/>
+            <SequenceStar>
+                <LineFollower name = "from_retry_zone" Ip_action_type="1"/>
+                <SubTree ID = "AREA_3_TASK"/>
+            </SequenceStar>
+        </ReactiveSequence>
+    </BehaviorTree>
+
+    <BehaviorTree ID = "AREA_3_TASK">
+        <Repeat num_cycles="100">
+                <SequenceStar>
+                    <GoToOrigin name= "ToOrigin"/>
+                    <LineFollower name = "Align_yaw" Ip_action_type="3"/>
+                    <!-- <GoToSiloPose name="goToSilo" Ip_SiloNumber="1" Op_SiloNumber="{SiloNumber}"/> -->
+
+                    <!-- <waitActionClient  In_sec="2" In_nanosec="0"/> -->
+                    <SubTree ID = "FindBall_AND_StoreInSilo"/>
+                    <!-- <waitActionClient  In_sec="2" In_nanosec="0"/> -->
+                </SequenceStar>
+        </Repeat>
     </BehaviorTree>
   
 

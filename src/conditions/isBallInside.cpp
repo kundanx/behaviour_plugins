@@ -7,7 +7,7 @@ isBallInside::isBallInside(
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
     rclcpp::QoS qos_profile(10);
-    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "is_ball_inside", qos_profile, std::bind(&isBallInside::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"isBallInside::Ready");
     inside = false;
