@@ -9,6 +9,7 @@
 #include "nav2_msgs/action/spin.hpp"
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "nav2_msgs/action/back_up.hpp"
+#include "action_pkg/action/line_follow.hpp"
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/float32.hpp"
 
@@ -21,12 +22,15 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
+#define MAX_SPIN_NUM 3
+#define MAX_BACKUP_NUM 3
+#define MAX_ALIGN_YAW_NUM 3
 enum RecoveryState
 {
     NAV,
     BACKUP,
     SPIN,
-    // ALIGN_YAW_,
+    YAW_ALIGN,
     HALT
 };
 enum BallDrift
@@ -52,6 +56,8 @@ class RecoveryNode : public BT::StatefulActionNode
     using Spin = nav2_msgs::action::Spin;
     using GoalHandleSpin = rclcpp_action::ClientGoalHandle<Spin>;
 
+    using LineFollow = action_pkg::action::LineFollow;
+    using GoalHandleLineFollow = rclcpp_action::ClientGoalHandle<LineFollow>;
 
     using PosMsg = geometry_msgs::msg::PoseStamped;
     using float64 = std_msgs::msg::Float64;
@@ -65,16 +71,25 @@ class RecoveryNode : public BT::StatefulActionNode
     rclcpp_action::Client<NavigateToPose>::SharedPtr nav_action_client_ptr_;
     rclcpp_action::Client<BackUp>::SharedPtr backUp_action_client_ptr_;
     rclcpp_action::Client<Spin>::SharedPtr spin_action_client_ptr_;
+    rclcpp_action::Client<LineFollow>::SharedPtr align_yaw_action_client_ptr_;
+
 
 
     std::shared_ptr<GoalHandleNav> nav_goal_handle;
     std::shared_ptr<GoalHandleBackUp> backUp_goal_handle;
     std::shared_ptr<GoalHandleSpin> spin_goal_handle;
+    std::shared_ptr<GoalHandleLineFollow> align_yaw_goal_handle;
+
+    enum TeamColor
+    {
+        RED = -1,
+        BLUE = 1
+    }team_color;
 
 
-
-
-    double xyz[3]; // x, y, z
+    uint8_t spin_counter;
+    uint8_t backup_counter;
+    uint8_t align_yaw_counter;
     double previous_ball_theta;
     bool done_flag;
     RecoveryState recovery_state;
@@ -83,7 +98,7 @@ class RecoveryNode : public BT::StatefulActionNode
     oakd_msgs::msg::StatePose ball_pose;
 
     // Methods override (uncomment if you have ports to I/O data)
-    // static BT::PortsList providedPorts();
+    static BT::PortsList providedPorts();
 
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
@@ -106,6 +121,10 @@ class RecoveryNode : public BT::StatefulActionNode
     void spin_goal_response_callback(const rclcpp_action::ClientGoalHandle<Spin>::SharedPtr & goal_handle_);
     void spin_result_callback(const GoalHandleSpin::WrappedResult &result);
     void spin_feedback_callback(GoalHandleSpin::SharedPtr, const std::shared_ptr<const Spin::Feedback> feedback);
+
+    void align_yaw_goal_response_callback(const GoalHandleLineFollow::SharedPtr & goal_handle_);
+    void align_yaw_feedback_callback( GoalHandleLineFollow::SharedPtr, const std::shared_ptr<const LineFollow::Feedback>);
+    void align_yaw_result_callback(const GoalHandleLineFollow::WrappedResult & result);
     
 };
 

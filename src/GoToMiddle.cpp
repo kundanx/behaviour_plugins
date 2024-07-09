@@ -17,16 +17,23 @@ GoToMiddle::GoToMiddle(
     subscription_odometry = node_ptr_->create_subscription<nav_msgs::msg::Odometry>(
         "/odometry/filtered",
         qos_profile,
-        std::bind(&GoToMiddle::odometry_callback, this, std::placeholders::_1));
-    // updated_goal_publisher_ = node_ptr_->create_publisher<geometry_msgs::msg::PoseStamped>( "/goal_update", 10);
-
-    RCLCPP_INFO(node_ptr_->get_logger(),"GoToMiddle::Ready");
+        std::bind(&GoToMiddle::odometry_callback, this, std::placeholders::_1)
+    );
+     subscription_team_color = node_ptr_->create_subscription<std_msgs::msg::Int8>(
+        "team_color",
+        qos_profile,
+        std::bind(&GoToMiddle::team_color_callback, this, std::placeholders::_1)
+    );
     done_flag = false;
+    RCLCPP_INFO(node_ptr_->get_logger(),"GoToMiddle::Ready");
 }
+
 BT::PortsList GoToMiddle::providedPorts()
 {
-    return {BT::InputPort<int>("Ip_middle_type")};
+    return {BT::InputPort<int>("Ip_middle_type"),
+            BT::InputPort<int>("In_start_wait")};
 }
+
 BT::NodeStatus GoToMiddle::onStart()
 {
     auto middle_type_ = getInput<int>("Ip_middle_type");
@@ -36,13 +43,12 @@ BT::NodeStatus GoToMiddle::onStart()
 
     }
     int middle_type = middle_type_.value();
-    // Setup action client goal
+
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.goal_response_callback =std::bind(&GoToMiddle::goal_response_callback, this, std::placeholders::_1);
-    send_goal_options.result_callback = std::bind(&GoToMiddle::nav_to_pose_result_callback, this, std::placeholders::_1);
-    send_goal_options.feedback_callback = std::bind(&GoToMiddle::nav_to_pose_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
+    send_goal_options.result_callback = std::bind(&GoToMiddle::goal_result_callback, this, std::placeholders::_1);
+    send_goal_options.feedback_callback = std::bind(&GoToMiddle::goal_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
-    // make pose
     auto goal_msg = NavigateToPose::Goal();
 
     switch (middle_type)
@@ -52,27 +58,26 @@ BT::NodeStatus GoToMiddle::onStart()
                 goal_msg.pose.pose.position.x = 1.3;
             else    
                 goal_msg.pose.pose.position.x = odom_msg.pose.pose.position.x;
-            goal_msg.pose.pose.position.y = -1.0;
+            goal_msg.pose.pose.position.y = -1.0 * team_color;
             break;
 
         case ABSOLUTE_MIDDLE:
             goal_msg.pose.pose.position.x = 0.0;
-            goal_msg.pose.pose.position.y = -2.0;
+            goal_msg.pose.pose.position.y = -2.0 * team_color;
             break;
     }
+
+    Quaternion q;
+    q = ToQuaternion(0.0, 0.0,  (1.57 * team_color));
         
     goal_msg.pose.header.frame_id = "map";
-    
     goal_msg.pose.pose.position.z = 0.0;
 
-    goal_msg.pose.pose.orientation.x = 0.0;
-    goal_msg.pose.pose.orientation.y = 0.0;
-    goal_msg.pose.pose.orientation.z = 0.7071068;
-    goal_msg.pose.pose.orientation.w = 0.7071068;
+    goal_msg.pose.pose.orientation.x = q.x;
+    goal_msg.pose.pose.orientation.y = q.y;
+    goal_msg.pose.pose.orientation.z = q.z;
+    goal_msg.pose.pose.orientation.w = q.w;
 
-    // auto cancel_future= action_client_ptr_->async_cancel_all_goals();
-
-    // send pose
     done_flag = false;
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"GoToMiddle::sent goal to nav2\n");
@@ -80,6 +85,16 @@ BT::NodeStatus GoToMiddle::onStart()
 }
 BT::NodeStatus GoToMiddle::onRunning()
 {   
+    
+    auto start_wait_ = getInput<int>("In_start_wait");
+    if(start_wait_ )
+    {
+        if(start_wait_.value() == -1)
+        {
+            cancel_goal();
+            return BT::NodeStatus::FAILURE;
+        }
+    }
     if(done_flag)
     {
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());
@@ -94,15 +109,18 @@ void GoToMiddle::onHalted()
     RCLCPP_WARN(node_ptr_->get_logger(),"GoToMiddle::Navigation aborted");
 }
 
-
-
 void GoToMiddle::odometry_callback(const nav_msgs::msg::Odometry &msg)
 {
     this->odom_msg = msg;
 }
-/*****************************************************************************************************************
- * @brief Cancle navigation action
- ******************************************************************************************************************/
+
+void GoToMiddle::team_color_callback(const std_msgs::msg::Int8 &msg)
+{
+    if( msg.data == -1)
+        team_color = RED;
+    else
+        team_color = BLUE;
+}
 
 void GoToMiddle::cancel_goal()
 {
@@ -124,26 +142,23 @@ void GoToMiddle::cancel_goal()
     }
 }
 
-void GoToMiddle::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)
+void GoToMiddle::goal_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)
 {
     if(wrappedresult.result)
     {
         done_flag=true;
         RCLCPP_INFO(node_ptr_->get_logger()," GoToMiddle:: Result sucessfull");
-
     }
     else
     {
         RCLCPP_INFO(node_ptr_->get_logger()," GoToMiddle:: Result ERROR..");
-
     }
 }
-void GoToMiddle::nav_to_pose_feedback_callback(
+void GoToMiddle::goal_feedback_callback(
     GoalHandleNav::SharedPtr,
     const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
     (void)feedback;
-    // RCLCPP_INFO(node_ptr_->get_logger()," GoToMiddle::Navigating to origin..");
 }
 
 void GoToMiddle::goal_response_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::SharedPtr & goal_handle_)

@@ -121,6 +121,7 @@ BT::NodeStatus LineFollower::onStart()
 }
 BT::NodeStatus LineFollower::onRunning()
 {   
+   
     if(done_flag)
     {
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());
@@ -132,6 +133,7 @@ BT::NodeStatus LineFollower::onRunning()
 void LineFollower::onHalted() 
 {
     // (void);
+
     cancel_goal();    
 }
 

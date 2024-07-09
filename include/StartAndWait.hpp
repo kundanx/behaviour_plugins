@@ -37,6 +37,9 @@ class StartAndWait : public BT::SyncActionNode
     bool start;
     bool wait;
 
+
+    // Methods override (uncomment if you have ports to I/O data)
+    static BT::PortsList providedPorts();
   
     BT::NodeStatus tick() override;
 

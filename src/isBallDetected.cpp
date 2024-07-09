@@ -15,6 +15,7 @@ isBallDetected::isBallDetected(
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     subscription_ = node_ptr_->create_subscription<oakd_msgs::msg::StatePose>( "/ball_tracker", qos_profile, std::bind(&isBallDetected::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::Ready");
+    ball_not_detected_counter = MAX_NOT_DETECTED;
     isDetected.data = false;
 }
 
@@ -36,13 +37,28 @@ BT::PortsList isBallDetected::providedPorts()
     return BT::NodeStatus::FAILURE;
  }
 
-void isBallDetected::subscriber_callback(oakd_msgs::msg::StatePose ball)
+void isBallDetected::subscriber_callback(oakd_msgs::msg::StatePose msg)
 {   
-    if(ball.is_tracked.data)
+    if(msg.is_tracked.data)
     {
+
         isDetected.data = true;    
-        setOutput<geometry_msgs::msg::PoseStamped>("op_pose", ball.goalpose);
+        setOutput<geometry_msgs::msg::PoseStamped>("op_pose", msg.goalpose);
+        // ball_not_detected_counter = 0;
+        // ball = msg;
     }
     else
+    {
         isDetected.data = false;
+        // ball_not_detected_counter ++;
+    }
+    
+    // if (ball_not_detected_counter < MAX_NOT_DETECTED)
+    // {
+    //     isDetected.data = true;    
+    //     setOutput<geometry_msgs::msg::PoseStamped>("op_pose", ball.goalpose);
+    // }
+    // else 
+    //     isDetected.data = false;
+
 }

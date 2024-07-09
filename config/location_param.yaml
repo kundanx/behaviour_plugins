@@ -3,16 +3,16 @@ testing : False
 
 # Location of silo w.r.t origin at Y junction
 # y co-oridinate of each silo = 4.164
-silo_one: [1.50, -3.00]
+silo_one: [1.50, -3.50]
 
 
-silo_two: [0.75, -3.00]
+silo_two: [0.75, -3.50]
 
 
-silo_three: [0.00, -3.00]
+silo_three: [0.00, -3.50]
 
 
-silo_four: [-0.75, -3.00]
+silo_four: [-0.75, -3.50]
 
-silo_five: [-1.50, -3.00]
+silo_five: [-1.50, -3.50]
 

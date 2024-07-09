@@ -41,7 +41,6 @@ src/GoToSiloPose.cpp
 src/fib_behaviour.cpp
 src/GoToOrigin.cpp
 src/GoToMiddle.cpp
-src/GetBallPose.cpp
 src/isBallDetected.cpp
 src/spinActionClient.cpp
 src/waitActionClient.cpp

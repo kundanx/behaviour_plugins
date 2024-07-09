@@ -14,6 +14,8 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
+#define MAX_NOT_DETECTED 10
+
 
 using namespace BT;
 class isBallDetected : public BT::SyncActionNode
@@ -28,6 +30,8 @@ class isBallDetected : public BT::SyncActionNode
     std::shared_ptr<rclcpp::Subscription<oakd_msgs::msg::StatePose>> subscription_;
     
     std_msgs::msg::Bool isDetected;
+    oakd_msgs::msg::StatePose ball;
+    uint64_t ball_not_detected_counter;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();

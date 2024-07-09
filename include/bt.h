@@ -11,7 +11,6 @@
 #include "behaviortree_cpp_v3/utils/shared_library.h"
 
 #include "isBallDetected.hpp"
-#include "GetBallPose.hpp"
 #include "GoToBallPose.h"
 #include "GoToSiloPose.hpp"
 #include "GoToOrigin.hpp"

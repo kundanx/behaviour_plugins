@@ -8,10 +8,13 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include "std_msgs/msg/int8.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
+#include "behaviour_plugins/angle_conversions.hpp"
+
 
 enum MiddleType
 {
@@ -30,15 +33,19 @@ class GoToMiddle : public BT::StatefulActionNode
     using PosMsg = geometry_msgs::msg::PoseStamped;
 
     rclcpp::Node::SharedPtr node_ptr_;
+    std::shared_ptr<GoalHandleNav> goal_handle;
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> subscription_team_color;  
 
-    std::shared_ptr<GoalHandleNav> goal_handle;
 
-
+    enum TeamColor
+    {
+        RED = -1,
+        BLUE = 1
+    }team_color;
     bool done_flag;
     nav_msgs::msg::Odometry odom_msg;
-
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
@@ -47,21 +54,16 @@ class GoToMiddle : public BT::StatefulActionNode
     BT::NodeStatus onRunning() override;
     void onHalted() override;
 
-    // Subscriber callback
-    // void ball_pose_callback(const geometry_msgs::msg::Pose & msg);
-
     void cancel_goal();
 
+    // Subscribers callbacks
     void odometry_callback(const nav_msgs::msg::Odometry &msg);
+    void team_color_callback(const std_msgs::msg::Int8 &msg);
 
-    // Action client goal response callback
+    // Action Server feedbacks
     void goal_response_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::SharedPtr & goal_handle_);
-
-    // Action client result callback
-    void nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &result);
-
-    // // Action client feedback callback
-    void nav_to_pose_feedback_callback(GoalHandleNav::SharedPtr, const std::shared_ptr<const NavigateToPose::Feedback> feedback);
+    void goal_result_callback(const GoalHandleNav::WrappedResult &result);
+    void goal_feedback_callback(GoalHandleNav::SharedPtr, const std::shared_ptr<const NavigateToPose::Feedback> feedback);
     
 };
 

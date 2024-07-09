@@ -10,51 +10,77 @@ GoToOrigin::GoToOrigin(
     rclcpp::Node::SharedPtr node_ptr) 
     : BT::StatefulActionNode(name,config), node_ptr_(node_ptr)
 {
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
-    updated_goal_publisher_ = node_ptr_->create_publisher<geometry_msgs::msg::PoseStamped>( "/goal_update", 10);
+     subscription_team_color = node_ptr_->create_subscription<std_msgs::msg::Int8>(
+        "team_color",
+        qos_profile,
+        std::bind(&GoToOrigin::team_color_callback, this, std::placeholders::_1)
+    );
 
     RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin::Ready");
     done_flag = false;
 }
 
+void GoToOrigin::team_color_callback(const std_msgs::msg::Int8 &msg)
+{
+    if( msg.data == -1)
+        team_color = RED;
+    else
+        team_color = BLUE;
+}
+ BT::PortsList GoToOrigin::providedPorts()
+ {
+    return{BT::InputPort<int>("In_start_wait")};
+ }
+
 BT::NodeStatus GoToOrigin::onStart()
 {
-    // Setup action client goal
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.goal_response_callback =std::bind(&GoToOrigin::goal_response_callback, this, std::placeholders::_1);
-    send_goal_options.result_callback = std::bind(&GoToOrigin::nav_to_pose_result_callback, this, std::placeholders::_1);
-    send_goal_options.feedback_callback = std::bind(&GoToOrigin::nav_to_pose_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
+    send_goal_options.result_callback = std::bind(&GoToOrigin::goal_result_callback, this, std::placeholders::_1);
+    send_goal_options.feedback_callback = std::bind(&GoToOrigin::goal_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
-    // make pose
     auto goal_msg = NavigateToPose::Goal();
-        
+
+    Quaternion q;
+    q = ToQuaternion(0.0, 0.0,  (1.57 * team_color));
+
     goal_msg.pose.header.frame_id = "map";
     goal_msg.pose.pose.position.x = 0.0;
     goal_msg.pose.pose.position.y = 0.0;
     goal_msg.pose.pose.position.z = 0.0;
 
-    goal_msg.pose.pose.orientation.x = 0.0;
-    goal_msg.pose.pose.orientation.y = 0.0;
-    goal_msg.pose.pose.orientation.z = 0.7071068;
-    goal_msg.pose.pose.orientation.w = 0.7071068;
+    goal_msg.pose.pose.orientation.x = q.x;
+    goal_msg.pose.pose.orientation.y = q.y;
+    goal_msg.pose.pose.orientation.z = q.z;
+    goal_msg.pose.pose.orientation.w = q.w;
 
-    // auto cancel_future= action_client_ptr_->async_cancel_all_goals();
-
-    // send pose
-    done_flag = false;
-    compute_goal_NavTo();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
-    RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin::sent goal to nav2\n");
+    done_flag = false;
+    RCLCPP_INFO(node_ptr_->get_logger(),"GoToOrigin::sent goal");
     return BT::NodeStatus::RUNNING;
 }
+
 BT::NodeStatus GoToOrigin::onRunning()
 {   
+    auto start_wait_ = getInput<int>("In_start_wait");
+    if(start_wait_ )
+    {
+        if(start_wait_.value() == -1)
+        {
+            cancel_goal();
+            return BT::NodeStatus::FAILURE;
+        }
+    }
+
     if(done_flag)
     {
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());
         return BT::NodeStatus::SUCCESS;
     }
-    compute_goal_NavTo();
     return BT::NodeStatus::RUNNING;
 }
 
@@ -63,10 +89,6 @@ void GoToOrigin::onHalted()
     cancel_goal();
     RCLCPP_WARN(node_ptr_->get_logger(),"GoToOrigin::Navigation aborted");
 }
-
-/*****************************************************************************************************************
- * @brief Cancle navigation action
- ******************************************************************************************************************/
 
 void GoToOrigin::cancel_goal()
 {
@@ -88,7 +110,7 @@ void GoToOrigin::cancel_goal()
     }
 }
 
-void GoToOrigin::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)
+void GoToOrigin::goal_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)
 {
     if(wrappedresult.result)
     {
@@ -102,12 +124,11 @@ void GoToOrigin::nav_to_pose_result_callback(const GoalHandleNav::WrappedResult 
 
     }
 }
-void GoToOrigin::nav_to_pose_feedback_callback(
+void GoToOrigin::goal_feedback_callback(
     GoalHandleNav::SharedPtr,
     const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
     (void)feedback;
-    // RCLCPP_INFO(node_ptr_->get_logger()," GoToOrigin::Navigating to origin..");
 }
 
 void GoToOrigin::goal_response_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::SharedPtr & goal_handle_)
@@ -123,20 +144,3 @@ void GoToOrigin::goal_response_callback(const rclcpp_action::ClientGoalHandle<Na
     }
 }
 
-void GoToOrigin::compute_goal_NavTo()
-{
-    geometry_msgs::msg::PoseStamped updated_goal;
-
-    updated_goal.header.frame_id = "map";
-    updated_goal.pose.position.x = 0.0;
-    updated_goal.pose.position.y = 0.0;
-    updated_goal.pose.position.z = 0.0;
-
-    updated_goal.pose.orientation.x = 0.0;
-    updated_goal.pose.orientation.y = 0.0;
-    updated_goal.pose.orientation.z = 0.7071068;
-    updated_goal.pose.orientation.w = 0.7071068;
-
-    updated_goal_publisher_->publish(updated_goal);
-
-}

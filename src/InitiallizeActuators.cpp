@@ -38,22 +38,27 @@ BT::PortsList InitiallizeActuators::providedPorts()
     setOutput<bool>("Op_PneumaticStatus", false);
     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Actuators in reset state..");
 
-    int ball_detect_status = system("exit $(ros2 lifecycle  get /oak/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
-    int silo_detect_status = system("exit $(ros2 lifecycle  get /silo/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
+    // int ball_detect_status = system("exit $(ros2 lifecycle  get /oak/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
+    // int   silo_detect_status   = system("exit $(ros2 lifecycle  get /silo/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
 
-    if ( ball_detect_status != 3)           
-    {
-        int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
-        RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "ball: %i", ball_flag);
-    }
+    // if ( ball_detect_status != 3)           
+    // {
+    //     int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+    //     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "ball: %i", ball_flag);
+    // }
 
 
-    if ( silo_detect_status == 3)
-    {
-        int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
-        RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "silo: %i", silo_flag);
-    }
+    // if ( silo_detect_status == 3)
+    // {        
+    //     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "silo");
 
+    //     int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+    //     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "silo: %i", silo_flag);
+    // }
+    int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+// 
+    int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+    RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "herer");
     
     return BT::NodeStatus::SUCCESS;
  }

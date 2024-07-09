@@ -7,17 +7,31 @@ ZoneAndColorConfig::ZoneAndColorConfig(
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
     rclcpp::QoS qos_profile(10);
-    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "robot_config", qos_profile, std::bind(&ZoneAndColorConfig::subscriber_callback,this,std::placeholders::_1));
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+    color_subscription_ = node_ptr_->create_subscription<std_msgs::msg::Int8>( "team_color", 
+        qos_profile, 
+        std::bind(&ZoneAndColorConfig::color_subscriber_callback,
+        this,
+        std::placeholders::_1));
+    zone_subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "zone_status", 
+        qos_profile, 
+        std::bind(&ZoneAndColorConfig::zone_subscriber_callback,
+        this,
+        std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::Ready..");
 }
 BT::PortsList ZoneAndColorConfig::providedPorts()
 {
-    return {BT::OutputPort<uint8_t>("OP_Team_color")};
+    return {BT::OutputPort<int>("OP_Team_color")};
 }
 
  BT::NodeStatus ZoneAndColorConfig::tick()
  {  
+    if ( team_color == RED)
+        RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::RED Team");
+    else
+        RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::BLUE Team");
+
     if(zone == START){
         RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::START Zone");
         return BT::NodeStatus::SUCCESS;
@@ -26,21 +40,24 @@ BT::PortsList ZoneAndColorConfig::providedPorts()
     return BT::NodeStatus::FAILURE;
  }
 
-void ZoneAndColorConfig::subscriber_callback(std_msgs::msg::UInt8 msg)
+void ZoneAndColorConfig::color_subscriber_callback(std_msgs::msg::Int8 msg)
 {   
-    if(msg.data & 0x01)
-        zone = START;    
-    else if( msg.data & 0x02)
-        zone = RETRY;
-    
-    if(msg.data & 0x04)
+
+    if(msg.data == 1)
         team_color = BLUE;
-    else if( msg.data & 0x08)
+    else 
         team_color = RED;
     
-    setOutput<uint8_t>("OP_Team_color", team_color);
+    setOutput<int>("OP_Team_color", team_color);
 }
 
+void ZoneAndColorConfig::zone_subscriber_callback(std_msgs::msg::UInt8 msg)
+{   
+    if(msg.data == 1)
+        zone = START;    
+    else if( msg.data == 2)
+        zone = RETRY;
+}
 
 
 

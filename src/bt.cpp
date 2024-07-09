@@ -45,7 +45,6 @@ void autonomy::create_behavior_tree()
     register_custom_action_nodes();
     register_condition_nodes();
 
-    /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_1  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {   
@@ -53,7 +52,6 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Fib>("Fib",builder_1);
 
-    /* Register GoToBallPose node */
     BT::NodeBuilder builder_2 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
@@ -61,15 +59,6 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_2);
 
-    /* Register GetBallPose node */ 
-    BT::NodeBuilder builder_3  =
-        [=](const std::string &name, const BT::NodeConfiguration &config)
-    {
-        return std::make_unique<GetBallPose>(name, config, shared_from_this());
-    };
-    factory.registerBuilder<GetBallPose>("GetBallPose",builder_3);
-
-    /* Register isBallDetected node */ 
     BT::NodeBuilder builder_4  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
@@ -163,7 +152,6 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GoToMiddle>("GoToMiddle",builder_16);
 
-    /* create BT */
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
 
     // Connect the Groot2Publisher. This will allow Groot2 to

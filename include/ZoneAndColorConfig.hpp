@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "std_msgs/msg/u_int8.hpp"
+#include "std_msgs/msg/int8.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/subscription.hpp"
@@ -17,8 +18,8 @@ using namespace BT;
 
 enum TeamColor
 {
-    RED,
-    BLUE
+    RED = -1,
+    BLUE = 1
 };
 enum Zone
 {
@@ -34,7 +35,8 @@ class ZoneAndColorConfig : public BT::SyncActionNode
         rclcpp::Node::SharedPtr node_ptr);
 
     rclcpp::Node::SharedPtr node_ptr_;
-    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> color_subscription_;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> zone_subscription_;
     
     // bool resetNow;
     TeamColor team_color;
@@ -46,7 +48,8 @@ class ZoneAndColorConfig : public BT::SyncActionNode
     BT::NodeStatus tick() override;
 
     // Subscriber callback
-    void subscriber_callback(std_msgs::msg::UInt8 msg);
+    void color_subscriber_callback(std_msgs::msg::Int8 msg);
+    void zone_subscriber_callback(std_msgs::msg::UInt8 msg);
     
 };
 
