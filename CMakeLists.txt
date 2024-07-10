@@ -63,6 +63,7 @@ src/actions/PneumaticOn.cpp
 
 src/decorator/returnFailureNode.cpp
 src/decorator/returnSuccessNode.cpp
+src/decorator/waitMilliseconds.cpp
 
 src/conditions/isBallInside.cpp
 src/conditions/isOnlyBall.cpp

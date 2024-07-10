@@ -323,6 +323,13 @@ void autonomy::register_decorator_nodes()
         return std::make_unique<nav2_behavior_tree::RateController>(name,config);
     };
     factory.registerBuilder<nav2_behavior_tree::RateController>("RateController",builder_3);
+
+    BT::NodeBuilder builder_4 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<waitMillisecond>(name,config,shared_from_this());
+    };
+    factory.registerBuilder<waitMillisecond>("waitMillisecond",builder_4);
     
 }
 
