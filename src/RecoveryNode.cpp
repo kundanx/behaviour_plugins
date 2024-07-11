@@ -280,6 +280,7 @@ void RecoveryNode::team_color_callback(const std_msgs::msg::Int8 &msg)
         team_color = RED;
     else
         team_color = BLUE;
+        
     color_feedback_publisher->publish(msg);
     
 }
