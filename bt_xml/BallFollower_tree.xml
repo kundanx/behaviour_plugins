@@ -271,7 +271,7 @@
                     <LineFollower name = "from_start_zone" Ip_action_type="0"/>
                     <SubTree ID = "AREA_3_TASK"/>
                 </SequenceStar> -->
-                <Inverter>
+                <!-- <Inverter>
                     <SequenceStar>
                         <InitiallizeActuators name = "initiallize_actutatos"
                             Op_RollerStatus="{RollerStatus}"
@@ -288,10 +288,10 @@
                             Ip_PneumaticStatus="{PneumaticStatus}"/>
                         <waitMillisecond name="wait_in_ms" Ip_wait_time="12000"/>
                         
-                        <!-- <waitActionClient  In_sec="120" In_nanosec="0"/>                     -->
+                        <waitActionClient  In_sec="120" In_nanosec="0"/>                    
                     </SequenceStar>
-                </Inverter>
-                <!-- <returnFailure name="returnFailed"/>  -->
+                </Inverter> -->
+                <returnFailure name="returnFailed"/> 
             </WhileDoElse>
     </BehaviorTree>
 
@@ -306,7 +306,7 @@
                 <SubTree ID = "AREA_3_TASK"/>
             </SequenceStar> -->
 
-            <Inverter>
+            <!-- <Inverter>
                 <SequenceStar>
                     <InitiallizeActuators name = "initiallize_actutatos"
                         Op_RollerStatus="{RollerStatus}"
@@ -322,10 +322,10 @@
                         Ip_PneumaticStatus="{PneumaticStatus}"/>
                     <waitMillisecond name="wait_in_ms" Ip_wait_time="12000"/>
                     
-                    <!-- <waitActionClient  In_sec="120" In_nanosec="0"/>                     -->
+                    <waitActionClient  In_sec="120" In_nanosec="0"/>                    
                 </SequenceStar>
-            </Inverter>
-            <!-- <returnFailure name="returnFailed"/> -->
+            </Inverter> -->
+            <returnFailure name="returnFailed"/>
             
         </WhileDoElse>
         

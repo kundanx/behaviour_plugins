@@ -13,6 +13,9 @@ GoToBallPose::GoToBallPose(
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
 
+    color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/GoToBallPose", qos_profile);
+
+
     subscription_odometry = node_ptr_->create_subscription<nav_msgs::msg::Odometry>( 
         "/odometry/filtered",
         qos_profile,
@@ -31,8 +34,7 @@ GoToBallPose::GoToBallPose(
 
 BT::PortsList GoToBallPose::providedPorts()
 {
-    return {BT::InputPort<geometry_msgs::msg::PoseStamped>("in_pose"),
-            BT::InputPort<int>("In_start_wait")};
+    return {BT::InputPort<geometry_msgs::msg::PoseStamped>("in_pose")};
 }
 
 BT::NodeStatus GoToBallPose::onStart()
@@ -108,15 +110,8 @@ void GoToBallPose::team_color_callback(const std_msgs::msg::Int8 &msg)
     else
         team_color = BLUE;
     
-    auto start_wait_ = getInput<int>("In_start_wait");
-    if(start_wait_ )
-    {
-        if(start_wait_.value() == -1)
-        {
-            if ( goal_handle)
-                cancel_goal();
-        }
-    }
+    color_feedback_publisher->publish(msg);
+
 }
 
 void GoToBallPose::cancel_goal()

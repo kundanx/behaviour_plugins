@@ -65,6 +65,9 @@ class GoToSiloPose : public BT::StatefulActionNode
 
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
 
+    rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr color_feedback_publisher;
+
+
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8MultiArray>> subscription_silonumber;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_junctiontype;

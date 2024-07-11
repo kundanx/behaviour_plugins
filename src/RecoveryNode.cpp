@@ -18,7 +18,8 @@ RecoveryNode::RecoveryNode(
     spin_action_client_ptr_ = rclcpp_action::create_client<Spin>(node_ptr_, "/spin");
     align_yaw_action_client_ptr_ = rclcpp_action::create_client<LineFollow>(node_ptr_, "/LineFollower");
 
-
+    color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/RecoveryNode", qos_profile);
+    
     subscription_odometry = node_ptr_->create_subscription<nav_msgs::msg::Odometry>( 
         "/odometry/filtered",
         qos_profile,
@@ -29,6 +30,11 @@ RecoveryNode::RecoveryNode(
         "/ball_tracker", 
         qos_profile, 
         std::bind(&RecoveryNode::ballpose_callback,this,std::placeholders::_1)
+    );
+    subscription_team_color = node_ptr_->create_subscription<std_msgs::msg::Int8>(
+        "team_color",
+        qos_profile,
+        std::bind(&RecoveryNode::team_color_callback, this, std::placeholders::_1)
     );
 
     RCLCPP_INFO(node_ptr_->get_logger(),"RecoveryNode::Ready");
@@ -46,21 +52,18 @@ BT::PortsList RecoveryNode::providedPorts()
 
 BT::NodeStatus RecoveryNode::onStart()
 {
-    auto team_color_ = getInput<int>("Ip_team_color");
-    if(team_color_)
-    {
-         if (team_color_.value() == -1)
-        {
-            team_color = RED;
-        }
-        else 
-            team_color = BLUE;
-    }
-    else 
-        team_color = RED;
-
-
-   
+    // auto team_color_ = getInput<int>("Ip_team_color");
+    // if(team_color_)
+    // {
+    //      if (team_color_.value() == -1)
+    //     {
+    //         team_color = RED;
+    //     }
+    //     else 
+    //         team_color = BLUE;
+    // }
+    // else 
+    //     team_color = RED;
 
     auto nav_send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     nav_send_goal_options.goal_response_callback =std::bind(&RecoveryNode::nav_goal_response_callback, this, std::placeholders::_1);
@@ -91,7 +94,7 @@ BT::NodeStatus RecoveryNode::onStart()
         
     goal_msg.pose.header.frame_id = "map";
     goal_msg.pose.pose.position.x = 0.0;
-    goal_msg.pose.pose.position.y = -2.0;
+    goal_msg.pose.pose.position.y = -2.0 * team_color;
     goal_msg.pose.pose.position.z = 0.0;
 
     goal_msg.pose.pose.orientation.x = q.x;
@@ -122,27 +125,10 @@ BT::NodeStatus RecoveryNode::onStart()
     {
         recovery_state = RecoveryState::NAV;
     }
-    // else if ( ball_drift != NO_DRIFT )
-    // {
-    //     if (spin_counter < MAX_SPIN_NUM)
-    //     {
-    //         recovery_state = RecoveryState::SPIN;
-    //         spin_counter++;
-    //     }
-    //     else
-    //     {
-    //         ball_drift = NO_DRIFT;
-    //         recovery_state = RecoveryState::YAW_ALIGN;
-    //     }
-    // }
     else 
     {
         recovery_state = RecoveryState::BACKUP;
 
-        // if ( backup_counter < MAX_BACKUP_NUM)
-        // {
-            // recovery_state = RecoveryState::BACKUP;
-        // }    
     }
 
     switch (recovery_state)
@@ -286,6 +272,16 @@ void RecoveryNode::ballpose_callback(const oakd_msgs::msg::StatePose &msg)
 
         previous_ball_theta = e.yaw;
     }
+}
+
+void RecoveryNode::team_color_callback(const std_msgs::msg::Int8 &msg)
+{
+    if( msg.data == -1)
+        team_color = RED;
+    else
+        team_color = BLUE;
+    color_feedback_publisher->publish(msg);
+    
 }
 
 void RecoveryNode::nav_result_callback(const GoalHandleNav::WrappedResult &wrappedresult)

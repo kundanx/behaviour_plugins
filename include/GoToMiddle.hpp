@@ -35,6 +35,9 @@ class GoToMiddle : public BT::StatefulActionNode
     rclcpp::Node::SharedPtr node_ptr_;
     std::shared_ptr<GoalHandleNav> goal_handle;
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
+
+    rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr color_feedback_publisher;
+
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> subscription_team_color;  
 

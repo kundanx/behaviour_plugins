@@ -12,6 +12,8 @@
 #include "action_pkg/action/line_follow.hpp"
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/float32.hpp"
+#include "std_msgs/msg/int8.hpp"
+
 
 
 #include "nav_msgs/msg/odometry.hpp"
@@ -67,6 +69,11 @@ class RecoveryNode : public BT::StatefulActionNode
     rclcpp::Node::SharedPtr node_ptr_;
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
     std::shared_ptr<rclcpp::Subscription<oakd_msgs::msg::StatePose>> subscription_ballpose;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> subscription_team_color;  
+
+
+    rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr color_feedback_publisher;
+
 
     rclcpp_action::Client<NavigateToPose>::SharedPtr nav_action_client_ptr_;
     rclcpp_action::Client<BackUp>::SharedPtr backUp_action_client_ptr_;
@@ -107,7 +114,7 @@ class RecoveryNode : public BT::StatefulActionNode
     // Odometry callback
     void odometry_callback(const nav_msgs::msg::Odometry &msg);
     void ballpose_callback(const oakd_msgs::msg::StatePose &msg);
-
+    void team_color_callback(const std_msgs::msg::Int8 &msg);
 
 
     void nav_goal_response_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::SharedPtr & goal_handle_);

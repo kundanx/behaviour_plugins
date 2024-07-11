@@ -14,6 +14,9 @@ GoToOrigin::GoToOrigin(
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
 
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
+
+    color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/GoToOrigin", qos_profile);
+
      subscription_team_color = node_ptr_->create_subscription<std_msgs::msg::Int8>(
         "team_color",
         qos_profile,
@@ -30,6 +33,8 @@ void GoToOrigin::team_color_callback(const std_msgs::msg::Int8 &msg)
         team_color = RED;
     else
         team_color = BLUE;
+    color_feedback_publisher->publish(msg);
+    
 }
  BT::PortsList GoToOrigin::providedPorts()
  {
