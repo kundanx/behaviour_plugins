@@ -1,5 +1,5 @@
 # set True if testing for naviagtion to  silo 
-testing : False
+testing : True
 
 # Location of silo w.r.t origin at Y junction
 # y co-oridinate of each silo = 4.164

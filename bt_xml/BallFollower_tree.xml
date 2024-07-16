@@ -1,6 +1,8 @@
 <!-- Behaviour Tree that sequentially navigates locations naively -->
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
+            <!-- <SubTree ID="Start_mechanisms"/> -->
+
         <SubTree ID="ROOT_TREE"/>
 
 
@@ -118,10 +120,10 @@
 
             <!-- <waitActionClient  In_sec="1" In_nanosec="0"/> -->
 
-            <!-- <GoToMiddle name="goToMiddle" Ip_middle_type="0"/> -->
+            <!-- <GoToMiddle name="back_up" Ip_middle_type="0"/> -->
 
-            <GoToSiloPose name="goToSilo" Ip_SiloNumber="1" Op_SiloNumber="{SiloNumber}"/>
-            <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+            <GoToSiloPose name="goToSilo" Ip_SiloNumber="2" Op_SiloNumber="{SiloNumber}"/>
+            <LineFollower name = "align_w_silo" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
             <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
         </SequenceStar>
     </BehaviorTree>
@@ -206,24 +208,40 @@
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="1" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
                     <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
+                    <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
+
                 </SequenceStar>
                  <GoToOrigin name= "ToOrigin"/>
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="2" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
                     <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
+                    <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
+
                 </SequenceStar>
                  <GoToOrigin name= "ToOrigin"/>
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="3" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
                     <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
+                    <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
+
                 </SequenceStar>
                  <GoToOrigin name= "ToOrigin"/>
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="4" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
                     <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
+                    <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
+
+                </SequenceStar>
+                 <GoToOrigin name= "ToOrigin"/>
+                <SequenceStar>
+                    <GoToSiloPose name="goToSilo" Ip_SiloNumber="5" Op_SiloNumber="{SiloNumber}"/>
+                    <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
+                    <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
+                    <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
+
                 </SequenceStar>
             </SequenceStar>
         </Repeat>        
@@ -265,6 +283,8 @@
     <BehaviorTree ID = "START_ZONE">
             <WhileDoElse>
                 <StartAndWait name="Waiting_for_go_command" Op_Start_wait="{start_wait}"/>
+                <!-- <SubTree ID="SILO_TEST"/> -->
+                
                 <SubTree ID = "AREA_3_TASK"/>
 
                 <!-- <SequenceStar>

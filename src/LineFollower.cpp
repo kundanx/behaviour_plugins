@@ -19,6 +19,8 @@ LineFollower::LineFollower(
     action_client_ptr_ = rclcpp_action::create_client<LineFollow>(node_ptr_, "LineFollower");
 
     silo_number.data.resize(2);
+    silo_number.data[0] = 0;
+    silo_number.data[1] = 0;
 
     RCLCPP_INFO(node_ptr_->get_logger(),"LineFollower::Ready");
     done_flag = false;
