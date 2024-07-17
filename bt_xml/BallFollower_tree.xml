@@ -1,9 +1,9 @@
 <!-- Behaviour Tree that sequentially navigates locations naively -->
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
-            <!-- <SubTree ID="Start_mechanisms"/> -->
+        <SubTree ID="Start_mechanisms"/>
 
-        <SubTree ID="ROOT_TREE"/>
+        <!-- <SubTree ID="ROOT_TREE"/> -->
 
 
         <!-- <SequenceStar>
@@ -144,15 +144,13 @@
                                 <LineFollower name = "Rotate_to_yaw" Ip_action_type="4" In_pose="{pose}"/>
                                 <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
                             </ReactiveSequence >
-                            <!-- <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/> -->
 
-                            <SequenceStar >
+                            <BallRecovery name="Recovery_node"/>
+
+                            <!-- <SequenceStar >
                                 <LineFollower name = "line_follow" Ip_action_type="3" In_pose="{pose}"/>
                                 <BallRecovery name="Recovery_node"/>
-
-                                <!-- <BackUpActionClient In_dist="-0.3" In_speed="0.5" /> -->
-                            </SequenceStar>
-                            <!-- <BallRecovery name="Recovery_node"/> -->
+                            </SequenceStar> -->
                         </WhileDoElse> 
 
                         <returnFailure name="returnFailed"/>
@@ -174,7 +172,6 @@
                 Ip_ConveyerStatus="{ConveyerStatus}"
                 Ip_ConveyerSpeed="{ConveyerSpeed}"
                 Ip_PneumaticStatus="{PneumaticStatus}"/>
-
 
             <Inverter>
                 <KeepRunningUntilFailure>

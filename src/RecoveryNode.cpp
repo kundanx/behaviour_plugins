@@ -108,7 +108,7 @@ BT::NodeStatus RecoveryNode::onStart()
     backUp_dist.target.x = 0.3;
     backUp_dist.target.y = 0.0;
     backUp_dist.target.z = 0.0;
-    backUp_dist.speed = 1.0;
+    backUp_dist.speed = 2.0;
 
     auto goal_spin = Spin::Goal();
     goal_spin.target_yaw = 15;
@@ -142,10 +142,17 @@ BT::NodeStatus RecoveryNode::onStart()
             break;
         
         case BACKUP:
-            backUp_action_client_ptr_->async_send_goal(backUp_dist, backUp_send_goal_options);    
+            if(backup_counter >MAX_BACKUP_NUM)
+            {
+                recovery_state = YAW_ALIGN;
+                break;
+            }
+            backUp_action_client_ptr_->async_send_goal(backUp_dist, backUp_send_goal_options);  
+            backup_counter++;  
             break;
 
         case YAW_ALIGN:
+            backup_counter = 0;
             recovery_state = RecoveryState::BACKUP;
             align_yaw_action_client_ptr_->async_send_goal(goal_align, align_yaw_send_goal_options);  
             break;  
@@ -271,6 +278,7 @@ void RecoveryNode::ballpose_callback(const oakd_msgs::msg::StatePose &msg)
         }
 
         previous_ball_theta = e.yaw;
+        backup_counter = 0;
     }
 }
 

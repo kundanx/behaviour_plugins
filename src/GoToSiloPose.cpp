@@ -8,7 +8,7 @@ using namespace std::chrono_literals;
  * @brief Subscribed topics : silo_number [silo to navigate to]
  *                          : junction_type [Abort navigation when landmark is reached and silo align action is called]
  ************************************************************************************************************************/
-
+int silo_check;
 GoToSiloPose::GoToSiloPose(
     const std::string &name,
     const BT::NodeConfiguration &config,
@@ -46,6 +46,7 @@ GoToSiloPose::GoToSiloPose(
     done_flag = false;
     this->x_horiz_line_detected = false;
     silo_numbers.data.resize(2);
+    silo_check = 4;
 
     RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::Ready");
 }
@@ -106,6 +107,31 @@ BT::NodeStatus GoToSiloPose::onStart()
             this->silo_numbers.data[0] = silo_number_.value();
         }
     }
+    if( silo_check == 4)
+    {
+        this->silo_numbers.data[0] = 2;
+        this->silo_numbers.data[1] = 3;
+        silo_check = 2;
+    }
+    else if ( silo_check == 2)
+    {
+        this->silo_numbers.data[0] = 3;
+        this->silo_numbers.data[1] = 4;
+        silo_check = 3;
+
+    }
+    else if ( silo_check == 3)
+    {
+        this->silo_numbers.data[0] = 4;
+        this->silo_numbers.data[1] = 2;
+        silo_check = 4;
+
+    }
+    else
+    {
+        silo_check = 4;    
+    }
+
     if(compute_goal_NavTo() == -1)
     { 
         return BT::NodeStatus::FAILURE;

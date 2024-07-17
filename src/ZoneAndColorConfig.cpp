@@ -27,16 +27,16 @@ BT::PortsList ZoneAndColorConfig::providedPorts()
 
  BT::NodeStatus ZoneAndColorConfig::tick()
  {  
-    if ( team_color == RED)
-        RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::RED Team");
-    else
-        RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::BLUE Team");
+    // if ( team_color == RED)
+    //     RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::RED Team");
+    // else
+    //     RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::BLUE Team");
 
     if(zone == START){
-        RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::START Zone");
+        // RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::START Zone");
         return BT::NodeStatus::SUCCESS;
     }
-    RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::RETRY Zone");
+    // RCLCPP_INFO(node_ptr_->get_logger(),"ZoneAndColorConfig::RETRY Zone");
     return BT::NodeStatus::FAILURE;
  }
 

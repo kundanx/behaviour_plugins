@@ -10,6 +10,6 @@ returnFailure::returnFailure(
 
 BT::NodeStatus returnFailure::tick() 
 {
-    RCLCPP_INFO(rclcpp::get_logger("returnFailure"),"FAILURE");
+    // RCLCPP_INFO(rclcpp::get_logger("returnFailure"),"FAILURE");
     return BT::NodeStatus::FAILURE;
 }

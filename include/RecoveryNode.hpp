@@ -97,6 +97,7 @@ class RecoveryNode : public BT::StatefulActionNode
     uint8_t spin_counter;
     uint8_t backup_counter;
     uint8_t align_yaw_counter;
+    
     double previous_ball_theta;
     bool done_flag;
     RecoveryState recovery_state;

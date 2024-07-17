@@ -24,10 +24,10 @@ BT::PortsList StartAndWait::providedPorts()
  {  
     if(!wait && start)
     {
-        RCLCPP_INFO(node_ptr_->get_logger(),"StartAndWait::Start");
+        // RCLCPP_INFO(node_ptr_->get_logger(),"StartAndWait::Start");
         return BT::NodeStatus::SUCCESS;
     }
-    // RCLCPP_INFO(node_ptr_->get_logger(),"StartAndWait::WAIT");
+    RCLCPP_INFO(node_ptr_->get_logger(),"StartAndWait::WAIT");
     return BT::NodeStatus::FAILURE;
  }
 
