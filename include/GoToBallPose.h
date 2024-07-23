@@ -34,6 +34,7 @@ class GoToBallPose : public BT::StatefulActionNode
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
 
     rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr color_feedback_publisher;
+    rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr ball_detection_slow_down_publisher;
 
 
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;

@@ -46,7 +46,7 @@ GoToSiloPose::GoToSiloPose(
     done_flag = false;
     this->x_horiz_line_detected = false;
     silo_numbers.data.resize(2);
-    silo_check = 4;
+    silo_check = 5;
 
     RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::Ready");
 }
@@ -107,11 +107,18 @@ BT::NodeStatus GoToSiloPose::onStart()
             this->silo_numbers.data[0] = silo_number_.value();
         }
     }
-    if( silo_check == 4)
+    if( silo_check == 5)
+    {
+        this->silo_numbers.data[0] = 1;
+        this->silo_numbers.data[1] = 2;
+        silo_check = 1;
+    }
+    else if ( silo_check == 1)
     {
         this->silo_numbers.data[0] = 2;
         this->silo_numbers.data[1] = 3;
         silo_check = 2;
+
     }
     else if ( silo_check == 2)
     {
@@ -123,13 +130,20 @@ BT::NodeStatus GoToSiloPose::onStart()
     else if ( silo_check == 3)
     {
         this->silo_numbers.data[0] = 4;
-        this->silo_numbers.data[1] = 2;
+        this->silo_numbers.data[1] = 5;
         silo_check = 4;
+
+    }
+    else if ( silo_check == 4)
+    {
+        this->silo_numbers.data[0] = 5;
+        this->silo_numbers.data[1] = 1;
+        silo_check = 5;
 
     }
     else
     {
-        silo_check = 4;    
+        silo_check = 5;   
     }
 
     if(compute_goal_NavTo() == -1)

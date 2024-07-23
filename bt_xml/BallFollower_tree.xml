@@ -1,43 +1,12 @@
 <!-- Behaviour Tree that sequentially navigates locations naively -->
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
-        <SubTree ID="Start_mechanisms"/>
+        <!-- <waitActionClient  In_sec="1" In_nanosec="0"/> -->
 
-        <!-- <SubTree ID="ROOT_TREE"/> -->
-
-
-        <!-- <SequenceStar>
-
-            <InitiallizeActuators name = "initiallize_actutatos"
-                Op_RollerStatus="{RollerStatus}"
-                Op_RollerSpeed="{RollerSpeed}"
-                Op_ConveyerStatus="{ConveyerStatus}"
-                Op_ConveyerSpeed="{ConveyerSpeed}"
-                Op_PneumaticStatus="{PneumaticStatus}"/>
-
-            <PacketPublisher name="packetPublisher"
-                Ip_RollerStatus="{RollerStatus}"
-                Ip_RollerSpeed="{RollerSpeed}"
-                Ip_ConveyerStatus="{ConveyerStatus}"
-                Ip_ConveyerSpeed="{ConveyerSpeed}"
-                Ip_PneumaticStatus="{PneumaticStatus}"/>                
-            <GoToOrigin name= "ToOrigin"/>
-
-            <Repeat num_cycles="100">
-                <SequenceStar>
-                    <LineFollower name = "Align_yaw" Ip_action_type="3"/>
-                    <SubTree ID = "FindBall_AND_StoreInSilo"
-                        ballDetectionFlag="{ballDetectionFlag}"
-                        RollerStatus="{RollerStatus}"
-                        RollerSpeed="{RollerSpeed}"
-                        ConveyerStatus="{ConveyerStatus}"
-                        ConveyerSpeed="{ConveyerSpeed}"
-                        PneumaticStatus="{PneumaticStatus}"/>
-                </SequenceStar>
-            </Repeat>
-        </SequenceStar> -->
-
-        <!-- <SubTree ID="SILO_TEST"/> -->
+        <!-- <SubTree ID="Start_mechanisms"/> -->
+    
+        <SubTree ID="ROOT_TREE"/>
+       
     </BehaviorTree>
 
     <BehaviorTree ID="FindBall_AND_StoreInSilo">
@@ -61,11 +30,10 @@
                             ConveyerSpeed="{ConveyerSpeed}"
                             PneumaticStatus="{PneumaticStatus}"/>
                         <SubTree ID="Go_TO_SILO"/>
-                        <!-- <GoToOrigin name= "ToOrigin"/> -->
                         <TurnOnConveyer name = "Keep_conveyer_running" 
                             Op_ConveyerStatus="{ConveyerStatus}"
                             Op_ConveyerSpeed="{ConveyerSpeed}" 
-                            Ip_ConveyerSpeed="100"/>
+                            Ip_ConveyerSpeed="30"/>
                         <PacketPublisher name="packetPublisher"
                             Ip_RollerStatus="{RollerStatus}"
                             Ip_RollerSpeed="{RollerSpeed}"
@@ -73,8 +41,6 @@
                             Ip_ConveyerSpeed="{ConveyerSpeed}"
                             Ip_PneumaticStatus="{PneumaticStatus}"/>
                         <waitMillisecond name="wait_in_ms" Ip_wait_time="500"/>
-
-                        <!-- <waitActionClient  In_sec="1" In_nanosec="0"/> -->
                         <TurnOffConveyer name = "Stop_conveyer"
                             Op_ConveyerSpeed="{ConveyerSpeed}" 
                             Op_ConveyerStatus="{ConveyerStatus}"/>
@@ -98,11 +64,11 @@
             <TurnOnRoller name = "Start_intake_roller" 
                     Op_RollerStatus="{RollerStatus}"
                     Op_RollerSpeed="{RollerSpeed}"
-                    Ip_RollerSpeed="80"/>
+                    Ip_RollerSpeed="60"/>
             <TurnOnConveyer name = "Keep_conveyer_running" 
                     Op_ConveyerStatus="{ConveyerStatus}"
                     Op_ConveyerSpeed="{ConveyerSpeed}" 
-                    Ip_ConveyerSpeed="80"/>
+                    Ip_ConveyerSpeed="60"/>
             <PacketPublisher name="packetPublisher"
                     Ip_RollerStatus="{RollerStatus}"
                     Ip_RollerSpeed="{RollerSpeed}"
@@ -249,8 +215,8 @@
         <SequenceStar>
             <waitMillisecond name="wait_in_ms" Ip_wait_time="1500"/>
             <!-- <waitActionClient  In_sec="3" In_nanosec="0"/> -->
-            <InitiallizeActuators name = "initiallize_actutatos"
-                    Op_RollerStatus="{RollerStatus}"
+	    <InitiallizeActuators name = "initiallize_actutatos"
+		    Op_RollerStatus="{RollerStatus}"
                     Op_RollerSpeed="{RollerSpeed}"
                     Op_ConveyerStatus="{ConveyerStatus}"
                     Op_ConveyerSpeed="{ConveyerSpeed}"
@@ -260,7 +226,7 @@
                 Ip_RollerSpeed="{RollerSpeed}"
                 Ip_ConveyerStatus="{ConveyerStatus}"
                 Ip_ConveyerSpeed="{ConveyerSpeed}"
-                Ip_PneumaticStatus="{PneumaticStatus}"/> 
+		    Ip_PneumaticStatus="{PneumaticStatus}"/>
 
             <Inverter>
                 <KeepRunningUntilFailure>
@@ -280,34 +246,17 @@
     <BehaviorTree ID = "START_ZONE">
             <WhileDoElse>
                 <StartAndWait name="Waiting_for_go_command" Op_Start_wait="{start_wait}"/>
-                <!-- <SubTree ID="SILO_TEST"/> -->
-                
-                <SubTree ID = "AREA_3_TASK"/>
+                <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
 
-                <!-- <SequenceStar>
+
+                <SequenceStar>
                     <LineFollower name = "from_start_zone" Ip_action_type="0"/>
                     <SubTree ID = "AREA_3_TASK"/>
-                </SequenceStar> -->
-                <!-- <Inverter>
-                    <SequenceStar>
-                        <InitiallizeActuators name = "initiallize_actutatos"
-                            Op_RollerStatus="{RollerStatus}"
-                            Op_RollerSpeed="{RollerSpeed}"
-                            Op_ConveyerStatus="{ConveyerStatus}"
-                            Op_ConveyerSpeed="{ConveyerSpeed}"
-                            Op_PneumaticStatus="{PneumaticStatus}"/>
-                            
-                        <PacketPublisher name="packetPublisher"
-                            Ip_RollerStatus="{RollerStatus}"
-                            Ip_RollerSpeed="{RollerSpeed}"
-                            Ip_ConveyerStatus="{ConveyerStatus}"
-                            Ip_ConveyerSpeed="{ConveyerSpeed}"
-                            Ip_PneumaticStatus="{PneumaticStatus}"/>
-                        <waitMillisecond name="wait_in_ms" Ip_wait_time="12000"/>
-                        
-                        <waitActionClient  In_sec="120" In_nanosec="0"/>                    
-                    </SequenceStar>
-                </Inverter> -->
+                </SequenceStar>
+
+                <!-- <SubTree ID="SILO_TEST"/> -->
+                <!-- <SubTree ID = "AREA_3_TASK"/> -->
+
                 <returnFailure name="returnFailed"/> 
             </WhileDoElse>
     </BehaviorTree>
@@ -316,32 +265,10 @@
 
         <WhileDoElse>
             <StartAndWait name="Waiting_for_go_command" Op_Start_wait="{start_wait}"/>
-            <SubTree ID = "AREA_3_TASK"/>
-
-            <!-- <SequenceStar>
-                <LineFollower name = "from_start_zone" Ip_action_type="1"/>
+            <SequenceStar>
+                <LineFollower name = "from_retry_zone" Ip_action_type="1"/>
                 <SubTree ID = "AREA_3_TASK"/>
-            </SequenceStar> -->
-
-            <!-- <Inverter>
-                <SequenceStar>
-                    <InitiallizeActuators name = "initiallize_actutatos"
-                        Op_RollerStatus="{RollerStatus}"
-                        Op_RollerSpeed="{RollerSpeed}"
-                        Op_ConveyerStatus="{ConveyerStatus}"
-                        Op_ConveyerSpeed="{ConveyerSpeed}"
-                        Op_PneumaticStatus="{PneumaticStatus}"/>
-                    <PacketPublisher name="packetPublisher"
-                        Ip_RollerStatus="{RollerStatus}"
-                        Ip_RollerSpeed="{RollerSpeed}"
-                        Ip_ConveyerStatus="{ConveyerStatus}"
-                        Ip_ConveyerSpeed="{ConveyerSpeed}"
-                        Ip_PneumaticStatus="{PneumaticStatus}"/>
-                    <waitMillisecond name="wait_in_ms" Ip_wait_time="12000"/>
-                    
-                    <waitActionClient  In_sec="120" In_nanosec="0"/>                    
-                </SequenceStar>
-            </Inverter> -->
+            </SequenceStar>
             <returnFailure name="returnFailed"/>
             
         </WhileDoElse>
@@ -349,9 +276,13 @@
     </BehaviorTree>
 
     <BehaviorTree ID = "AREA_3_TASK">
+        <!-- <GoToOrigin name= "ToOrigin"/> -->
 
-        <SequenceStar>               
-            <GoToOrigin name= "ToOrigin"/>
+
+        <SequenceStar>         
+            <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>     
+
+            <!-- <GoToOrigin name= "ToOrigin"/> -->
             <Repeat num_cycles="100">
                 <SequenceStar>
                     <LineFollower name = "Align_yaw" Ip_action_type="3"/>

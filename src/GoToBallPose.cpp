@@ -14,6 +14,7 @@ GoToBallPose::GoToBallPose(
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
 
     color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/GoToBallPose", qos_profile);
+    ball_detection_slow_down_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("ball_detected_slow_down", 10);
 
 
     subscription_odometry = node_ptr_->create_subscription<nav_msgs::msg::Odometry>( 
@@ -38,7 +39,10 @@ BT::PortsList GoToBallPose::providedPorts()
 }
 
 BT::NodeStatus GoToBallPose::onStart()
-{   
+{  
+    std_msgs::msg::Int8  slow_down_msg;
+    slow_down_msg.data = 1;
+
     nav_to_pose_compute_goal();
 
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
@@ -47,6 +51,7 @@ BT::NodeStatus GoToBallPose::onStart()
     send_goal_options.feedback_callback = std::bind(&GoToBallPose::goal_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
+    ball_detection_slow_down_publisher->publish(slow_down_msg);
 
     done_flag = false;
     RCLCPP_INFO(node_ptr_->get_logger(),"GoToBallPose::sent goal");
@@ -57,6 +62,10 @@ BT::NodeStatus GoToBallPose::onRunning()
 {     
     if(done_flag)
     {
+        std_msgs::msg::Int8 slow_down_msg;
+        slow_down_msg.data = 0;
+        ball_detection_slow_down_publisher->publish(slow_down_msg);
+
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached", this->name().c_str());
         return BT::NodeStatus::SUCCESS;
     }
@@ -65,6 +74,9 @@ BT::NodeStatus GoToBallPose::onRunning()
 
 void GoToBallPose::onHalted() 
 {
+    std_msgs::msg::Int8 slow_down_msg;
+    slow_down_msg.data = 0;
+    ball_detection_slow_down_publisher->publish(slow_down_msg);
     cancel_goal();
 }
 

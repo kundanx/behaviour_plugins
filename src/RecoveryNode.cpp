@@ -121,7 +121,7 @@ BT::NodeStatus RecoveryNode::onStart()
     goal_align.silo_numbers.data[1] = 0;
 
     // send goal
-    if ( odom_msg.pose.pose.position.y <= -1.55)
+    if ( odom_msg.pose.pose.position.y * team_color <= -1.55)
     {
         recovery_state = RecoveryState::NAV;
     }
