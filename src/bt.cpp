@@ -145,12 +145,19 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Cv_Config>("CvConfig",builder_15);
 
-     BT::NodeBuilder builder_16 =
+    BT::NodeBuilder builder_16 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
         return std::make_unique<GoToMiddle>(name, config, shared_from_this());
     };
     factory.registerBuilder<GoToMiddle>("GoToMiddle",builder_16);
+
+    BT::NodeBuilder builder_17=
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<GoTo>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<GoTo>("GoTo",builder_17);
 
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
 

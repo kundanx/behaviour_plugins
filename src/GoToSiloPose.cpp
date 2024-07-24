@@ -176,7 +176,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
         }
     }
 
-    if ( odom_msg.pose.pose.position.y <= -2.20 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.3 )
+    if ( odom_msg.pose.pose.position.y <= -2.20 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.5 )
     {
         if (this->is_on_line)
         {

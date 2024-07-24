@@ -4,6 +4,9 @@
         <!-- <waitActionClient  In_sec="1" In_nanosec="0"/> -->
 
         <!-- <SubTree ID="Start_mechanisms"/> -->
+        <!-- <SubTree ID="AREA_3_TASK"/> -->
+
+       
     
         <SubTree ID="ROOT_TREE"/>
        
@@ -106,10 +109,10 @@
                         <WhileDoElse> 
                             <isBallDetected name="isBallDetected_node" op_pose="{pose}"/>
                           
-                            <ReactiveSequence>
+                            <SequenceStar>
                                 <LineFollower name = "Rotate_to_yaw" Ip_action_type="4" In_pose="{pose}"/>
                                 <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-                            </ReactiveSequence >
+                            </SequenceStar >
 
                             <BallRecovery name="Recovery_node"/>
 
@@ -172,17 +175,18 @@
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
                     <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
                     <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
-
                 </SequenceStar>
-                 <GoToOrigin name= "ToOrigin"/>
+
+
+                <GoTo x="-1.5" y ="0.5" />
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="2" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
                     <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
                     <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
-
                 </SequenceStar>
-                 <GoToOrigin name= "ToOrigin"/>
+
+                <GoTo x="-1.5" y ="0.5" />
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="3" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
@@ -190,7 +194,7 @@
                     <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
 
                 </SequenceStar>
-                 <GoToOrigin name= "ToOrigin"/>
+                <GoTo x="1.5" y ="0.5" />
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="4" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
@@ -198,7 +202,7 @@
                     <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
 
                 </SequenceStar>
-                 <GoToOrigin name= "ToOrigin"/>
+                <GoTo x="1.5" y ="0.5" />
                 <SequenceStar>
                     <GoToSiloPose name="goToSilo" Ip_SiloNumber="5" Op_SiloNumber="{SiloNumber}"/>
                     <LineFollower name = "line_follow" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
@@ -206,6 +210,8 @@
                     <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>     
 
                 </SequenceStar>
+
+                
             </SequenceStar>
         </Repeat>        
     </BehaviorTree>
@@ -246,16 +252,16 @@
     <BehaviorTree ID = "START_ZONE">
             <WhileDoElse>
                 <StartAndWait name="Waiting_for_go_command" Op_Start_wait="{start_wait}"/>
-                <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
 
 
-                <SequenceStar>
+                <!-- <SequenceStar>
                     <LineFollower name = "from_start_zone" Ip_action_type="0"/>
                     <SubTree ID = "AREA_3_TASK"/>
-                </SequenceStar>
+                </SequenceStar> -->
 
+                <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
+                <SubTree ID = "AREA_3_TASK"/>
                 <!-- <SubTree ID="SILO_TEST"/> -->
-                <!-- <SubTree ID = "AREA_3_TASK"/> -->
 
                 <returnFailure name="returnFailed"/> 
             </WhileDoElse>
@@ -277,12 +283,15 @@
 
     <BehaviorTree ID = "AREA_3_TASK">
         <!-- <GoToOrigin name= "ToOrigin"/> -->
+        <!-- <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>      -->
+        <!-- <SubTree ID="SILO_TEST"/> -->
+
 
 
         <SequenceStar>         
-            <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>     
+            <GoToOrigin name= "ToOrigin"/>
 
-            <!-- <GoToOrigin name= "ToOrigin"/> -->
+            <!-- <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>      -->
             <Repeat num_cycles="100">
                 <SequenceStar>
                     <LineFollower name = "Align_yaw" Ip_action_type="3"/>

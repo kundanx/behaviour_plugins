@@ -12,6 +12,7 @@
 
 #include "isBallDetected.hpp"
 #include "GoToBallPose.h"
+#include "GoTo.hpp"
 #include "GoToSiloPose.hpp"
 #include "GoToOrigin.hpp"
 #include "fib_behaviour.h"

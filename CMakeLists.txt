@@ -39,6 +39,7 @@ set(BEHAVIOUR_SOURCES
 src/GoToBallPose.cpp
 src/GoToSiloPose.cpp
 src/fib_behaviour.cpp
+src/GoTo.cpp
 src/GoToOrigin.cpp
 src/GoToMiddle.cpp
 src/isBallDetected.cpp
