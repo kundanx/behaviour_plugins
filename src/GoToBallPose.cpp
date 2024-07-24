@@ -44,7 +44,7 @@ BT::NodeStatus GoToBallPose::onStart()
     slow_down_msg.data = 1;
 
     nav_to_pose_compute_goal();
-
+    
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.goal_response_callback = std::bind(&GoToBallPose::goal_response_callback, this, std::placeholders::_1);
     send_goal_options.result_callback = std::bind(&GoToBallPose::goal_result_callback, this, std::placeholders::_1);
@@ -60,6 +60,35 @@ BT::NodeStatus GoToBallPose::onStart()
 
 BT::NodeStatus GoToBallPose::onRunning()
 {     
+    auto goal_pose_ = getInput<geometry_msgs::msg::PoseStamped>("in_pose");
+    if( goal_pose_ )
+    {
+        auto goal_pose = goal_pose_.value();
+
+        if( goal_msg.pose.pose.position.x != goal_pose.pose.position.x ||  goal_msg.pose.pose.position.y != goal_pose.pose.position.y ||
+            goal_msg.pose.pose.orientation.z != goal_pose.pose.orientation.z || goal_msg.pose.pose.orientation.w != goal_pose.pose.orientation.w)
+        {
+            cancel_goal();
+
+            auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
+            send_goal_options.goal_response_callback = std::bind(&GoToBallPose::goal_response_callback, this, std::placeholders::_1);
+            send_goal_options.result_callback = std::bind(&GoToBallPose::goal_result_callback, this, std::placeholders::_1);
+            send_goal_options.feedback_callback = std::bind(&GoToBallPose::goal_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
+        
+            goal_msg.pose.header.frame_id = "map";
+            goal_msg.pose.pose.position.x = goal_pose.pose.position.x;
+            goal_msg.pose.pose.position.y = goal_pose.pose.position.y;
+            goal_msg.pose.pose.position.z = goal_pose.pose.position.z;
+
+            goal_msg.pose.pose.orientation.x = goal_pose.pose.orientation.x;
+            goal_msg.pose.pose.orientation.y = goal_pose.pose.orientation.y;
+            goal_msg.pose.pose.orientation.z = goal_pose.pose.orientation.z;
+            goal_msg.pose.pose.orientation.w = goal_pose.pose.orientation.w;
+            action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
+            done_flag = false;
+        }
+
+    }
     if(done_flag)
     {
         std_msgs::msg::Int8 slow_down_msg;

@@ -108,7 +108,7 @@ BT::NodeStatus RecoveryNode::onStart()
     backUp_dist.target.x = 0.3;
     backUp_dist.target.y = 0.0;
     backUp_dist.target.z = 0.0;
-    backUp_dist.speed = 2.0;
+    backUp_dist.speed = 1.0;
 
     auto goal_spin = Spin::Goal();
     goal_spin.target_yaw = 15;
@@ -137,28 +137,12 @@ BT::NodeStatus RecoveryNode::onStart()
             nav_action_client_ptr_->async_send_goal(goal_msg, nav_send_goal_options);   
             break;
 
-        case SPIN:
-            spin_action_client_ptr_->async_send_goal(goal_spin, spin_send_goal_options);
-            break;
-        
         case BACKUP:
-            if(backup_counter >MAX_BACKUP_NUM)
-            {
-                recovery_state = YAW_ALIGN;
-                break;
-            }
             backUp_action_client_ptr_->async_send_goal(backUp_dist, backUp_send_goal_options);  
-            backup_counter++;  
-            break;
-
-        case YAW_ALIGN:
-            backup_counter = 0;
-            recovery_state = RecoveryState::BACKUP;
-            align_yaw_action_client_ptr_->async_send_goal(goal_align, align_yaw_send_goal_options);  
-            break;  
+            break;       
             
         default:    
-        return BT::NodeStatus::SUCCESS;
+            return BT::NodeStatus::SUCCESS;
     }
 
     done_flag = false;
@@ -180,7 +164,7 @@ void RecoveryNode::onHalted()
 {
     switch (recovery_state)
     {
-        case NAV:
+        case RecoveryState::NAV:
             if (nav_goal_handle)
             {
                 try
@@ -195,51 +179,21 @@ void RecoveryNode::onHalted()
             }
             break;
 
-        case SPIN:
-         if (spin_goal_handle)
-            {
-                try
-                    {
-                        auto cancel_future = spin_action_client_ptr_->async_cancel_goal(spin_goal_handle);
-                    }
-                    catch(rclcpp_action::exceptions::UnknownGoalHandleError)
-                    {
-                        RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted::SPIN::rclcpp_action::exceptions::UnknownGoalHandleError");
-                    }
-                    RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::Spin Goal canceled");
-            }
-            break;
-
-        case BACKUP:
-        if (backUp_goal_handle)
-            {
-                try
-                    {
-                        auto cancel_future = backUp_action_client_ptr_->async_cancel_goal(backUp_goal_handle);
-                    }
-                    catch(rclcpp_action::exceptions::UnknownGoalHandleError)
-                    {
-                        RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted::BACKUP::rclcpp_action::exceptions::UnknownGoalHandleError");
-                    }
-                    RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::BackUp Goal canceled");
-            }
+        case RecoveryState::BACKUP:
+            if (backUp_goal_handle)
+                {
+                    try
+                        {
+                            auto cancel_future = backUp_action_client_ptr_->async_cancel_goal(backUp_goal_handle);
+                        }
+                        catch(rclcpp_action::exceptions::UnknownGoalHandleError)
+                        {
+                            RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted::BACKUP::rclcpp_action::exceptions::UnknownGoalHandleError");
+                        }
+                        RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::BackUp Goal canceled");
+                }
             break;
         
-        case YAW_ALIGN:
-         if (align_yaw_goal_handle) 
-            {
-                try
-                    {
-                        auto cancel_future = align_yaw_action_client_ptr_->async_cancel_goal(align_yaw_goal_handle);
-                    }
-                    catch(rclcpp_action::exceptions::UnknownGoalHandleError)
-                    {
-                        RCLCPP_WARN(node_ptr_->get_logger(),"rclcpp_action::exceptions::UnknownGoalHandleError");
-                    }
-                    RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::YAW_ALIGN Goal canceled");
-
-            } 
-            
         default:
             RCLCPP_WARN(node_ptr_->get_logger(),"RecoveryNode::onHalted:: No goal to cancel");
             return ;

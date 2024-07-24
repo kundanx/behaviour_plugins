@@ -205,6 +205,8 @@ void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & w
     {
         RCLCPP_INFO(node_ptr_->get_logger(),"LineFollower::Aligned With silo");
         setOutput<uint8_t>("Op_SiloNumber", wrappedresult.result->aligned_silo_number);
+        RCLCPP_INFO(node_ptr_->get_logger(),"LineFollower::Aligned silo number %i", wrappedresult.result->aligned_silo_number);
+
         done_flag = true;
     }
     else if (wrappedresult.result->robot_state == wrappedresult.result->ALIGNED_YAW )
