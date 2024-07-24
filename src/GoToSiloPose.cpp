@@ -31,10 +31,6 @@ GoToSiloPose::GoToSiloPose(
         "/silo_number",
         qos_profile,
         std::bind(&GoToSiloPose::silo_subscriber_callback, this, std::placeholders::_1));
-    subscription_junctiontype = node_ptr_->create_subscription<std_msgs::msg::UInt8>(
-        "/junction_type",
-        qos_profile,
-        std::bind(&GoToSiloPose::junction_subscriber_callback, this, std::placeholders::_1));
     subscription_isOnLine = node_ptr_->create_subscription<std_msgs::msg::Bool>(
         "is_on_line",
         qos_profile,
@@ -57,14 +53,6 @@ void GoToSiloPose::silo_subscriber_callback(const std_msgs::msg::UInt8MultiArray
     this->silo_numbers = msg;
 }
 
-void GoToSiloPose::junction_subscriber_callback(const std_msgs::msg::UInt8 &msg)
-{
-    if (msg.data == X_HORIZONTAL_LINE)
-    {
-        RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose:: x_horz_line_detected..");
-        this->x_horiz_line_detected = true;
-    }
-}
 
 void GoToSiloPose::line_subscriber_callback(const std_msgs::msg::Bool &msg)
 {
@@ -164,6 +152,9 @@ BT::NodeStatus GoToSiloPose::onStart()
     std_msgs::msg::UInt8 nav_to_silo;
     nav_to_silo.data = 1;
     go_to_silo_publisher->publish(nav_to_silo);
+    start_time = get_tick_ms();
+    prev_x = odom_msg.pose.pose.position.x;
+    prev_y = odom_msg.pose.pose.position.y;
 
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     setOutput<std_msgs::msg::UInt8MultiArray>("Op_SiloNumber", silo_numbers);
@@ -173,7 +164,30 @@ BT::NodeStatus GoToSiloPose::onStart()
 }
 BT::NodeStatus GoToSiloPose::onRunning()
 {
-    if ( odom_msg.pose.pose.position.y <= -2.20 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.5 )
+    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.5)
+    {
+        uint32_t now = get_tick_ms();
+        if( now - start_time >= 1000)
+        {
+            cancel_goal();
+            this->done_flag = true;
+            this->is_on_line = false;
+            this->x_horiz_line_detected = false;
+            // std_msgs::msg::UInt8 nav_to_silo;
+            // nav_to_silo.data = 0;
+            // go_to_silo_publisher->publish(nav_to_silo);
+            RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Inside cancel ");
+
+        }   
+    }
+    else
+    {
+        prev_x = odom_msg.pose.pose.position.x;
+        prev_y = odom_msg.pose.pose.position.y;
+        start_time = get_tick_ms();
+    }
+
+    if ( odom_msg.pose.pose.position.y <= -2.20 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.03 )
     {
         if (this->is_on_line)
         {

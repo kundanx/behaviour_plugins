@@ -17,34 +17,15 @@
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "nav2_msgs/action/navigate_through_poses.hpp"
 
+#include "behaviour_plugins/robotlibpc/cpp/common/time.hpp"
+
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
 #include "behaviour_plugins/angle_conversions.hpp"
 
-
-enum JUNCTION_TYPE
-{
-    JUNCTION_NOT_DETECTED,
-    LEFT_TURN,
-    RIGHT_TURN,
-    CROSS_JUNCTION,
-    T_JUNCTION,
-    RIGHT_T_JUNCTION,
-    LEFT_T_JUNCTION,
-    X_HORIZONTAL_LINE,
-    Y_VERTICAL_LINE,
-    L_JUNCTION,
-    MIRROR_L_JUNCTIO 
-
-};
-enum ROBOT_POSE_WRT_SILO
-{
-    LEFT,
-    RIGHT,
-    CENTRE
-};
 
 
 class GoToSiloPose : public BT::StatefulActionNode
@@ -70,7 +51,6 @@ class GoToSiloPose : public BT::StatefulActionNode
 
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8MultiArray>> subscription_silonumber;
-    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_junctiontype;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Bool>> subscription_isOnLine;  
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> subscription_team_color; 
     std::shared_ptr<GoalHandleNav> goal_handle;
@@ -85,6 +65,9 @@ class GoToSiloPose : public BT::StatefulActionNode
     bool is_on_line;
     bool x_horiz_line_detected;
     double y_coordinate;
+    uint32_t start_time;
+    float prev_x;
+    float prev_y;
     std::vector<float> pose{2};
 
     NavigateToPose::Goal goal_msg;
