@@ -83,6 +83,8 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
+            RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::NAVIGATE_FROM_START_ZONE sent");
+
             break;
 
         case NAVIGATE_FROM_RETRY_ZONE:
@@ -90,12 +92,16 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
+            RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::NAVIGATE_FROM_RETRY_ZONE sent");
+
             break;
 
         case ALIGN_W_SILO:
             goal_msg.task = goal_msg.ALIGN_W_SILO;
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers = silo_number;
+            RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::ALIGN_W_SILO sent");
+          
             break;
 
         case ALIGN_YAW:
@@ -103,13 +109,16 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
-
+            RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::ALIGN_YAW sent");
             break;
+
         case ROTATE_TO_BALL:
             goal_msg.task = goal_msg.ROTATE_TO_BALL;
             goal_msg.rotate_to_angle = goal_yaw;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
+            RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::ROTATE_TO_BALL sent");
+
             break;
 
         default :
@@ -118,7 +127,6 @@ BT::NodeStatus LineFollower::onStart()
     }
     done_flag = false;
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
-    RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::goal sent");
     return BT::NodeStatus::RUNNING;
 }
 BT::NodeStatus LineFollower::onRunning()

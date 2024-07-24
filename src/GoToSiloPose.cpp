@@ -21,6 +21,7 @@ GoToSiloPose::GoToSiloPose(
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
 
     color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/GoToSiloPose", qos_profile);
+    go_to_silo_publisher = node_ptr_->create_publisher<std_msgs::msg::UInt8>("go_to_silo", 10);
 
     subscription_odometry = node_ptr_->create_subscription<nav_msgs::msg::Odometry>(
         "/odometry/filtered",
@@ -88,8 +89,7 @@ void GoToSiloPose::team_color_callback(const std_msgs::msg::Int8 &msg)
 BT::PortsList GoToSiloPose::providedPorts()
 {
     return {BT::InputPort<int>("Ip_SiloNumber"),
-            BT::OutputPort<std_msgs::msg::UInt8MultiArray>("Op_SiloNumber"),
-            BT::InputPort<int>("In_start_wait")};
+            BT::OutputPort<std_msgs::msg::UInt8MultiArray>("Op_SiloNumber")};
 }
 
 BT::NodeStatus GoToSiloPose::onStart()
@@ -100,50 +100,53 @@ BT::NodeStatus GoToSiloPose::onStart()
     const std::string location_file = node_ptr_->get_parameter("location_file").as_string();
     YAML::Node locations = YAML::LoadFile(location_file);
     this->testing = locations["testing"].as<bool>();   
-    if (silo_number_)
+     if (testing)
     {
-        if (testing)
+        if (silo_number_)
         {
+       
             this->silo_numbers.data[0] = silo_number_.value();
         }
-    }
-    if( silo_check == 5)
-    {
-        this->silo_numbers.data[0] = 1;
-        this->silo_numbers.data[1] = 2;
-        silo_check = 1;
-    }
-    else if ( silo_check == 1)
-    {
-        this->silo_numbers.data[0] = 2;
-        this->silo_numbers.data[1] = 3;
-        silo_check = 2;
+        else{
+            if( silo_check == 5)
+            {
+                this->silo_numbers.data[0] = 1;
+                this->silo_numbers.data[1] = 2;
+                silo_check = 1;
+            }
+            else if ( silo_check == 1)
+            {
+                this->silo_numbers.data[0] = 2;
+                this->silo_numbers.data[1] = 3;
+                silo_check = 2;
 
-    }
-    else if ( silo_check == 2)
-    {
-        this->silo_numbers.data[0] = 3;
-        this->silo_numbers.data[1] = 4;
-        silo_check = 3;
+            }
+            else if ( silo_check == 2)
+            {
+                this->silo_numbers.data[0] = 3;
+                this->silo_numbers.data[1] = 4;
+                silo_check = 3;
 
-    }
-    else if ( silo_check == 3)
-    {
-        this->silo_numbers.data[0] = 4;
-        this->silo_numbers.data[1] = 5;
-        silo_check = 4;
+            }
+            else if ( silo_check == 3)
+            {
+                this->silo_numbers.data[0] = 4;
+                this->silo_numbers.data[1] = 5;
+                silo_check = 4;
 
-    }
-    else if ( silo_check == 4)
-    {
-        this->silo_numbers.data[0] = 5;
-        this->silo_numbers.data[1] = 1;
-        silo_check = 5;
+            }
+            else if ( silo_check == 4)
+            {
+                this->silo_numbers.data[0] = 5;
+                this->silo_numbers.data[1] = 1;
+                silo_check = 5;
 
-    }
-    else
-    {
-        silo_check = 5;   
+            }
+            else
+            {
+                silo_check = 5;   
+            }
+        }
     }
 
     if(compute_goal_NavTo() == -1)
@@ -157,6 +160,11 @@ BT::NodeStatus GoToSiloPose::onStart()
 
     done_flag = false;
     x_horiz_line_detected = false;
+
+    std_msgs::msg::UInt8 nav_to_silo;
+    nav_to_silo.data = 1;
+    go_to_silo_publisher->publish(nav_to_silo);
+
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     setOutput<std_msgs::msg::UInt8MultiArray>("Op_SiloNumber", silo_numbers);
     RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::sent goal");
@@ -165,17 +173,6 @@ BT::NodeStatus GoToSiloPose::onStart()
 }
 BT::NodeStatus GoToSiloPose::onRunning()
 {
-
-    auto start_wait_ = getInput<int>("In_start_wait");
-    if(start_wait_ )
-    {
-        if(start_wait_.value() == -1)
-        {
-            cancel_goal();
-            return BT::NodeStatus::FAILURE;
-        }
-    }
-
     if ( odom_msg.pose.pose.position.y <= -2.20 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.5 )
     {
         if (this->is_on_line)
@@ -184,6 +181,9 @@ BT::NodeStatus GoToSiloPose::onRunning()
             this->done_flag = true;
             this->is_on_line = false;
             this->x_horiz_line_detected = false;
+            std_msgs::msg::UInt8 nav_to_silo;
+            nav_to_silo.data = 0;
+            go_to_silo_publisher->publish(nav_to_silo);
             RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Inside cancel ");
         }
     }
