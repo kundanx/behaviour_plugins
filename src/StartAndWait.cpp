@@ -17,11 +17,25 @@ StartAndWait::StartAndWait(
 
 BT::PortsList StartAndWait::providedPorts()
 {
-    return {BT::OutputPort<int>("Op_Start_wait")};
+    return {BT::OutputPort<int>("Op_Start_wait"),
+
+            BT::OutputPort<bool>("Op_RollerStatus"),
+            BT::OutputPort<int>("Op_RollerSpeed"),   
+            BT::OutputPort<bool>("Op_ConveyerStatus"),
+            BT::OutputPort<int>("Op_ConveyerSpeed"), 
+            BT::OutputPort<bool>("Op_PneumaticStatus"),
+            BT::OutputPort<bool>("OP_IsBallInside"),
+            BT::OutputPort<bool>("OP_IsOnlyBall")
+        };
 }
 
  BT::NodeStatus StartAndWait::tick()
  {  
+    setOutput<bool>("Op_ConveyerStatus", false);
+    setOutput<int>("Op_ConveyerSpeed", 1);
+    setOutput<bool>("Op_RollerStatus", false);
+    setOutput<int>("Op_RollerSpeed", 1);
+    setOutput<bool>("Op_PneumaticStatus", false);
     if(!wait && start)
     {
         // RCLCPP_INFO(node_ptr_->get_logger(),"StartAndWait::Start");
