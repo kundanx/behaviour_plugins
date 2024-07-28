@@ -164,7 +164,7 @@ BT::NodeStatus GoToSiloPose::onStart()
 }
 BT::NodeStatus GoToSiloPose::onRunning()
 {
-    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.5)
+    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
     {
         uint32_t now = get_tick_ms();
         if( now - start_time >= 1000)
@@ -187,7 +187,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
         start_time = get_tick_ms();
     }
 
-    if ( odom_msg.pose.pose.position.y <= -2.20 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.03 )
+    if ( fabs(odom_msg.pose.pose.position.y) >= 2.10 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.5 )
     {
         if (this->is_on_line)
         {
