@@ -10,6 +10,8 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "std_msgs/msg/int8.hpp"
 
+#include "behaviour_plugins/robotlibpc/cpp/common/time.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
@@ -47,6 +49,11 @@ class GoToMiddle : public BT::StatefulActionNode
         RED = -1,
         BLUE = 1
     }team_color;
+
+    uint32_t start_time;
+    float prev_x;
+    float prev_y;
+   
     bool done_flag;
     nav_msgs::msg::Odometry odom_msg;
 

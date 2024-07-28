@@ -8,6 +8,8 @@
 #include "behaviour_plugins/angle_conversions.hpp"
 #include "oakd_msgs/msg/state_pose.hpp"
 
+#include "behaviour_plugins/robotlibpc/cpp/common/time.hpp"
+
 #include "std_msgs/msg/int8.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -47,10 +49,14 @@ class GoToBallPose : public BT::StatefulActionNode
         RED = -1,
         BLUE = 1
     }team_color;
-   
+    
+    uint32_t start_time;
+    float prev_x;
+    float prev_y;
+
     bool done_flag;
     bool goal_sent_once;
-    nav_msgs::msg::Odometry curr_pose;
+    nav_msgs::msg::Odometry odom_msg;
     NavigateToPose::Goal goal_msg;
 
 

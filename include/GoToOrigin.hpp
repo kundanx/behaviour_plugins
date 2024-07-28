@@ -43,9 +43,11 @@ class GoToOrigin : public BT::StatefulActionNode
         RED = -1,
         BLUE = 1
     }team_color;
+
     uint32_t start_time;
     float prev_x;
     float prev_y;
+    
     nav_msgs::msg::Odometry odom_msg;
 
     bool done_flag;

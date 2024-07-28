@@ -73,6 +73,12 @@ src/control/pipeline_sequence.cpp
 src/control/recovery_node.cpp
 src/control/round_robin_node.cpp
 )
+# add_library(
+#   include/robotlibpc/cpp/crypto/crc8.cpp
+#   include/robotlibpc/cpp/controller/pid.cpp
+#   include/robotlibpc/cpp/communication/serial.cpp
+#   include/robotlibpc/cpp/msgs/state_msg.cpp
+# )
 
 set(TARGET_DEPENDS
       rclcpp

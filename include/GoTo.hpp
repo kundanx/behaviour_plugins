@@ -8,6 +8,8 @@
 #include "behaviour_plugins/angle_conversions.hpp"
 #include "oakd_msgs/msg/state_pose.hpp"
 
+#include "behaviour_plugins/robotlibpc/cpp/common/time.hpp"
+
 #include "std_msgs/msg/int8.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -34,6 +36,7 @@ class GoTo : public BT::StatefulActionNode
     rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
     rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr color_feedback_publisher;
 
+    std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> subscription_team_color;  
     std::shared_ptr<GoalHandleNav> goal_handle = nullptr;
 
@@ -42,9 +45,14 @@ class GoTo : public BT::StatefulActionNode
         RED = -1,
         BLUE = 1
     }team_color;
+
+    uint32_t start_time;
+    float prev_x;
+    float prev_y;
    
     bool done_flag;
     NavigateToPose::Goal goal_msg;
+    nav_msgs::msg::Odometry odom_msg;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
@@ -58,6 +66,8 @@ class GoTo : public BT::StatefulActionNode
 
     // Subscribers callback
     void team_color_callback(const std_msgs::msg::Int8 &msg);
+    void odometry_callback(const nav_msgs::msg::Odometry &msg);
+    
 
     // Action client feedbacks
     void goal_response_callback(const GoalHandleNav::SharedPtr &goal_handle_);
