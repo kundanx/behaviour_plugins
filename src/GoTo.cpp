@@ -14,6 +14,12 @@ GoTo::GoTo(
     action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
 
     color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/GoTo", qos_profile);
+
+    subscription_odometry = node_ptr_->create_subscription<nav_msgs::msg::Odometry>( 
+        "/odometry/filtered",
+        qos_profile,
+        std::bind(&GoTo::odometry_callback,this,std::placeholders::_1)
+    );
  
     subscription_team_color = node_ptr_->create_subscription<std_msgs::msg::Int8>(
         "team_color",
@@ -36,13 +42,15 @@ BT::NodeStatus GoTo::onStart()
 {  
 
     nav_to_pose_compute_goal();
-
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.goal_response_callback = std::bind(&GoTo::goal_response_callback, this, std::placeholders::_1);
     send_goal_options.result_callback = std::bind(&GoTo::goal_result_callback, this, std::placeholders::_1);
     send_goal_options.feedback_callback = std::bind(&GoTo::goal_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
+    prev_x = odom_msg.pose.pose.position.x;
+    prev_y = odom_msg.pose.pose.position.y;
+    start_time = get_tick_ms();
 
     done_flag = false;
     RCLCPP_INFO(node_ptr_->get_logger(),"GoTo::sent goal");
@@ -51,6 +59,24 @@ BT::NodeStatus GoTo::onStart()
 
 BT::NodeStatus GoTo::onRunning()
 {     
+
+    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.5)
+    {
+        uint32_t now = get_tick_ms();
+        if( now - start_time >= 3000)
+        {
+            cancel_goal();
+            this->done_flag = true;
+            RCLCPP_INFO(node_ptr_->get_logger(), "GoTo::No pose update ");
+        }   
+    }
+    else
+    {
+        prev_x = odom_msg.pose.pose.position.x;
+        prev_y = odom_msg.pose.pose.position.y;
+        start_time = get_tick_ms();
+    }
+
     if(done_flag)
     {
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached", this->name().c_str());
@@ -75,9 +101,7 @@ void GoTo::goal_response_callback(const GoalHandleNav::SharedPtr &goal_handle_)
         RCLCPP_INFO(node_ptr_->get_logger(), "GoTo::Navigating to given pose ");
         this->goal_handle = goal_handle_;
     }
-
 }
-
 
 void GoTo::goal_result_callback(const GoalHandleNav::WrappedResult &result)
 {
@@ -102,18 +126,17 @@ void GoTo::team_color_callback(const std_msgs::msg::Int8 &msg)
         team_color = BLUE;
     
     color_feedback_publisher->publish(msg);
+}
 
+void GoTo::odometry_callback(const nav_msgs::msg::Odometry &msg)
+{
+    odom_msg = msg;
 }
 
 void GoTo::cancel_goal()
 {
     if (goal_handle )
     {
-        RCLCPP_WARN(node_ptr_->get_logger(), "GoTo::No active goal to cancel");
-    }
-    else
-    {
-        RCLCPP_INFO(node_ptr_->get_logger(), "GoTo::Goal canceled");
         try
         {
             auto cancel_future = action_client_ptr_->async_cancel_goal(goal_handle);
@@ -122,10 +145,15 @@ void GoTo::cancel_goal()
         {
             RCLCPP_WARN(node_ptr_->get_logger(),"GoTo::cancel_goal::rclcpp_action::exceptions::UnknownGoalHandleError");
         }
+        RCLCPP_INFO(node_ptr_->get_logger(), "GoTo::Goal canceled");
+
     }
-
+    else
+    {
+        RCLCPP_WARN(node_ptr_->get_logger(), "GoTo::No active goal to cancel");
+       
+    }
 }
-
 
 void GoTo::nav_to_pose_compute_goal()
 {
