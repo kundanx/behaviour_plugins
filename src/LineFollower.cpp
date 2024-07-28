@@ -31,13 +31,16 @@ BT::PortsList LineFollower::providedPorts()
     return {BT::InputPort<int>("Ip_action_type"),
             BT::InputPort<geometry_msgs::msg::PoseStamped>("In_pose"),
             BT::InputPort<std_msgs::msg::UInt8MultiArray>("Ip_SiloNumber"),
-            BT::OutputPort<uint8_t>("Op_SiloNumber")};
+            BT::OutputPort<uint8_t>("Op_SiloNumber"),
+            BT::InputPort<float>("In_back_dist")
+            };
 }
 
 BT::NodeStatus LineFollower::onStart()
 {
     double goal_yaw = 1.57;
     auto action_type_ = getInput<int>("Ip_action_type");
+    auto back_dist_ = getInput<float>("In_back_dist");
     auto goal_pose_ = getInput<geometry_msgs::msg::PoseStamped>("In_pose");
     auto silo_number_ = getInput<std_msgs::msg::UInt8MultiArray>("Ip_SiloNumber");
 
@@ -57,9 +60,13 @@ BT::NodeStatus LineFollower::onStart()
                           goal_pose.pose.orientation.z);
         goal_yaw = e.yaw;
     }
-    if ( silo_number_ )
+    if (silo_number_ )
     {
         silo_number = silo_number_.value();
+    }
+    if (back_dist_)
+    {
+        back_dist = back_dist_.value();
     }
        
     // make pose
@@ -83,6 +90,7 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
+            goal_msg.back_dist = 0.0;
             RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::NAVIGATE_FROM_START_ZONE sent");
 
             break;
@@ -92,6 +100,7 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
+            goal_msg.back_dist = 0.0;
             RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::NAVIGATE_FROM_RETRY_ZONE sent");
 
             break;
@@ -100,6 +109,7 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.task = goal_msg.ALIGN_W_SILO;
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers = silo_number;
+            goal_msg.back_dist = 0.0;
             RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::ALIGN_W_SILO sent");
           
             break;
@@ -109,6 +119,7 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.rotate_to_angle = 0;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
+            goal_msg.back_dist = 0.0;
             RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::ALIGN_YAW sent");
             break;
 
@@ -117,8 +128,17 @@ BT::NodeStatus LineFollower::onStart()
             goal_msg.rotate_to_angle = goal_yaw;
             goal_msg.silo_numbers.data[0] = 0;
             goal_msg.silo_numbers.data[1] = 0;
+            goal_msg.back_dist = 0.0;
             RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::ROTATE_TO_BALL sent");
-
+            break;
+        
+        case BACK_UP:
+            goal_msg.task = goal_msg.BACK_UP;
+            goal_msg.back_dist = back_dist;
+            goal_msg.rotate_to_angle = 0.0;
+            goal_msg.silo_numbers.data[0] = 0;
+            goal_msg.silo_numbers.data[1] = 0;
+            RCLCPP_INFO(node_ptr_->get_logger(), "LineFollower::BACK_UP sent");
             break;
 
         default :
@@ -225,6 +245,11 @@ void LineFollower::result_callback(const GoalHandleLineFollow::WrappedResult & w
     else if (wrappedresult.result->robot_state == wrappedresult.result->ROTATED_TO_BALL )
     {
         RCLCPP_INFO(node_ptr_->get_logger(),"LineFollower::Rotated to Ball");
+        done_flag = true;
+    }
+    else if (wrappedresult.result->robot_state == wrappedresult.result->BACKED_UP )
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(),"LineFollower::Backed up");
         done_flag = true;
     }
    

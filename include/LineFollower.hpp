@@ -9,6 +9,7 @@
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "action_pkg/action/line_follow.hpp"
 #include "std_msgs/msg/u_int8.hpp"
+// #include "std_msgs/msg/Float64.hpp"
 #include "std_msgs/msg/u_int8_multi_array.hpp"
 #include "std_msgs/msg/float32_multi_array.hpp"
 
@@ -26,7 +27,8 @@ enum ActionType
     NAVIGATE_FROM_RETRY_ZONE,
     ALIGN_W_SILO,
     ALIGN_YAW,
-    ROTATE_TO_BALL
+    ROTATE_TO_BALL,
+    BACK_UP
 };
 
 class LineFollower : public BT::StatefulActionNode  
@@ -48,6 +50,7 @@ class LineFollower : public BT::StatefulActionNode
     std::shared_ptr<GoalHandleLineFollow> goal_handle = nullptr;
 
     std_msgs::msg::UInt8MultiArray silo_number;
+    double back_dist;
     
     
     // Methods override (uncomment if you have ports to I/O data)
