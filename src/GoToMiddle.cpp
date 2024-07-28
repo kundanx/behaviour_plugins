@@ -81,22 +81,32 @@ BT::NodeStatus GoToMiddle::onStart()
     goal_msg.pose.pose.orientation.w = q.w;
 
     done_flag = false;
+    prev_x = odom_msg.pose.pose.position.x;
+    prev_y = odom_msg.pose.pose.position.y;
+    start_time = get_tick_ms();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     RCLCPP_INFO(node_ptr_->get_logger(),"GoToMiddle::sent goal to nav2\n");
     return BT::NodeStatus::RUNNING;
 }
 BT::NodeStatus GoToMiddle::onRunning()
 {   
-    
-    auto start_wait_ = getInput<int>("In_start_wait");
-    if(start_wait_ )
+      if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.5)
     {
-        if(start_wait_.value() == -1)
+        uint32_t now = get_tick_ms();
+        if( now - start_time >= 3000)
         {
             cancel_goal();
-            return BT::NodeStatus::FAILURE;
-        }
+            this->done_flag = true;
+            RCLCPP_INFO(node_ptr_->get_logger(), " GoToMiddle::No pose update ");
+        }   
     }
+    else
+    {
+        prev_x = odom_msg.pose.pose.position.x;
+        prev_y = odom_msg.pose.pose.position.y;
+        start_time = get_tick_ms();
+    }
+
     if(done_flag)
     {
         RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());

@@ -86,7 +86,7 @@ BT::NodeStatus GoToOrigin::onStart()
 BT::NodeStatus GoToOrigin::onRunning()
 {   
   
-    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.5)
+    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.02 && (prev_y - odom_msg.pose.pose.position.y) < 0.02)
     {
         uint32_t now = get_tick_ms();
         if( now - start_time >= 1000)
