@@ -75,7 +75,7 @@ void BackUpActionClient::onHalted()
 
 void BackUpActionClient::cancel_goal()
 {
-    if (goal_handle != nullptr)
+    if (goal_handle)
     {
         RCLCPP_INFO(node_ptr_->get_logger(), "BackUpActionClient::Goal canceled");
         try
