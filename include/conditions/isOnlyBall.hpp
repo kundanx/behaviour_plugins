@@ -27,6 +27,7 @@ class isOnlyBall : public BT::SyncActionNode
     
     bool onlyBall;
     bool node_called_once;
+    bool print_log;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();

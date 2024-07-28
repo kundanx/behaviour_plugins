@@ -11,6 +11,7 @@ isOnlyBall::isOnlyBall(
     subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "is_only_ball", qos_profile, std::bind(&isOnlyBall::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"isOnlyBall::Ready..");
     onlyBall = false;
+    print_log = false;
 }
 BT::PortsList isOnlyBall::providedPorts()
 {
@@ -23,6 +24,8 @@ BT::PortsList isOnlyBall::providedPorts()
     {
         onlyBall = false;
         node_called_once = false;
+        print_log = false;
+
     }
     if(onlyBall){
         RCLCPP_INFO(node_ptr_->get_logger(),"isOnlyBall::yes");
@@ -32,7 +35,11 @@ BT::PortsList isOnlyBall::providedPorts()
         node_called_once = true;
         return BT::NodeStatus::SUCCESS;
     }
-    RCLCPP_INFO(node_ptr_->get_logger(),"isOnlyBall::Multiple balls inside");
+    if(!print_log)
+    {
+        RCLCPP_INFO(node_ptr_->get_logger(),"isOnlyBall::Multiple balls inside");
+        print_log = true;
+    }
     return BT::NodeStatus::FAILURE;
  }
 
