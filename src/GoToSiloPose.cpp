@@ -18,7 +18,7 @@ GoToSiloPose::GoToSiloPose(
     rclcpp::QoS qos_profile(10);
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
 
-    action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
+    silo_action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
 
     color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/GoToSiloPose", qos_profile);
     go_to_silo_publisher = node_ptr_->create_publisher<std_msgs::msg::UInt8>("go_to_silo", 10);
@@ -156,7 +156,7 @@ BT::NodeStatus GoToSiloPose::onStart()
     prev_x = odom_msg.pose.pose.position.x;
     prev_y = odom_msg.pose.pose.position.y;
 
-    action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
+    silo_action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
     setOutput<std_msgs::msg::UInt8MultiArray>("Op_SiloNumber", silo_numbers);
     RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::sent goal");
 
@@ -167,7 +167,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
     if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
     {
         uint32_t now = get_tick_ms();
-        if( now - start_time >= 1000)
+        if( now - start_time >= 3000)
         {
             cancel_goal();
             this->done_flag = true;
@@ -176,7 +176,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
             // std_msgs::msg::UInt8 nav_to_silo;
             // nav_to_silo.data = 0;
             // go_to_silo_publisher->publish(nav_to_silo);
-            RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Inside cancel ");
+            RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Robot static.. cancel goal ");
 
         }   
     }
@@ -198,7 +198,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
             std_msgs::msg::UInt8 nav_to_silo;
             nav_to_silo.data = 0;
             go_to_silo_publisher->publish(nav_to_silo);
-            RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Inside cancel ");
+            RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::is on line.. cancel goal ");
         }
     }
     if (done_flag)
@@ -233,7 +233,7 @@ void GoToSiloPose::result_callback(const GoalHandleNav::WrappedResult &result)
 {
     if (result.result)
     {
-        RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::[%s] Goal reached\n", this->name().c_str());
+        RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::Goal reached\n");
         done_flag = true;
     }
 }
@@ -252,7 +252,7 @@ void GoToSiloPose::cancel_goal()
     {
        try
         {
-            auto cancel_future = action_client_ptr_->async_cancel_goal(goal_handle);
+            auto cancel_future = silo_action_client_ptr_->async_cancel_goal(goal_handle);
         }
         catch(rclcpp_action::exceptions::UnknownGoalHandleError)
         {

@@ -87,8 +87,8 @@ BT::NodeStatus GoToBallPose::onRunning()
     {
         auto goal_pose = goal_pose_.value();
 
-        if( goal_msg.pose.pose.position.x != goal_pose.pose.position.x ||  goal_msg.pose.pose.position.y != goal_pose.pose.position.y ||
-            goal_msg.pose.pose.orientation.z != goal_pose.pose.orientation.z || goal_msg.pose.pose.orientation.w != goal_pose.pose.orientation.w)
+        if((fabs(goal_msg.pose.pose.position.x - goal_pose.pose.position.x) >= 0.05) ||  (fabs(goal_msg.pose.pose.position.y - goal_pose.pose.position.y) >=0.05))
+        // ||  goal_msg.pose.pose.orientation.z != goal_pose.pose.orientation.z || goal_msg.pose.pose.orientation.w != goal_pose.pose.orientation.w)
         {
             cancel_goal();
 

@@ -85,19 +85,19 @@ BT::NodeStatus GoToMiddle::onStart()
     prev_y = odom_msg.pose.pose.position.y;
     start_time = get_tick_ms();
     action_client_ptr_->async_send_goal(goal_msg, send_goal_options);
-    RCLCPP_INFO(node_ptr_->get_logger(),"GoToMiddle::sent goal to nav2\n");
+    RCLCPP_INFO(node_ptr_->get_logger(),"GoToMiddle::sent goal to nav2");
     return BT::NodeStatus::RUNNING;
 }
 BT::NodeStatus GoToMiddle::onRunning()
 {   
-      if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.5)
+      if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.05)
     {
         uint32_t now = get_tick_ms();
         if( now - start_time >= 3000)
         {
             cancel_goal();
             this->done_flag = true;
-            RCLCPP_INFO(node_ptr_->get_logger(), " GoToMiddle::No pose update ");
+            RCLCPP_INFO(node_ptr_->get_logger(), " GoToMiddle::Robot static.. cancel goal ");
         }   
     }
     else
@@ -109,7 +109,7 @@ BT::NodeStatus GoToMiddle::onRunning()
 
     if(done_flag)
     {
-        RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());
+        RCLCPP_INFO(node_ptr_->get_logger(),"GoToMiddle::Goal reached");
         return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::RUNNING;
@@ -146,13 +146,14 @@ void GoToMiddle::cancel_goal()
         }
         catch(rclcpp_action::exceptions::UnknownGoalHandleError)
         {
-            RCLCPP_WARN(node_ptr_->get_logger(),"GoToSiloPose::cancel_goal::rclcpp_action::exceptions::UnknownGoalHandleError");
+            RCLCPP_WARN(node_ptr_->get_logger(),"GoToMiddle::cancel_goal::rclcpp_action::exceptions::UnknownGoalHandleError");
         }
-        RCLCPP_INFO(node_ptr_->get_logger(), "GoToSiloPose::Goal canceled");
+        RCLCPP_INFO(node_ptr_->get_logger(), "GoToMiddle::Goal canceled");
+
     }
     else
     {
-        RCLCPP_WARN(node_ptr_->get_logger(), "GoToSiloPose::No active goal to cancel");
+        RCLCPP_WARN(node_ptr_->get_logger(), "GoToMiddle::No active goal to cancel");
     }
 }
 

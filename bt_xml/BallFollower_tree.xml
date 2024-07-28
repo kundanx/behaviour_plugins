@@ -5,6 +5,7 @@
 
         <!-- <SubTree ID="Start_mechanisms"/> -->
         <!-- <SubTree ID="AREA_3_TASK"/> -->
+        <!-- <LineFollower name = "Back_up" Ip_action_type="5" In_back_dist="0.1"/> -->
 
        
     
@@ -66,7 +67,7 @@
                 <!-- <SubTree ID="SILO_TEST"/> -->
                 <Inverter>
                     <PacketPublisher name="packetPublisher"
-                        Ip_RollerStatus="{RollerStatus}"a
+                        Ip_RollerStatus="{RollerStatus}"
                         Ip_RollerSpeed="{RollerSpeed}"
                         Ip_ConveyerStatus="{ConveyerStatus}"
                         Ip_ConveyerSpeed="{ConveyerSpeed}"
@@ -91,7 +92,7 @@
 
             <Inverter>
                 <PacketPublisher name="packetPublisher"
-                    Ip_RollerStatus="{RollerStatus}"a
+                    Ip_RollerStatus="{RollerStatus}"
                     Ip_RollerSpeed="{RollerSpeed}"
                     Ip_ConveyerStatus="{ConveyerStatus}"
                     Ip_ConveyerSpeed="{ConveyerSpeed}"
@@ -221,12 +222,12 @@
         <SequenceStar>
             <CvConfig name = "silo_detection_activate" In_vision_type="1"/>
             <LineFollower name = "Align_yaw" Ip_action_type="3"/>
-            <waitMillisecond name="wait_in_ms" Ip_wait_time="500"/>
+            <waitMillisecond name="wait_in_ms" Ip_wait_time="1000"/>
 
             <!-- <waitActionClient  In_sec="1" In_nanosec="0"/> -->
 
-            <GoToMiddle name="back_up" Ip_middle_type="0"/>
-
+            <!-- <GoToMiddle name="back_up" Ip_middle_type="0"/> -->
+            <!-- <waitMillisecond name="wait_in_ms" Ip_wait_time="500"/> -->
             <GoToSiloPose name="goToSilo" Ip_SiloNumber="2" Op_SiloNumber="{SiloNumber}"/>
             <LineFollower name = "align_w_silo" Ip_action_type="2" Ip_SiloNumber="{SiloNumber}" Op_SiloNumber="{Updated_SiloNumber}"/>
             <ResetOdom name = "Reset" Ip_SiloNumber="{Updated_SiloNumber}"/>
@@ -251,7 +252,9 @@
                             </SequenceStar >
 
                             <!-- <BallRecovery name="Recovery_node"/> -->
-                            <BackUpActionClient name= "backup" In_dist="0.3" In_speed="1.0"/>
+                            <!-- <BackUpActionClient name= "backup" In_dist="0.3" In_speed="1.0"/> -->
+                            <LineFollower name = "Back_up" Ip_action_type="5" In_back_dist="0.1"/>
+
 
                             <!-- <SequenceStar >
                                 <LineFollower name = "line_follow" Ip_action_type="3" In_pose="{pose}"/>

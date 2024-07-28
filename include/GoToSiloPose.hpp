@@ -44,7 +44,7 @@ class GoToSiloPose : public BT::StatefulActionNode
     rclcpp::Node::SharedPtr node_ptr_;
     rclcpp::TimerBase::SharedPtr goal_abort_timer;
 
-    rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
+    rclcpp_action::Client<NavigateToPose>::SharedPtr silo_action_client_ptr_;
 
     rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr color_feedback_publisher;
     rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr go_to_silo_publisher;
