@@ -31,7 +31,8 @@ class isBallDetected : public BT::SyncActionNode
     
     std_msgs::msg::Bool isDetected;
     oakd_msgs::msg::StatePose ball;
-    uint64_t ball_not_detected_counter;
+    bool print_not_detected;
+    bool print_detected;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();

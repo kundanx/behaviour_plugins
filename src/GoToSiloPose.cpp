@@ -167,7 +167,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
     if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
     {
         uint32_t now = get_tick_ms();
-        if( now - start_time >= 3000)
+        if( now - start_time >= 5000)
         {
             cancel_goal();
             this->done_flag = true;
@@ -187,7 +187,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
         start_time = get_tick_ms();
     }
 
-    if ( fabs(odom_msg.pose.pose.position.y) >= 2.10 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.5 )
+    if ( fabs(odom_msg.pose.pose.position.y) >= 2.10 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.3 )
     {
         if (this->is_on_line)
         {

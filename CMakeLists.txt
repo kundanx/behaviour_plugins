@@ -61,6 +61,8 @@ src/actions/TurnOffRoller.cpp
 src/actions/TurnOffConveyer.cpp
 src/actions/PneumaticOff.cpp
 src/actions/PneumaticOn.cpp
+src/actions/StartPhotoCapture.cpp
+
 
 src/decorator/returnFailureNode.cpp
 src/decorator/returnSuccessNode.cpp

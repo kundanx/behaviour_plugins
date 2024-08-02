@@ -32,6 +32,8 @@ Cv_Config::Cv_Config(
     rclcpp::Node::SharedPtr node_ptr) 
     : BT::SyncActionNode(name,config), node_ptr_(node_ptr)
 {
+    rclcpp::QoS qos_profile(10);
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     ball_client_ptr_ =node_ptr_->create_client<lifecycle_msgs::srv::ChangeState>("/oak/yolo/yolov8_node/change_state");
     silo_client_ptr_ =node_ptr_->create_client<lifecycle_msgs::srv::ChangeState>("/silo/yolo/yolov8_node/change_state");
 
@@ -40,7 +42,9 @@ Cv_Config::Cv_Config(
     
     // auto result_1 = ball_client_ptr_->async_send_request(deactive_request).future.share();
     // auto result_2 = silo_client_ptr_->async_send_request(deactive_request).future.share();
+    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "go_or_wait", qos_profile, std::bind(&Cv_Config::subscriber_callback,this,std::placeholders::_1));
 
+    Reset_vision = true;
     RCLCPP_INFO(node_ptr_->get_logger(),"Cv_Config::Ready");
 
 }
@@ -53,39 +57,57 @@ BT::PortsList Cv_Config::providedPorts()
 BT::NodeStatus Cv_Config::tick()
 {
     auto vision_type_ = getInput<int>("In_vision_type");
-    if ( ! vision_type_)
+    if (vision_type_)
     {
-        throw BT::RuntimeError("error reading port [In_vision_type]:", vision_type_.error());
-    }
-    vision_type = vision_type_.value();
 
-    auto active_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
-    active_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE;
-    
-    auto deactive_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
-    deactive_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE;
-    
-    if(vision_type == VisionType::EH_BALLZ)
+        vision_type = vision_type_.value();
+
+        auto active_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
+        active_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE;
+        
+        auto deactive_request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
+        deactive_request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE;
+        
+        if(vision_type == VisionType::EH_BALLZ)
+        {
+            system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+            system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+            // auto result_1 = ball_client_ptr_->async_send_request(active_request).future.share();
+            // auto result_2 = silo_client_ptr_->async_send_request(deactive_request).future.share();
+            RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Ball Service success");
+
+            return BT::NodeStatus::SUCCESS;
+        
+        }
+        else if (vision_type == VisionType::SILO_DETECTION)
+        {
+            system("ros2 lifecycle set /oak/yolo/yolov8_node deactivate ");
+            system("ros2 lifecycle set /silo/yolo/yolov8_node activate ");
+            // auto result_1 = ball_client_ptr_->async_send_request(deactive_request);
+            // auto result_2 = silo_client_ptr_->async_send_request(active_request);
+            RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "silo Service success");
+
+            return BT::NodeStatus::SUCCESS;
+        
+        }
+    }
+    if(Reset_vision)
     {
-        auto result_1 = ball_client_ptr_->async_send_request(active_request).future.share();
-        auto result_2 = silo_client_ptr_->async_send_request(deactive_request).future.share();
-        RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Ball Service success");
-
-        return BT::NodeStatus::SUCCESS;
-     
+        system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+        system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+        Reset_vision = false;
     }
-    else if (vision_type == VisionType::SILO_DETECTION)
-    {
-        auto result_1 = ball_client_ptr_->async_send_request(deactive_request);
-        auto result_2 = silo_client_ptr_->async_send_request(active_request);
-        RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "silo Service success");
-
-        return BT::NodeStatus::SUCCESS;
-       
-    }
-    return BT::NodeStatus::FAILURE;
+   
+    return BT::NodeStatus::SUCCESS;
 }
 
+void Cv_Config::subscriber_callback(std_msgs::msg::UInt8 msg)
+{   
+    if ( msg.data == 0xf0)
+    {
+        Reset_vision = true;
+    }
+}
 
 
 

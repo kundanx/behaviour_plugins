@@ -15,7 +15,8 @@ isBallDetected::isBallDetected(
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     subscription_ = node_ptr_->create_subscription<oakd_msgs::msg::StatePose>( "/ball_tracker", qos_profile, std::bind(&isBallDetected::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::Ready");
-    ball_not_detected_counter = MAX_NOT_DETECTED;
+    print_not_detected = true;
+    print_detected = true;
     isDetected.data = false;
 }
 
@@ -27,12 +28,21 @@ BT::PortsList isBallDetected::providedPorts()
  BT::NodeStatus isBallDetected::tick()
  {  
     if(isDetected.data){
-        RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::Detected.");
-        isDetected.data = false;
+        if(print_detected)
+        {    
+            RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::Detected.");
+            print_not_detected = true;
+            print_detected = false;
+        }
         return BT::NodeStatus::SUCCESS;
     }
-    RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::not Detected.");
-    // rclcpp_action::Client::SharedPtr::async_cancel_all_goals();
+    if(print_not_detected)
+    {
+        print_not_detected = false;
+        print_detected = true;
+        RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::not Detected.");
+        
+    }
 
     return BT::NodeStatus::FAILURE;
  }
@@ -44,21 +54,10 @@ void isBallDetected::subscriber_callback(oakd_msgs::msg::StatePose msg)
 
         isDetected.data = true;    
         setOutput<geometry_msgs::msg::PoseStamped>("op_pose", msg.goalpose);
-        // ball_not_detected_counter = 0;
-        // ball = msg;
     }
     else
     {
         isDetected.data = false;
-        // ball_not_detected_counter ++;
     }
     
-    // if (ball_not_detected_counter < MAX_NOT_DETECTED)
-    // {
-    //     isDetected.data = true;    
-    //     setOutput<geometry_msgs::msg::PoseStamped>("op_pose", ball.goalpose);
-    // }
-    // else 
-    //     isDetected.data = false;
-
 }

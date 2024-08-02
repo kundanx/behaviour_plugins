@@ -214,6 +214,13 @@ void autonomy::register_custom_action_nodes()
         return std::make_unique<PneumaticOff>(name,config);
     };
     factory.registerBuilder<PneumaticOff>("PneumaticOff",builder_6);
+
+    BT::NodeBuilder builder_7  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<StartPhotoCapture>(name,config,shared_from_this());
+    };
+    factory.registerBuilder<StartPhotoCapture>("StartPhotoCapture",builder_7);
 }
 
 /******************************************************************************************************************

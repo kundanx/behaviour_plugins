@@ -35,6 +35,7 @@
 #include "actions/TurnOffConveyer.hpp"
 #include "actions/PneumaticOn.hpp"
 #include "actions/PneumaticOff.hpp"
+#include "actions/StartPhotoCapture.hpp"
 
 #include "decorator/returnFailureNode.hpp"
 #include "decorator/returnSuccessNode.hpp"

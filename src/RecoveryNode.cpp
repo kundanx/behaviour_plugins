@@ -14,9 +14,7 @@ RecoveryNode::RecoveryNode(
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
 
     nav_action_client_ptr_ = rclcpp_action::create_client<NavigateToPose>(node_ptr_, "/navigate_to_pose");
-    backUp_action_client_ptr_ = rclcpp_action::create_client<BackUp>(node_ptr_, "/backup");
-    spin_action_client_ptr_ = rclcpp_action::create_client<Spin>(node_ptr_, "/spin");
-    align_yaw_action_client_ptr_ = rclcpp_action::create_client<LineFollow>(node_ptr_, "/LineFollower");
+    backUp_action_client_ptr_ = rclcpp_action::create_client<LineFollow>(node_ptr_, "LineFollower");
 
     color_feedback_publisher = node_ptr_->create_publisher<std_msgs::msg::Int8>("color_feedback/RecoveryNode", qos_profile);
     
@@ -40,88 +38,47 @@ RecoveryNode::RecoveryNode(
     RCLCPP_INFO(node_ptr_->get_logger(),"RecoveryNode::Ready");
     done_flag = false;
     recovery_state = HALT;
-    spin_counter = MAX_SPIN_NUM;
-    // RecoveryState recoveryType = HALT;
 }
-
-BT::PortsList RecoveryNode::providedPorts()
-{
-    return{BT::InputPort<int>("Ip_team_color")};
-}
-
 
 BT::NodeStatus RecoveryNode::onStart()
 {
-    // auto team_color_ = getInput<int>("Ip_team_color");
-    // if(team_color_)
-    // {
-    //      if (team_color_.value() == -1)
-    //     {
-    //         team_color = RED;
-    //     }
-    //     else 
-    //         team_color = BLUE;
-    // }
-    // else 
-    //     team_color = RED;
-
     auto nav_send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     nav_send_goal_options.goal_response_callback =std::bind(&RecoveryNode::nav_goal_response_callback, this, std::placeholders::_1);
     nav_send_goal_options.result_callback = std::bind(&RecoveryNode::nav_result_callback, this, std::placeholders::_1);
     nav_send_goal_options.feedback_callback = std::bind(&RecoveryNode::nav_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
-    auto backUp_send_goal_options = rclcpp_action::Client<BackUp>::SendGoalOptions();
+    auto backUp_send_goal_options = rclcpp_action::Client<LineFollow>::SendGoalOptions();
     backUp_send_goal_options.goal_response_callback =std::bind(&RecoveryNode::backUp_goal_response_callback, this, std::placeholders::_1);
     backUp_send_goal_options.result_callback = std::bind(&RecoveryNode::backUp_result_callback, this, std::placeholders::_1);
     backUp_send_goal_options.feedback_callback = std::bind(&RecoveryNode::backUp_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
 
-    auto spin_send_goal_options = rclcpp_action::Client<Spin>::SendGoalOptions();
-    spin_send_goal_options.goal_response_callback =std::bind(&RecoveryNode::spin_goal_response_callback, this, std::placeholders::_1);
-    spin_send_goal_options.result_callback = std::bind(&RecoveryNode::spin_result_callback, this, std::placeholders::_1);
-    spin_send_goal_options.feedback_callback = std::bind(&RecoveryNode::spin_feedback_callback, this, std::placeholders::_1,std::placeholders::_2);
-
-    auto align_yaw_send_goal_options = rclcpp_action::Client<LineFollow>::SendGoalOptions();
-    align_yaw_send_goal_options.goal_response_callback = std::bind(&RecoveryNode::align_yaw_goal_response_callback, this,std::placeholders::_1);
-    align_yaw_send_goal_options.feedback_callback = std::bind(&RecoveryNode::align_yaw_feedback_callback, this,std::placeholders::_1,std::placeholders::_2);
-    align_yaw_send_goal_options.result_callback = std::bind(&RecoveryNode::align_yaw_result_callback, this,std::placeholders::_1);
-    
-
-
+   
     // make nav goal pose
-    auto goal_msg = NavigateToPose::Goal();
+    auto nav_goal_msg = NavigateToPose::Goal();
     Quaternion q;
     q = ToQuaternion(0.0, 0.0,  (1.57 * team_color));
         
-    goal_msg.pose.header.frame_id = "map";
-    goal_msg.pose.pose.position.x = 0.0;
-    goal_msg.pose.pose.position.y = -2.0 * team_color;
-    goal_msg.pose.pose.position.z = 0.0;
+    nav_goal_msg.pose.header.frame_id = "map";
+    nav_goal_msg.pose.pose.position.x = 0.0;
+    nav_goal_msg.pose.pose.position.y = -1.0 * team_color;
+    nav_goal_msg.pose.pose.position.z = 0.0;
 
-    goal_msg.pose.pose.orientation.x = q.x;
-    goal_msg.pose.pose.orientation.y = q.y;
-    goal_msg.pose.pose.orientation.z = q.z;
-    goal_msg.pose.pose.orientation.w = q.w;
+    nav_goal_msg.pose.pose.orientation.x = q.x;
+    nav_goal_msg.pose.pose.orientation.y = q.y;
+    nav_goal_msg.pose.pose.orientation.z = q.z;
+    nav_goal_msg.pose.pose.orientation.w = q.w;
 
-    // make backUp goal distance
-    auto  backUp_dist = BackUp::Goal();
+  
 
-    backUp_dist.target.x = 0.3;
-    backUp_dist.target.y = 0.0;
-    backUp_dist.target.z = 0.0;
-    backUp_dist.speed = 1.0;
-
-    auto goal_spin = Spin::Goal();
-    goal_spin.target_yaw = 15;
-
-    auto goal_align = LineFollow::Goal();
-    goal_align.silo_numbers.data.resize(2);
-    goal_align.task = goal_align.ALIGN_YAW;
-    goal_align.rotate_to_angle = 0;
-    goal_align.silo_numbers.data[0] = 0;
-    goal_align.silo_numbers.data[1] = 0;
+    auto goal_back_up = LineFollow::Goal();
+    goal_back_up.silo_numbers.data.resize(2);
+    goal_back_up.task = goal_back_up.BACK_UP;
+    goal_back_up.rotate_to_angle = 0;
+    goal_back_up.silo_numbers.data[0] = 0;
+    goal_back_up.silo_numbers.data[1] = 0;
 
     // send goal
-    if ( odom_msg.pose.pose.position.y * team_color <= -1.55)
+    if ( fabs(odom_msg.pose.pose.position.y) >= 1.55)
     {
         recovery_state = RecoveryState::NAV;
     }
@@ -134,11 +91,11 @@ BT::NodeStatus RecoveryNode::onStart()
     switch (recovery_state)
     {
         case NAV:
-            nav_action_client_ptr_->async_send_goal(goal_msg, nav_send_goal_options);   
+            nav_action_client_ptr_->async_send_goal(nav_goal_msg, nav_send_goal_options);   
             break;
 
         case BACKUP:
-            backUp_action_client_ptr_->async_send_goal(backUp_dist, backUp_send_goal_options);  
+            backUp_action_client_ptr_->async_send_goal(goal_back_up, backUp_send_goal_options);  
             break;       
             
         default:    
@@ -154,7 +111,7 @@ BT::NodeStatus RecoveryNode::onRunning()
 {   
     if(done_flag)
     {
-        RCLCPP_INFO(node_ptr_->get_logger(),"[%s] Goal reached\n", this->name().c_str());
+        RCLCPP_INFO(node_ptr_->get_logger()," RecoveryNode::Goal reached");
         return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::RUNNING;
@@ -209,31 +166,30 @@ void RecoveryNode::odometry_callback(const nav_msgs::msg::Odometry &msg)
 void RecoveryNode::ballpose_callback(const oakd_msgs::msg::StatePose &msg)
 {
     ball_pose = msg;
-    if ( ball_pose.is_tracked.data)
-    {
-        spin_counter = 0;
-        EulerAngles e;
-        e = ToEulerAngles(ball_pose.goalpose.pose.orientation.w,
-                          ball_pose.goalpose.pose.orientation.x,
-                          ball_pose.goalpose.pose.orientation.y,
-                          ball_pose.goalpose.pose.orientation.z);
+    // if ( ball_pose.is_tracked.data)
+    // {
+    //     spin_counter = 0;
+    //     EulerAngles e;
+    //     e = ToEulerAngles(ball_pose.goalpose.pose.orientation.w,
+    //                       ball_pose.goalpose.pose.orientation.x,
+    //                       ball_pose.goalpose.pose.orientation.y,
+    //                       ball_pose.goalpose.pose.orientation.z);
         
-        if (e.yaw - previous_ball_theta > 0)
-        {
-            ball_drift = CLOCKWISE;
-        }
-        else if (e.yaw - previous_ball_theta <0)
-        {
-            ball_drift = ANTI_CLOCKWISE;
-        }
-        else 
-        {
-            ball_drift = NO_DRIFT;
-        }
+    //     if (e.yaw - previous_ball_theta > 0)
+    //     {
+    //         ball_drift = CLOCKWISE;
+    //     }
+    //     else if (e.yaw - previous_ball_theta <0)
+    //     {
+    //         ball_drift = ANTI_CLOCKWISE;
+    //     }
+    //     else 
+    //     {
+    //         ball_drift = NO_DRIFT;
+    //     }
 
-        previous_ball_theta = e.yaw;
-        backup_counter = 0;
-    }
+    //     previous_ball_theta = e.yaw;
+    // }
 }
 
 void RecoveryNode::team_color_callback(const std_msgs::msg::Int8 &msg)
@@ -281,7 +237,7 @@ void RecoveryNode::nav_goal_response_callback(const rclcpp_action::ClientGoalHan
     }
 }
 
-void RecoveryNode::backUp_result_callback(const GoalHandleBackUp::WrappedResult &wrappedresult)
+void RecoveryNode::backUp_result_callback(const GoalHandleLineFollow::WrappedResult &wrappedresult)
 {
     if(wrappedresult.result)
     {
@@ -297,13 +253,13 @@ void RecoveryNode::backUp_result_callback(const GoalHandleBackUp::WrappedResult 
 }
 
 void RecoveryNode::backUp_feedback_callback(
-    GoalHandleBackUp::SharedPtr,
-    const std::shared_ptr<const BackUp::Feedback> feedback)
+    GoalHandleLineFollow::SharedPtr,
+    const std::shared_ptr<const LineFollow::Feedback> feedback)
 {
     (void)feedback;
 }
 
-void RecoveryNode::backUp_goal_response_callback(const rclcpp_action::ClientGoalHandle<BackUp>::SharedPtr & goal_handle_)
+void RecoveryNode::backUp_goal_response_callback(const rclcpp_action::ClientGoalHandle<LineFollow>::SharedPtr & goal_handle_)
 {
     if (!goal_handle_) 
     {
@@ -315,68 +271,4 @@ void RecoveryNode::backUp_goal_response_callback(const rclcpp_action::ClientGoal
         this->backUp_goal_handle = goal_handle_;
     }
 }
-
-void RecoveryNode::spin_result_callback(const GoalHandleSpin::WrappedResult &wrappedresult)
-{
-    if(wrappedresult.result)
-    {
-        done_flag=true;
-        RCLCPP_INFO(node_ptr_->get_logger()," RecoveryNode:: Spin complete");
-
-    }
-    else
-    {
-        RCLCPP_INFO(node_ptr_->get_logger()," RecoveryNode:: Spin failed");
-
-    }
-}
-
-void RecoveryNode::spin_feedback_callback(
-    GoalHandleSpin::SharedPtr,
-    const std::shared_ptr<const Spin::Feedback> feedback)
-{
-    (void)feedback;
-}
-
-void RecoveryNode::spin_goal_response_callback(const rclcpp_action::ClientGoalHandle<Spin>::SharedPtr & goal_handle_)
-{
-    if (!goal_handle_) 
-    {
-        RCLCPP_ERROR(node_ptr_->get_logger(), "RecoveryNode::Spin goal rejected ");
-    } 
-    else
-    {
-        RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::Spining ");
-        this->spin_goal_handle = goal_handle_;
-    }
-}
-
-void RecoveryNode::align_yaw_goal_response_callback(const GoalHandleLineFollow::SharedPtr & goal_handle_)
-{
-    if (!goal_handle_)
-    {
-        RCLCPP_ERROR(node_ptr_->get_logger(), "RecoveryNode::Align Yaw goal rejected");
-    } else
-    {
-        RCLCPP_INFO(node_ptr_->get_logger(), "RecoveryNode::Aligning yaw");
-        this->align_yaw_goal_handle = goal_handle_;
-    }
-}
-
-void RecoveryNode::align_yaw_feedback_callback( 
-    GoalHandleLineFollow::SharedPtr, 
-    const std::shared_ptr<const LineFollow::Feedback> feedback)
-{
-    (void)feedback;
-}
-
-void RecoveryNode::align_yaw_result_callback(const GoalHandleLineFollow::WrappedResult & wrappedresult)
-{
-    if (wrappedresult.result->robot_state == wrappedresult.result->ALIGNED_YAW )
-    {
-        RCLCPP_INFO(node_ptr_->get_logger(),"RecoveryNode::YAW Aligned");
-    }
-
-}
-
 

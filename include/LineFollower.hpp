@@ -9,7 +9,6 @@
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "action_pkg/action/line_follow.hpp"
 #include "std_msgs/msg/u_int8.hpp"
-// #include "std_msgs/msg/Float64.hpp"
 #include "std_msgs/msg/u_int8_multi_array.hpp"
 #include "std_msgs/msg/float32_multi_array.hpp"
 

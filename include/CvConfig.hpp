@@ -7,6 +7,8 @@
 
 // #include "cv.h"
 
+#include "std_msgs/msg/u_int8.hpp"
+
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
@@ -34,10 +36,16 @@ class Cv_Config : public BT::SyncActionNode
 //    using ife_cycle
 
     rclcpp::Node::SharedPtr node_ptr_;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_;
+
     rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr ball_client_ptr_;
     rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr silo_client_ptr_;
 
     uint8_t vision_type;
+    bool Reset_vision;
+
+
+    void subscriber_callback(std_msgs::msg::UInt8 msg);
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
