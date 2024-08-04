@@ -66,12 +66,12 @@
                 <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
                 <!-- <SubTree ID = "AREA_3_TASK"/> -->
                 <!-- <SubTree ID="SILO_TEST"/> -->
+
                 <Inverter>
                     <SequenceStar>
                         <SubTree ID="Stop_mechanisms"/>
                         <CvConfig name = "Reset_vision"/>
                     </SequenceStar>
-                    
                 </Inverter>
             </WhileDoElse>
     </BehaviorTree>
@@ -89,9 +89,9 @@
                 <LineFollower name = "from_retry_zone" Ip_action_type="1"/>
                 <SubTree ID = "AREA_3_TASK"/>
             </SequenceStar> -->
+            
             <SubTree ID = "AREA_3_TASK"/>
-
-
+            
              <Inverter>
                 <SequenceStar>
                     <SubTree ID="Stop_mechanisms"/>

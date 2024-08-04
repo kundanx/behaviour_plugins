@@ -55,9 +55,8 @@ BT::PortsList InitiallizeActuators::providedPorts()
     //     int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
     //     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "silo: %i", silo_flag);
     // }
-    int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
-// 
-    int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+//     int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+//     int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "herer");
     
     return BT::NodeStatus::SUCCESS;
