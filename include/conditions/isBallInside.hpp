@@ -11,7 +11,7 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 
 #include "behaviortree_cpp_v3/bt_factory.h"
-
+#include "behaviour_plugins/robotlibpc/cpp/common/time.hpp"
 
 using namespace BT;
 class isBallInside : public BT::SyncActionNode
@@ -28,6 +28,8 @@ class isBallInside : public BT::SyncActionNode
     bool inside;
     bool node_called_once;
     bool print_log;
+    bool capture_inside_time;
+    uint32_t last_inside_time;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
