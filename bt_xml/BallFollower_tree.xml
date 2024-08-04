@@ -228,8 +228,7 @@
 
 
     <BehaviorTree ID="Retrieve_balls">
-        <SequenceStar>
-           
+        <ReactiveSequence>
             <Inverter>
                 <KeepRunningUntilFailure>
                     <WhileDoElse> 
@@ -243,10 +242,16 @@
                                 <!-- <LineFollower name = "Rotate_to_yaw" Ip_action_type="4" In_pose="{pose}"/> -->
                                 <!-- <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/> -->
                             <!-- </SequenceStar > -->
-                            <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-
+                            <Sequence>
+                                <SubTree ID="Start_mechanisms"/>
+                                <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
+                            </Sequence>
 
                             <BallRecovery name="Recovery_node"/>
+                            <!-- <Sequence>
+                                <SubTree ID="Stop_mechanisms"/>
+                                <BallRecovery name="Recovery_node"/>
+                            </Sequence> -->
                             <!-- <BackUpActionClient name= "backup" In_dist="0.3" In_speed="1.0"/> -->
                             <!-- <LineFollower name = "Back_up" Ip_action_type="5" In_back_dist="0.1"/> -->
 
@@ -269,7 +274,7 @@
              <TurnOnConveyer name = "Keep_conveyer_running" 
                 Op_ConveyerStatus="{ConveyerStatus}"
                 Op_ConveyerSpeed="{ConveyerSpeed}" 
-                Ip_ConveyerSpeed="35"/>
+                Ip_ConveyerSpeed="40"/>
             <PacketPublisher name="packetPublisher"
                 Ip_RollerStatus="{RollerStatus}"
                 Ip_RollerSpeed="{RollerSpeed}"
@@ -296,7 +301,7 @@
                 </KeepRunningUntilFailure>
             </Inverter>
 
-        </SequenceStar>
+        </ReactiveSequence>
     </BehaviorTree>
 
     <BehaviorTree ID="Go_TO_SILO">
