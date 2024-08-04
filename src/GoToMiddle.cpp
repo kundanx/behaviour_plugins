@@ -65,7 +65,7 @@ BT::NodeStatus GoToMiddle::onStart()
 
         case ABSOLUTE_MIDDLE:
             goal_msg.pose.pose.position.x = 0.0;
-            goal_msg.pose.pose.position.y = -2.0 * team_color;
+            goal_msg.pose.pose.position.y = -0.4 * team_color;
             break;
     }
 

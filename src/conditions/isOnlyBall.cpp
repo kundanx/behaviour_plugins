@@ -8,12 +8,14 @@ isOnlyBall::isOnlyBall(
 {
     rclcpp::QoS qos_profile(10);
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
-    onlyl_ball_subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "is_only_ball", qos_profile, std::bind(&isOnlyBall::subscriber_callback,this,std::placeholders::_1));
-    ball_inside_subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "is_ball_inside", qos_profile, std::bind(&isBallInside::subscriber_callback,this,std::placeholders::_1));
+    onlyl_ball_subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>(
+        "is_only_ball", 
+        qos_profile, 
+        std::bind(&isOnlyBall::only_ball_subscriber_callback,
+        this,std::placeholders::_1));
 
     RCLCPP_INFO(node_ptr_->get_logger(),"isOnlyBall::Ready..");
     onlyBall = false;
-    ballInside = false;
     print_log = false;
 }
 BT::PortsList isOnlyBall::providedPorts()
@@ -52,11 +54,4 @@ void isOnlyBall::only_ball_subscriber_callback(std_msgs::msg::UInt8 msg)
         onlyBall = true;    
     else
         onlyBall = false;
-}
-void isOnlyBall::ball_inside_subscriber_callback(std_msgs::msg::UInt8 msg)
-{   
-    if(msg.data == 1)
-        ballInside = true;    
-    else
-        ballInside = false;
 }
