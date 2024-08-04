@@ -70,8 +70,11 @@ BT::NodeStatus Cv_Config::tick()
         
         if(vision_type == VisionType::EH_BALLZ)
         {
-            system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
-            system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+            // system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+            // system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+            system("/home/apil/life_srv_oak a ");
+            system("/home/apil/life_srv_silo d ");
+
             // auto result_1 = ball_client_ptr_->async_send_request(active_request).future.share();
             // auto result_2 = silo_client_ptr_->async_send_request(deactive_request).future.share();
             RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "Ball Service success");
@@ -81,8 +84,11 @@ BT::NodeStatus Cv_Config::tick()
         }
         else if (vision_type == VisionType::SILO_DETECTION)
         {
-            system("ros2 lifecycle set /oak/yolo/yolov8_node deactivate ");
-            system("ros2 lifecycle set /silo/yolo/yolov8_node activate ");
+            system("/home/apil/life_srv_oak d ");
+            system("/home/apil/life_srv_silo a ");
+
+            // system("ros2 lifecycle set /oak/yolo/yolov8_node deactivate ");
+            // system("ros2 lifecycle set /silo/yolo/yolov8_node activate ");
             // auto result_1 = ball_client_ptr_->async_send_request(deactive_request);
             // auto result_2 = silo_client_ptr_->async_send_request(active_request);
             RCLCPP_INFO(rclcpp::get_logger("Cv_Config"), "silo Service success");
