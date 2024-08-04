@@ -13,8 +13,7 @@
 #include "std_msgs/msg/int8.hpp"
 #include "action_pkg/action/line_follow.hpp"
 
-
-
+#include "behaviour_plugins/robotlibpc/cpp/common/time.hpp"
 
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/pose.hpp"
@@ -31,15 +30,14 @@ enum RecoveryState
 {
     NAV,
     BACKUP,
-    SPIN,
-    YAW_ALIGN,
     HALT
 };
-enum BallDrift
+enum LeftOrRight
 {
-    CLOCKWISE = 1,
-    ANTI_CLOCKWISE = -1,
-    NO_DRIFT = 100
+    LEFT,
+    RIGHT,
+    MIDDLE,
+    N0_CHANGE
 };
 
 class RecoveryNode : public BT::StatefulActionNode
@@ -87,15 +85,22 @@ class RecoveryNode : public BT::StatefulActionNode
     
     // double previous_ball_theta;
     bool done_flag;
+    bool in_middle;
 
+    uint32_t start_time;
+    float prev_x;
+    float prev_y;
+    LeftOrRight left_right;
     RecoveryState recovery_state;
-    BallDrift ball_drift;
+    
     nav_msgs::msg::Odometry odom_msg;
     oakd_msgs::msg::StatePose ball_pose;
 
     // Methods override (uncomment if you have ports to I/O data)
     // static BT::PortsList providedPorts();
 
+    void cancel_goal();
+    
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
