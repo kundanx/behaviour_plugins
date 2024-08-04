@@ -86,23 +86,23 @@ BT::NodeStatus GoToOrigin::onStart()
 BT::NodeStatus GoToOrigin::onRunning()
 {   
   
-    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && (prev_y - odom_msg.pose.pose.position.y) < 0.01)
-    {
-        uint32_t now = get_tick_ms();
-        if( now - start_time >= 5000)
-        {
-            cancel_goal();
-            this->done_flag = true;
-            RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Inside cancel ");
+    // if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && (prev_y - odom_msg.pose.pose.position.y) < 0.01)
+    // {
+    //     uint32_t now = get_tick_ms();
+    //     if( now - start_time >= 5000)
+    //     {
+    //         cancel_goal();
+    //         this->done_flag = true;
+    //         RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::robot static goal cancel ");
 
-        }   
-    }
-    else
-    {
-        prev_x = odom_msg.pose.pose.position.x;
-        prev_y = odom_msg.pose.pose.position.y;
-        start_time = get_tick_ms();
-    }
+    //     }   
+    // }
+    // else
+    // {
+    //     prev_x = odom_msg.pose.pose.position.x;
+    //     prev_y = odom_msg.pose.pose.position.y;
+    //     start_time = get_tick_ms();
+    // }
 
     if(done_flag)
     {

@@ -34,6 +34,8 @@ BT::PortsList isBallDetected::providedPorts()
             print_not_detected = true;
             print_detected = false;
         }
+            RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::Detected.");
+
         return BT::NodeStatus::SUCCESS;
     }
     if(print_not_detected)
@@ -43,6 +45,7 @@ BT::PortsList isBallDetected::providedPorts()
         RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::not Detected.");
         
     }
+        RCLCPP_INFO(node_ptr_->get_logger(),"IsBallDetected::not Detected.");
 
     return BT::NodeStatus::FAILURE;
  }

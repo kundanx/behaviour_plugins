@@ -6,11 +6,11 @@
         <!-- <SubTree ID="Start_mechanisms"/> -->
         <!-- <SubTree ID="AREA_3_TASK"/> -->
         <!-- <LineFollower name = "Back_up" Ip_action_type="5" In_back_dist="0.1"/> -->
-        <!-- <SubTree ID="Test_Mechanisms"/> -->
+        <SubTree ID="Test_Mechanisms"/>
 
        
     
-        <SubTree ID="ROOT_TREE"/>
+        <!-- <SubTree ID="ROOT_TREE"/> -->
        
     </BehaviorTree>
 
@@ -56,13 +56,13 @@
                     Op_PneumaticStatus="{PneumaticStatus}"/>
 
 
-                <!-- <SequenceStar>
+                <SequenceStar>
                     <LineFollower name = "from_start_zone" Ip_action_type="0"/>
                     <SubTree ID = "AREA_3_TASK"/>
-                </SequenceStar> -->
+                </SequenceStar>
 
                 <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
-                <SubTree ID = "AREA_3_TASK"/>
+                <!-- <SubTree ID = "AREA_3_TASK"/> -->
                 <!-- <SubTree ID="SILO_TEST"/> -->
                 <Inverter>
                     <SequenceStar>
@@ -88,26 +88,26 @@
                 <SubTree ID = "AREA_3_TASK"/>
             </SequenceStar>
 
-            <Inverter>
-                <PacketPublisher name="packetPublisher"
-                    Ip_RollerStatus="{RollerStatus}"
-                    Ip_RollerSpeed="{RollerSpeed}"
-                    Ip_ConveyerStatus="{ConveyerStatus}"
-                    Ip_ConveyerSpeed="{ConveyerSpeed}"
-                    Ip_PneumaticStatus="{PneumaticStatus}"/>
+             <Inverter>
+                <SequenceStar>
+                    <SubTree ID="Stop_mechanisms"/>
+                    <CvConfig name = "Reset_vision"/>
+                </SequenceStar>
+                    
             </Inverter>
         </WhileDoElse>
     </BehaviorTree>
 
     <BehaviorTree ID = "AREA_3_TASK">
+        <!-- <SubTree ID="Start_mechanisms"/> -->
         <!-- <GoToOrigin name= "ToOrigin"/> -->
         <!-- <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>      -->
-        <SubTree ID="SILO_TEST"/>
+        <!-- <SubTree ID="SILO_TEST"/> -->
 
 
 
-        <!-- <SequenceStar>         
-            <GoToOrigin name= "ToOrigin"/>
+        <SequenceStar>         
+            <!-- <GoToOrigin name= "ToOrigin"/> -->
 
             <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>     
             <Repeat num_cycles="100">
@@ -122,7 +122,7 @@
                         PneumaticStatus="{PneumaticStatus}"/>
                 </SequenceStar>
             </Repeat>
-        </SequenceStar> -->
+        </SequenceStar>
     </BehaviorTree>
 
     <BehaviorTree ID="FindBall_AND_StoreInSilo">
@@ -130,6 +130,7 @@
             <KeepRunningUntilFailure>
                 <Inverter>
                     <SequenceStar>
+                    <!-- Actuators reset initially to remove runtime error.. Error reading RollerSpeed_ -->
                         <TurnOffRoller name = "Stop_roller" 
                             Op_RollerSpeed="{RollerSpeed}"
                             Op_RollerStatus="{RollerStatus}"/> 
@@ -137,6 +138,7 @@
                         <TurnOffConveyer name = "Stop_conveyer"
                             Op_ConveyerSpeed="{ConveyerSpeed}" 
                             Op_ConveyerStatus="{ConveyerStatus}"/>
+                    <!-- Up to here -->
                         <SubTree ID="Start_mechanisms"/>
                         <SubTree ID="Retrieve_balls"
                             ballDetectionFlag="{ballDetectionFlag}"
@@ -168,7 +170,9 @@
                             Ip_ConveyerSpeed="{ConveyerSpeed}"
                             Ip_PneumaticStatus="{PneumaticStatus}"/>  
                         <CvConfig name = "ball_detection_activate" In_vision_type="0"/>
-                        <GoToOrigin name= "ToOrigin"/>
+                        <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>     
+    
+                        <!-- <GoToOrigin name= "ToOrigin"/> -->
 
                         <!-- <GoToMiddle name="goToMiddle" Ip_middle_type="1"/>      -->
                     </SequenceStar>
@@ -184,7 +188,7 @@
             <TurnOnRoller name = "Start_intake_roller" 
                     Op_RollerStatus="{RollerStatus}"
                     Op_RollerSpeed="{RollerSpeed}"
-                    Ip_RollerSpeed="40"/>
+                    Ip_RollerSpeed="50"/>
             <TurnOnConveyer name = "Keep_conveyer_running" 
                     Op_ConveyerStatus="{ConveyerStatus}"
                     Op_ConveyerSpeed="{ConveyerSpeed}" 
@@ -231,10 +235,12 @@
                         <WhileDoElse> 
                             <isBallDetected name="isBallDetected_node" op_pose="{pose}"/>
                           
-                            <SequenceStar>
-                                <LineFollower name = "Rotate_to_yaw" Ip_action_type="4" In_pose="{pose}"/>
-                                <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
-                            </SequenceStar >
+                            <!-- <SequenceStar> -->
+                                <!-- <LineFollower name = "Rotate_to_yaw" Ip_action_type="4" In_pose="{pose}"/> -->
+                                <!-- <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/> -->
+                            <!-- </SequenceStar > -->
+                            <GoToBallPose name="GoToBallPose_node" in_pose="{pose}"/>
+
 
                             <BallRecovery name="Recovery_node"/>
                             <!-- <BackUpActionClient name= "backup" In_dist="0.3" In_speed="1.0"/> -->
@@ -507,6 +513,7 @@
             
             <PneumaticOff name="Lower_pneumatic" Op_PneumaticStatus="{PneumaticStatus}"/>
             <waitMillisecond name="wait_in_ms" Ip_wait_time="500"/> 
+            <SubTree ID="Stop_mechanisms"/>
 
         </SequenceStar>
     

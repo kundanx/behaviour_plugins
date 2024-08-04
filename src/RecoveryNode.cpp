@@ -24,11 +24,6 @@ RecoveryNode::RecoveryNode(
         std::bind(&RecoveryNode::odometry_callback,this,std::placeholders::_1)
     );
 
-    subscription_ballpose = node_ptr_->create_subscription<oakd_msgs::msg::StatePose>( 
-        "/ball_tracker", 
-        qos_profile, 
-        std::bind(&RecoveryNode::ballpose_callback,this,std::placeholders::_1)
-    );
     subscription_team_color = node_ptr_->create_subscription<std_msgs::msg::Int8>(
         "team_color",
         qos_profile,
@@ -60,7 +55,7 @@ BT::NodeStatus RecoveryNode::onStart()
         
     nav_goal_msg.pose.header.frame_id = "map";
     nav_goal_msg.pose.pose.position.x = 0.0;
-    nav_goal_msg.pose.pose.position.y = -1.0 * team_color;
+    nav_goal_msg.pose.pose.position.y = -0.40 * team_color;
     nav_goal_msg.pose.pose.position.z = 0.0;
 
     nav_goal_msg.pose.pose.orientation.x = q.x;
@@ -73,6 +68,7 @@ BT::NodeStatus RecoveryNode::onStart()
     auto goal_back_up = LineFollow::Goal();
     goal_back_up.silo_numbers.data.resize(2);
     goal_back_up.task = goal_back_up.BACK_UP;
+    goal_back_up.back_dist = 0.3;
     goal_back_up.rotate_to_angle = 0;
     goal_back_up.silo_numbers.data[0] = 0;
     goal_back_up.silo_numbers.data[1] = 0;
@@ -161,35 +157,6 @@ void RecoveryNode::onHalted()
 void RecoveryNode::odometry_callback(const nav_msgs::msg::Odometry &msg)
 {
     odom_msg = msg;
-}
-
-void RecoveryNode::ballpose_callback(const oakd_msgs::msg::StatePose &msg)
-{
-    ball_pose = msg;
-    // if ( ball_pose.is_tracked.data)
-    // {
-    //     spin_counter = 0;
-    //     EulerAngles e;
-    //     e = ToEulerAngles(ball_pose.goalpose.pose.orientation.w,
-    //                       ball_pose.goalpose.pose.orientation.x,
-    //                       ball_pose.goalpose.pose.orientation.y,
-    //                       ball_pose.goalpose.pose.orientation.z);
-        
-    //     if (e.yaw - previous_ball_theta > 0)
-    //     {
-    //         ball_drift = CLOCKWISE;
-    //     }
-    //     else if (e.yaw - previous_ball_theta <0)
-    //     {
-    //         ball_drift = ANTI_CLOCKWISE;
-    //     }
-    //     else 
-    //     {
-    //         ball_drift = NO_DRIFT;
-    //     }
-
-    //     previous_ball_theta = e.yaw;
-    // }
 }
 
 void RecoveryNode::team_color_callback(const std_msgs::msg::Int8 &msg)

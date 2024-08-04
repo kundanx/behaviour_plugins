@@ -177,6 +177,7 @@ BT::NodeStatus GoToSiloPose::onRunning()
             // nav_to_silo.data = 0;
             // go_to_silo_publisher->publish(nav_to_silo);
             RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Robot static.. cancel goal ");
+            return BT::NodeStatus::SUCCESS; 
 
         }   
     }

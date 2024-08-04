@@ -62,7 +62,6 @@ class RecoveryNode : public BT::StatefulActionNode
 
     rclcpp::Node::SharedPtr node_ptr_;
     std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
-    std::shared_ptr<rclcpp::Subscription<oakd_msgs::msg::StatePose>> subscription_ballpose;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> subscription_team_color;  
 
 
@@ -103,7 +102,6 @@ class RecoveryNode : public BT::StatefulActionNode
 
     // Odometry callback
     void odometry_callback(const nav_msgs::msg::Odometry &msg);
-    void ballpose_callback(const oakd_msgs::msg::StatePose &msg);
     void team_color_callback(const std_msgs::msg::Int8 &msg);
 
 

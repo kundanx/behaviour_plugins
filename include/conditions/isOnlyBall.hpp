@@ -23,9 +23,11 @@ class isOnlyBall : public BT::SyncActionNode
         rclcpp::Node::SharedPtr node_ptr);
 
     rclcpp::Node::SharedPtr node_ptr_;
-    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> subscription_;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> ball_inside_subscription_;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> onlyl_ball_subscription_;
     
     bool onlyBall;
+    bool ballInside;
     bool node_called_once;
     bool print_log;
 
@@ -35,7 +37,8 @@ class isOnlyBall : public BT::SyncActionNode
     BT::NodeStatus tick() override;
 
     // Subscriber callback
-    void subscriber_callback(std_msgs::msg::UInt8 msg);
+    void only_ball_subscriber_callback(std_msgs::msg::UInt8 msg);
+    void ball_inside_subscriber_callback(std_msgs::msg::UInt8 msg);
     
 };
 

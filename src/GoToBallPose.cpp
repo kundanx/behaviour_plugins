@@ -72,7 +72,7 @@ BT::NodeStatus GoToBallPose::onRunning()
         {
             cancel_goal();
             this->done_flag = true;
-            RCLCPP_INFO(node_ptr_->get_logger(), " GoToBallPose::No pose update ");
+            RCLCPP_INFO(node_ptr_->get_logger(), " GoToBallPose::robot static goal cancel ");
         }   
     }
     else
