@@ -237,6 +237,8 @@ BT::NodeStatus RecoveryNode::onRunning()
         {
             start_time = get_tick_ms();
         }
+        prev_x = odom_msg.pose.pose.position.x;
+        prev_y = odom_msg.pose.pose.position.y;
     }
 
     if(done_flag)

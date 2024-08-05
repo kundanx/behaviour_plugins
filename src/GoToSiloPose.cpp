@@ -164,31 +164,30 @@ BT::NodeStatus GoToSiloPose::onStart()
 }
 BT::NodeStatus GoToSiloPose::onRunning()
 {
-    // if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
-    // {
-    //     uint32_t now = get_tick_ms();
-    //     if( now - start_time >= 5000)
-    //     {
-    //         cancel_goal();
-    //         this->done_flag = true;
-    //         this->is_on_line = false;
-    //         this->x_horiz_line_detected = false;
-    //         // std_msgs::msg::UInt8 nav_to_silo;
-    //         // nav_to_silo.data = 0;
-    //         // go_to_silo_publisher->publish(nav_to_silo);
-    //         RCLCPP_INFO(node_ptr_->get_logger(), " GoToSiloPose::Robot static.. cancel goal ");
-    //         return BT::NodeStatus::SUCCESS; 
+   
+    uint32_t now = get_tick_ms();
+    if ( now - start_time >= 3000)
+    {
+        if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
+        {
+            cancel_goal();
+            this->done_flag = true;
+            this->is_on_line = false;
 
-    //     }   
-    // }
-    // else
-    // {
-    //     prev_x = odom_msg.pose.pose.position.x;
-    //     prev_y = odom_msg.pose.pose.position.y;
-    //     start_time = get_tick_ms();
-    // }
+            RCLCPP_INFO(node_ptr_->get_logger(), " RecoveryNode::Robot static.. cancel goal ");
+            return BT::NodeStatus::SUCCESS; 
 
-    if ( fabs(odom_msg.pose.pose.position.y) >= 2.10 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.3 )
+        }
+        else
+        {
+            start_time = get_tick_ms();
+        }
+        prev_x = odom_msg.pose.pose.position.x;
+        prev_y = odom_msg.pose.pose.position.y;
+    }
+
+
+    if ( fabs(odom_msg.pose.pose.position.y) >= 2.70 && fabs(odom_msg.pose.pose.position.x -  goal_msg.pose.pose.position.x) < 0.3 )
     {
         if (this->is_on_line)
         {

@@ -60,21 +60,23 @@ BT::NodeStatus GoTo::onStart()
 BT::NodeStatus GoTo::onRunning()
 {     
 
-    if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.05 && (prev_y - odom_msg.pose.pose.position.y) < 0.5)
+    uint32_t now = get_tick_ms();
+    if ( now - start_time >= 3000)
     {
-        uint32_t now = get_tick_ms();
-        if( now - start_time >= 3000)
+        if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
         {
             cancel_goal();
             this->done_flag = true;
-            RCLCPP_INFO(node_ptr_->get_logger(), "GoTo::No pose update ");
-        }   
-    }
-    else
-    {
+            RCLCPP_INFO(node_ptr_->get_logger(), " RecoveryNode::Robot static.. cancel goal ");
+            return BT::NodeStatus::SUCCESS; 
+
+        }
+        else
+        {
+            start_time = get_tick_ms();
+        }
         prev_x = odom_msg.pose.pose.position.x;
         prev_y = odom_msg.pose.pose.position.y;
-        start_time = get_tick_ms();
     }
 
     if(done_flag)

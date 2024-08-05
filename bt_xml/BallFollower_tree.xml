@@ -56,11 +56,11 @@
                     Op_PneumaticStatus="{PneumaticStatus}"/>
 
 
-                <!-- <SequenceStar> -->
-                    <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
-                    <!-- <SubTree ID = "AREA_3_TASK"/> -->
-                <!-- </SequenceStar> -->
-                <SubTree ID = "AREA_3_TASK"/>
+                <SequenceStar>
+                    <LineFollower name = "from_start_zone" Ip_action_type="0"/>
+                    <SubTree ID = "AREA_3_TASK"/>
+                </SequenceStar>
+                <!-- <SubTree ID = "AREA_3_TASK"/> -->
 
 
                 <!-- <LineFollower name = "from_start_zone" Ip_action_type="0"/> -->
@@ -85,12 +85,12 @@
                 Op_ConveyerSpeed="{ConveyerSpeed}"
                 Op_PneumaticStatus="{PneumaticStatus}"/>
 
-            <!-- <SequenceStar>
+            <SequenceStar>
                 <LineFollower name = "from_retry_zone" Ip_action_type="1"/>
                 <SubTree ID = "AREA_3_TASK"/>
-            </SequenceStar> -->
+            </SequenceStar>
             
-            <SubTree ID = "AREA_3_TASK"/>
+            <!-- <SubTree ID = "AREA_3_TASK"/> -->
             
              <Inverter>
                 <SequenceStar>
@@ -103,14 +103,15 @@
     </BehaviorTree>
 
     <BehaviorTree ID = "AREA_3_TASK">
-        <!-- <SubTree ID="Start_mechanisms"/> -->
         <!-- <GoToOrigin name= "ToOrigin"/> -->
         <!-- <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>      -->
         <!-- <SubTree ID="SILO_TEST"/> -->
 
 
 
-        <SequenceStar>         
+        <SequenceStar>   
+            <SubTree ID="Start_mechanisms"/>
+
             <GoToOrigin name= "ToOrigin"/>
 
             <!-- <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>      -->
@@ -228,7 +229,7 @@
 
 
     <BehaviorTree ID="Retrieve_balls">
-        <ReactiveSequence>
+        <SequenceStar>
             <Inverter>
                 <KeepRunningUntilFailure>
                     <WhileDoElse> 
@@ -301,7 +302,7 @@
                 </KeepRunningUntilFailure>
             </Inverter>
 
-        </ReactiveSequence>
+        </SequenceStar>
     </BehaviorTree>
 
     <BehaviorTree ID="Go_TO_SILO">
