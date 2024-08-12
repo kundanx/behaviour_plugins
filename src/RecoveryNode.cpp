@@ -52,7 +52,7 @@ BT::NodeStatus RecoveryNode::onStart()
     Quaternion q;
     q = ToQuaternion(0.0, 0.0,  (1.57 * team_color));
 
-    if ( fabs(odom_msg.pose.pose.position.y - (-0.50 * team_color)) <= 0.1)
+    if ( fabs(odom_msg.pose.pose.position.y - (-0.80 * team_color)) <= 0.1)
     {
         in_middle = true;
     }
@@ -111,7 +111,7 @@ BT::NodeStatus RecoveryNode::onStart()
             
             left_goal_msg.pose.header.frame_id = "map";
             left_goal_msg.pose.pose.position.x = 1.2;
-            left_goal_msg.pose.pose.position.y = -0.50 * team_color;
+            left_goal_msg.pose.pose.position.y = -0.9 * team_color;
             left_goal_msg.pose.pose.position.z = 0.0;
         
             left_goal_msg.pose.pose.orientation.x = q.x;
@@ -131,7 +131,7 @@ BT::NodeStatus RecoveryNode::onStart()
 
             right_goal_msg.pose.header.frame_id = "map";
             right_goal_msg.pose.pose.position.x = -1.2;
-            right_goal_msg.pose.pose.position.y = -0.50 * team_color;
+            right_goal_msg.pose.pose.position.y = -0.9 * team_color;
             right_goal_msg.pose.pose.position.z = 0.0;
 
             right_goal_msg.pose.pose.orientation.x = q.x;
@@ -155,7 +155,7 @@ BT::NodeStatus RecoveryNode::onStart()
         
             middle_goal_msg.pose.header.frame_id = "map";
             middle_goal_msg.pose.pose.position.x = 0.0;
-            middle_goal_msg.pose.pose.position.y = -0.50 * team_color;
+            middle_goal_msg.pose.pose.position.y = -0.90 * team_color;
             middle_goal_msg.pose.pose.position.z = 0.0;
         
             middle_goal_msg.pose.pose.orientation.x = q.x;
@@ -222,24 +222,24 @@ BT::NodeStatus RecoveryNode::onRunning()
     //     start_time = get_tick_ms();
     // }
 
-    uint32_t now = get_tick_ms();
-    if ( now - start_time >= 3000)
-    {
-        if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
-        {
-            cancel_goal();
-            this->done_flag = true;
-            RCLCPP_INFO(node_ptr_->get_logger(), " RecoveryNode::Robot static.. cancel goal ");
-            return BT::NodeStatus::SUCCESS; 
+    // uint32_t now = get_tick_ms();
+    // if ( now - start_time >= 3000)
+    // {
+    //     if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
+    //     {
+    //         cancel_goal();
+    //         this->done_flag = true;
+    //         RCLCPP_INFO(node_ptr_->get_logger(), " RecoveryNode::Robot static.. cancel goal ");
+    //         return BT::NodeStatus::SUCCESS; 
 
-        }
-        else
-        {
-            start_time = get_tick_ms();
-        }
-        prev_x = odom_msg.pose.pose.position.x;
-        prev_y = odom_msg.pose.pose.position.y;
-    }
+    //     }
+    //     else
+    //     {
+    //         start_time = get_tick_ms();
+    //     }
+    //     prev_x = odom_msg.pose.pose.position.x;
+    //     prev_y = odom_msg.pose.pose.position.y;
+    // }
 
     if(done_flag)
     {

@@ -8,15 +8,17 @@
         <!-- <LineFollower name = "Back_up" Ip_action_type="5" In_back_dist="0.1"/> -->
         <!-- <SubTree ID="Test_Mechanisms"/> -->
 
+        <SequenceStar>
+            <waitMillisecond name="wait_in_ms" Ip_wait_time="10000"/>
+            <SubTree ID="ROOT_TREE"/>
+        </SequenceStar>
        
     
-        <SubTree ID="ROOT_TREE"/>
        
     </BehaviorTree>
 
     <BehaviorTree ID="ROOT_TREE">
         <SequenceStar>
-            <waitMillisecond name="wait_in_ms" Ip_wait_time="1500"/>
             <!-- <waitActionClient  In_sec="3" In_nanosec="0"/> -->
 	    <InitiallizeActuators name = "initiallize_actutatos"
 		    Op_RollerStatus="{RollerStatus}"
@@ -111,7 +113,6 @@
 
         <SequenceStar>   
             <SubTree ID="Start_mechanisms"/>
-
             <GoToOrigin name= "ToOrigin"/>
 
             <!-- <GoToMiddle name="absolute_middle" Ip_middle_type="1"/>      -->
@@ -145,6 +146,8 @@
                             Op_ConveyerStatus="{ConveyerStatus}"/>
                     <!-- Up to here -->
                         <SubTree ID="Start_mechanisms"/>
+                        <waitMillisecond name="wait_in_ms" Ip_wait_time="500"/>
+
                         <SubTree ID="Retrieve_balls"
                             ballDetectionFlag="{ballDetectionFlag}"
                             RollerStatus="{RollerStatus}"
@@ -152,12 +155,12 @@
                             ConveyerStatus="{ConveyerStatus}"
                             ConveyerSpeed="{ConveyerSpeed}"
                             PneumaticStatus="{PneumaticStatus}"/>
-                        <waitMillisecond name="wait_in_ms" Ip_wait_time="100"/>
+                        <!-- <waitMillisecond name="wait_in_ms" Ip_wait_time="100"/> -->
                         <SubTree ID="Go_TO_SILO"/>
                         <TurnOnConveyer name = "Keep_conveyer_running" 
                             Op_ConveyerStatus="{ConveyerStatus}"
                             Op_ConveyerSpeed="{ConveyerSpeed}" 
-                            Ip_ConveyerSpeed="35"/>
+                            Ip_ConveyerSpeed="40"/>
                         <PacketPublisher name="packetPublisher"
                             Ip_RollerStatus="{RollerStatus}"
                             Ip_RollerSpeed="{RollerSpeed}"
@@ -193,7 +196,7 @@
             <TurnOnRoller name = "Start_intake_roller" 
                     Op_RollerStatus="{RollerStatus}"
                     Op_RollerSpeed="{RollerSpeed}"
-                    Ip_RollerSpeed="35"/>
+                    Ip_RollerSpeed="50"/>
             <TurnOnConveyer name = "Keep_conveyer_running" 
                     Op_ConveyerStatus="{ConveyerStatus}"
                     Op_ConveyerSpeed="{ConveyerSpeed}" 
@@ -275,7 +278,7 @@
              <TurnOnConveyer name = "Keep_conveyer_running" 
                 Op_ConveyerStatus="{ConveyerStatus}"
                 Op_ConveyerSpeed="{ConveyerSpeed}" 
-                Ip_ConveyerSpeed="40"/>
+                Ip_ConveyerSpeed="35"/>
             <PacketPublisher name="packetPublisher"
                 Ip_RollerStatus="{RollerStatus}"
                 Ip_RollerSpeed="{RollerSpeed}"

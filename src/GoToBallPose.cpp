@@ -65,7 +65,7 @@ BT::NodeStatus GoToBallPose::onStart()
 BT::NodeStatus GoToBallPose::onRunning()
 {     
 
-    uint32_t now = get_tick_ms();
+     uint32_t now = get_tick_ms();
     if ( now - start_time >= 3000)
     {
         if( fabs(prev_x - odom_msg.pose.pose.position.x) < 0.01 && fabs((prev_y - odom_msg.pose.pose.position.y)) < 0.01)
