@@ -11,8 +11,8 @@
 #include "behaviortree_cpp_v3/utils/shared_library.h"
 
 #include "isBallDetected.hpp"
-#include "GetBallPose.hpp"
 #include "GoToBallPose.h"
+#include "GoTo.hpp"
 #include "GoToSiloPose.hpp"
 #include "GoToOrigin.hpp"
 #include "fib_behaviour.h"
@@ -23,6 +23,11 @@
 #include "LineFollower.hpp"
 #include "ResetOdom.hpp"
 #include "BackUpActionClient.hpp"
+#include "RecoveryNode.hpp"
+#include "StartAndWait.hpp"
+#include "ZoneAndColorConfig.hpp"
+#include "CvConfig.hpp"
+#include "GoToMiddle.hpp"
 
 #include "actions/TurnOnRoller.hpp"
 #include "actions/TurnOffRoller.hpp"
@@ -30,9 +35,11 @@
 #include "actions/TurnOffConveyer.hpp"
 #include "actions/PneumaticOn.hpp"
 #include "actions/PneumaticOff.hpp"
+#include "actions/StartPhotoCapture.hpp"
 
 #include "decorator/returnFailureNode.hpp"
 #include "decorator/returnSuccessNode.hpp"
+#include "decorator/waitMilliseconds.hpp"   
 
 #include "conditions/isBallInside.hpp"
 #include "conditions/isOnlyBall.hpp"
@@ -43,6 +50,7 @@
 
 #include "nav2_behavior_tree/plugins/action/spin_action.hpp"
 #include "nav2_behavior_tree/plugins/action/back_up_action.hpp"
+#include "nav2_behavior_tree/plugins/decorator/rate_controller.hpp"
 
 
 class autonomy : public rclcpp::Node

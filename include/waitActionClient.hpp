@@ -28,6 +28,8 @@ class waitActionClient : public BT::StatefulActionNode
 
     rclcpp::Node::SharedPtr node_ptr_;
     rclcpp_action::Client<Wait>::SharedPtr action_client_ptr_;
+    std::shared_ptr<GoalHandleWait> goal_handle;
+
 
     Wait::Goal wait;
     bool done_flag;
@@ -39,6 +41,8 @@ class waitActionClient : public BT::StatefulActionNode
     BT::NodeStatus onRunning() override;
     void onHalted() override;
 
+    // Action client goal response callback
+    void goal_response_callback(const rclcpp_action::ClientGoalHandle<Wait>::SharedPtr & goal_handle_);
 
     // Action client result callback
     void wait_result_callback(const GoalHandleWait::WrappedResult &result);

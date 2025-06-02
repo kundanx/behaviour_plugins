@@ -6,11 +6,15 @@
 #include <tf2/LinearMath/Quaternion.h>
 
 #include "std_msgs/msg/bool.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+#include "oakd_msgs/msg/state_pose.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/subscription.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
+
+#define MAX_NOT_DETECTED 10
 
 
 using namespace BT;
@@ -23,9 +27,12 @@ class isBallDetected : public BT::SyncActionNode
         rclcpp::Node::SharedPtr node_ptr);
 
     rclcpp::Node::SharedPtr node_ptr_;
-    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Bool>> subscription_;
+    std::shared_ptr<rclcpp::Subscription<oakd_msgs::msg::StatePose>> subscription_;
     
     std_msgs::msg::Bool isDetected;
+    oakd_msgs::msg::StatePose ball;
+    bool print_not_detected;
+    bool print_detected;
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
@@ -33,7 +40,7 @@ class isBallDetected : public BT::SyncActionNode
     BT::NodeStatus tick() override;
 
     // Subscriber callback
-    void subscriber_callback(std_msgs::msg::Bool msg);
+    void subscriber_callback(oakd_msgs::msg::StatePose);
     
 };
 

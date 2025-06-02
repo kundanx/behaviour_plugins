@@ -4,8 +4,11 @@
 #include <string>
 #include <memory>
 
+// #include "behaviour_plugins/angle_conversions.hpp"
+
 #include "nav2_msgs/action/spin.hpp"
 #include "std_msgs/msg/float32.hpp"
+#include "nav_msgs/msg/odometry.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
@@ -28,9 +31,14 @@ class spinActionClient : public BT::StatefulActionNode
 
     rclcpp::Node::SharedPtr node_ptr_;
     rclcpp_action::Client<Spin>::SharedPtr action_client_ptr_;
+    std::shared_ptr<GoalHandleSpin> goal_handle;
+    std::shared_ptr<rclcpp::Subscription<nav_msgs::msg::Odometry>> subscription_odometry;
+
 
     Spin::Goal goal_spin_yaw;
     bool done_flag;
+    nav_msgs::msg::Odometry odom_msg;
+
 
     // Methods override (uncomment if you have ports to I/O data)
     static BT::PortsList providedPorts();
@@ -39,6 +47,10 @@ class spinActionClient : public BT::StatefulActionNode
     BT::NodeStatus onRunning() override;
     void onHalted() override;
 
+    void odometry_callback(const nav_msgs::msg::Odometry &msg);
+
+    // Action client goal response callback
+    void goal_response_callback(const rclcpp_action::ClientGoalHandle<Spin>::SharedPtr & goal_handle_);
 
     // Action client result callback
     void spin_result_callback(const GoalHandleSpin::WrappedResult &result);

@@ -5,7 +5,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# set(CMAKE_PREFIX_PATH "/usr/local/include")
+set(CMAKE_PREFIX_PATH "/usr/local/include")
 # list(APPEND CMAKE_MODULE_PATH "ros-projects/dev_pi_communicate/install/behaviortree_ros2/share/behaviortree_ros2/cmake")
 # list(APPEND CMAKE_MODULE_PATH "/usr/local/share/behaviortree_cpp/cmake")
 
@@ -21,7 +21,10 @@ find_package(yaml-cpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(action_pkg REQUIRED)
+find_package(oakd_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
+
 # find_package(my_bt REQUIRED)
 # find_package(behaviortree_ros2 REQUIRED)
 
@@ -36,8 +39,9 @@ set(BEHAVIOUR_SOURCES
 src/GoToBallPose.cpp
 src/GoToSiloPose.cpp
 src/fib_behaviour.cpp
+src/GoTo.cpp
 src/GoToOrigin.cpp
-src/GetBallPose.cpp
+src/GoToMiddle.cpp
 src/isBallDetected.cpp
 src/spinActionClient.cpp
 src/waitActionClient.cpp
@@ -46,6 +50,10 @@ src/InitiallizeActuators.cpp
 src/LineFollower.cpp
 src/ResetOdom.cpp
 src/BackUpActionClient.cpp
+src/RecoveryNode.cpp
+src/StartAndWait.cpp 
+src/ZoneAndColorConfig.cpp
+src/CvConfig.cpp
 
 src/actions/TurnOnRoller.cpp
 src/actions/TurnOnConveyer.cpp
@@ -53,9 +61,12 @@ src/actions/TurnOffRoller.cpp
 src/actions/TurnOffConveyer.cpp
 src/actions/PneumaticOff.cpp
 src/actions/PneumaticOn.cpp
+src/actions/StartPhotoCapture.cpp
+
 
 src/decorator/returnFailureNode.cpp
 src/decorator/returnSuccessNode.cpp
+src/decorator/waitMilliseconds.cpp
 
 src/conditions/isBallInside.cpp
 src/conditions/isOnlyBall.cpp
@@ -64,6 +75,12 @@ src/control/pipeline_sequence.cpp
 src/control/recovery_node.cpp
 src/control/round_robin_node.cpp
 )
+# add_library(
+#   include/robotlibpc/cpp/crypto/crc8.cpp
+#   include/robotlibpc/cpp/controller/pid.cpp
+#   include/robotlibpc/cpp/communication/serial.cpp
+#   include/robotlibpc/cpp/msgs/state_msg.cpp
+# )
 
 set(TARGET_DEPENDS
       rclcpp
@@ -76,6 +93,8 @@ set(TARGET_DEPENDS
       tf2_geometry_msgs
       tf2
       action_pkg
+      oakd_msgs
+      lifecycle_msgs
       # behaviortree_ros2
 )
 

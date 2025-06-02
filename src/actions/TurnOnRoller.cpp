@@ -7,7 +7,7 @@ TurnOnRoller::TurnOnRoller(
 {
     // Mechanism is turnedOff intially
     setOutput<bool>("Op_RollerStatus", false);
-    RCLCPP_INFO(rclcpp::get_logger("TurnOnRoller"),"TurnOnRoller action Ready..");
+    RCLCPP_INFO(rclcpp::get_logger("TurnOnRoller"),"TurnOnRoller::Ready");
 }
 
 BT::PortsList TurnOnRoller::providedPorts()

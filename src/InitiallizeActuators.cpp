@@ -13,7 +13,6 @@ InitiallizeActuators::InitiallizeActuators(
 {
     rclcpp::QoS qos_profile(10);
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
-    subscription_ = node_ptr_->create_subscription<std_msgs::msg::UInt8>( "/ball_roller_status", 10, std::bind(&InitiallizeActuators::subscriber_callback,this,std::placeholders::_1));
     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"InitiallizeActuators node Ready..");
 }
 
@@ -38,32 +37,31 @@ BT::PortsList InitiallizeActuators::providedPorts()
     setOutput<int>("Op_RollerSpeed", 1);
     setOutput<bool>("Op_PneumaticStatus", false);
     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Actuators in reset state..");
+
+    // int ball_detect_status = system("exit $(ros2 lifecycle  get /oak/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
+    // int   silo_detect_status   = system("exit $(ros2 lifecycle  get /silo/yolo/yolov8_node | grep -oP '(?<=\[).*?(?=\])')");
+
+    // if ( ball_detect_status != 3)           
+    // {
+    //     int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+    //     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "ball: %i", ball_flag);
+    // }
+
+
+    // if ( silo_detect_status == 3)
+    // {        
+    //     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "silo");
+
+    //     int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+    //     RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "silo: %i", silo_flag);
+    // }
+    int ball_flag = system("ros2 lifecycle set /oak/yolo/yolov8_node activate ");
+    int silo_flag = system("ros2 lifecycle set /silo/yolo/yolov8_node deactivate ");
+    RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"), "herer");
+    
     return BT::NodeStatus::SUCCESS;
  }
 
- void InitiallizeActuators::subscriber_callback(std_msgs::msg::UInt8 msg)
- {
-    RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"InitiallizeActuators subs callback..");
-    switch (msg.data)
-    {
-        case '1': 
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Red Ball detected");
-            setOutput<bool>("OP_IsBallInside", true);
-            break;
-        case '2':
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"Blue Ball detected");
-            setOutput<bool>("OP_IsBallInside", false);
-            break;
-        case '3':
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"purple Ball detected");
-            setOutput<bool>("OP_IsBallInside", false);
-            break;
-
-        default:
-            RCLCPP_INFO(rclcpp::get_logger("InitiallizeActuators"),"No ball detected");
-            setOutput<bool>("OP_IsBallInside", false);
-    }
- }
 
 
 

@@ -1,0 +1,56 @@
+#ifndef ZONE_AND_COLOR_HPP
+#define ZONE_AND_COLOR_HPP
+
+#include <string>
+#include <memory>
+
+#include "std_msgs/msg/u_int8.hpp"
+#include "std_msgs/msg/int8.hpp"
+
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/subscription.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
+
+#include "behaviortree_cpp_v3/bt_factory.h"
+
+
+using namespace BT;
+
+enum TeamColor
+{
+    RED = -1,
+    BLUE = 1
+};
+enum Zone
+{
+    START,
+    RETRY
+};
+class ZoneAndColorConfig : public BT::SyncActionNode
+{
+    public:
+    ZoneAndColorConfig(
+        const std::string &name,
+        const BT::NodeConfiguration &config,
+        rclcpp::Node::SharedPtr node_ptr);
+
+    rclcpp::Node::SharedPtr node_ptr_;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Int8>> color_subscription_;
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::UInt8>> zone_subscription_;
+    
+    // bool resetNow;
+    TeamColor team_color;
+    Zone zone;
+
+    // Methods override (uncomment if you have ports to I/O data)
+    static BT::PortsList providedPorts();
+
+    BT::NodeStatus tick() override;
+
+    // Subscriber callback
+    void color_subscriber_callback(std_msgs::msg::Int8 msg);
+    void zone_subscriber_callback(std_msgs::msg::UInt8 msg);
+    
+};
+
+#endif

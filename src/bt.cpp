@@ -45,7 +45,6 @@ void autonomy::create_behavior_tree()
     register_custom_action_nodes();
     register_condition_nodes();
 
-    /* Register fibbonacci_action node*/
     BT::NodeBuilder builder_1  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {   
@@ -53,7 +52,6 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<Fib>("Fib",builder_1);
 
-    /* Register GoToBallPose node */
     BT::NodeBuilder builder_2 =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
@@ -61,15 +59,6 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<GoToBallPose>("GoToBallPose",builder_2);
 
-    /* Register GetBallPose node */ 
-    BT::NodeBuilder builder_3  =
-        [=](const std::string &name, const BT::NodeConfiguration &config)
-    {
-        return std::make_unique<GetBallPose>(name, config, shared_from_this());
-    };
-    factory.registerBuilder<GetBallPose>("GetBallPose",builder_3);
-
-    /* Register isBallDetected node */ 
     BT::NodeBuilder builder_4  =
         [=](const std::string &name, const BT::NodeConfiguration &config)
     {
@@ -127,38 +116,64 @@ void autonomy::create_behavior_tree()
     };
     factory.registerBuilder<BackUpActionClient>("BackUpActionClient",builder_11);
 
+    BT::NodeBuilder builder_12 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<RecoveryNode>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<RecoveryNode>("BallRecovery",builder_12);
 
-    /* create BT */
+
+    BT::NodeBuilder builder_13 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<StartAndWait>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<StartAndWait>("StartAndWait",builder_13);
+
+    BT::NodeBuilder builder_14 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<ZoneAndColorConfig>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<ZoneAndColorConfig>("ZoneAndColorConfig",builder_14);
+
+    BT::NodeBuilder builder_15 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<Cv_Config>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<Cv_Config>("CvConfig",builder_15);
+
+    BT::NodeBuilder builder_16 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<GoToMiddle>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<GoToMiddle>("GoToMiddle",builder_16);
+
+    BT::NodeBuilder builder_17=
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<GoTo>(name, config, shared_from_this());
+    };
+    factory.registerBuilder<GoTo>("GoTo",builder_17);
+
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
+    
+    std::string xml_models = BT::writeTreeNodesModelXML(factory);
 
+    std::ofstream out("/home/kuns/stuffs/robocon/ros2_humble_ws/src/behaviour_plugins/bt_load_models.xml");
+    if (out.is_open())
+    {
+        out << xml_models;
+        out.close();
+    }
+   
     // Connect the Groot2Publisher. This will allow Groot2 to
     // get the tree and poll status updates.
     // const unsigned port = 1667;
     // BT::Groot2Publisher publisher(tree_, port);
-}
-
-/*******************************************************************************************************************
- * @brief Tick tree nodes
-********************************************************************************************************************/
-
-void autonomy::update_behavior_tree()
-{
-    // tick BT when asked
-    BT::NodeStatus tree_status = tree_.tickRoot();
-    if(tree_status == BT::NodeStatus::RUNNING)
-    {
-        return;
-    }
-    else if(tree_status == BT::NodeStatus::SUCCESS)
-    {
-        RCLCPP_INFO(this->get_logger(),"Finished behaviour");
-        timer_->cancel();
-    }
-    else
-    {
-        RCLCPP_INFO(this->get_logger(),"Tree Failed");
-        timer_->cancel();
-    }
 }
 
 /*******************************************************************************************************************
@@ -208,6 +223,13 @@ void autonomy::register_custom_action_nodes()
         return std::make_unique<PneumaticOff>(name,config);
     };
     factory.registerBuilder<PneumaticOff>("PneumaticOff",builder_6);
+
+    BT::NodeBuilder builder_7  =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<StartPhotoCapture>(name,config,shared_from_this());
+    };
+    factory.registerBuilder<StartPhotoCapture>("StartPhotoCapture",builder_7);
 }
 
 /******************************************************************************************************************
@@ -317,8 +339,47 @@ void autonomy::register_decorator_nodes()
         return std::make_unique<returnFailure>(name,config);
     };
     factory.registerBuilder<returnFailure>("returnFailure",builder_2);
+    
+    BT::NodeBuilder builder_3 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<nav2_behavior_tree::RateController>(name,config);
+    };
+    factory.registerBuilder<nav2_behavior_tree::RateController>("RateController",builder_3);
+
+    BT::NodeBuilder builder_4 =
+        [=](const std::string &name, const BT::NodeConfiguration &config)
+    {
+        return std::make_unique<waitMillisecond>(name,config,shared_from_this());
+    };
+    factory.registerBuilder<waitMillisecond>("waitMillisecond",builder_4);
+    
 }
 
+
+/*******************************************************************************************************************
+ * @brief Tick tree nodes
+********************************************************************************************************************/
+
+void autonomy::update_behavior_tree()
+{
+    // tick BT when asked
+    BT::NodeStatus tree_status = tree_.tickRoot();
+    if(tree_status == BT::NodeStatus::RUNNING)
+    {
+        return;
+    }
+    else if(tree_status == BT::NodeStatus::SUCCESS)
+    {
+        RCLCPP_INFO(this->get_logger(),"Finished behaviour");
+        timer_->cancel();
+    }
+    else
+    {
+        RCLCPP_INFO(this->get_logger(),"Tree Failed");
+        timer_->cancel();
+    }
+}
 
 /******************************************************************************************************************
  * @brief Main function 

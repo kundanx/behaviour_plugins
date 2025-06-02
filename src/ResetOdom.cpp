@@ -14,7 +14,7 @@ ResetOdom::ResetOdom(
     rclcpp::QoS qos_profile(10);
     qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
     publisher_ = node_ptr->create_publisher<std_msgs::msg::UInt8>("alignedSilo_number", qos_profile);
-    RCLCPP_INFO(node_ptr_->get_logger(),"ResetOdom node Ready..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"ResetOdom::Ready");
 }
 
 BT::PortsList ResetOdom::providedPorts()
@@ -24,20 +24,17 @@ BT::PortsList ResetOdom::providedPorts()
 
  BT::NodeStatus ResetOdom::tick()
  {  
-    // RCLCPP_INFO(node_ptr_->get_logger(),"RESETODOM::Tick");
     auto silo_number_ = getInput<uint8_t>("Ip_SiloNumber");
-    // RCLCPP_INFO(node_ptr_->get_logger(),"RESETODOM::here");
     if( !silo_number_ )
     {
-        throw BT::RuntimeError("RESETODOM::error reading port [Ip_SiloNumber]:", silo_number_.error());
+        throw BT::RuntimeError("ResetOdom::error reading port [Ip_SiloNumber]:", silo_number_.error());
     }
     auto silo_number = silo_number_.value();
 
-    // RCLCPP_INFO(node_ptr_->get_logger(),"RESETODOM::here2");
     std_msgs::msg::UInt8 msg;
     msg.data = silo_number;
     publisher_->publish(msg);
-    RCLCPP_INFO(node_ptr_->get_logger(),"RESETODOM::odometry reset..");
+    RCLCPP_INFO(node_ptr_->get_logger(),"ResetOdom::odometry reset to silo %i location", msg.data);
     return BT::NodeStatus::SUCCESS;
  }
 
