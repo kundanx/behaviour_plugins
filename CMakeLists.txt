@@ -5,7 +5,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# set(CMAKE_PREFIX_PATH "/usr/local/include")
+set(CMAKE_PREFIX_PATH "/usr/local/include")
 # list(APPEND CMAKE_MODULE_PATH "ros-projects/dev_pi_communicate/install/behaviortree_ros2/share/behaviortree_ros2/cmake")
 # list(APPEND CMAKE_MODULE_PATH "/usr/local/share/behaviortree_cpp/cmake")
 

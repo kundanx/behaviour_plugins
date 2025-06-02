@@ -160,7 +160,16 @@ void autonomy::create_behavior_tree()
     factory.registerBuilder<GoTo>("GoTo",builder_17);
 
     tree_ = factory.createTreeFromFile(bt_xml_dir + "/BallFollower_tree.xml");
+    
+    std::string xml_models = BT::writeTreeNodesModelXML(factory);
 
+    std::ofstream out("/home/kuns/stuffs/robocon/ros2_humble_ws/src/behaviour_plugins/bt_load_models.xml");
+    if (out.is_open())
+    {
+        out << xml_models;
+        out.close();
+    }
+   
     // Connect the Groot2Publisher. This will allow Groot2 to
     // get the tree and poll status updates.
     // const unsigned port = 1667;

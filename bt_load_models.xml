@@ -1,0 +1,135 @@
+<root>
+    <TreeNodesModel>
+        <Action ID="BackUp">
+            <input_port name="backup_dist" type="double" default="0.150000">Distance to backup</input_port>
+            <input_port name="backup_speed" type="double" default="0.025000">Speed at which to backup</input_port>
+            <input_port name="server_name" type="std::string">Action server name</input_port>
+            <input_port name="server_timeout" type="std::chrono::duration&lt;long, std::ratio&lt;1l, 1000l&gt; &gt;"/>
+            <input_port name="time_allowance" type="double" default="10.000000">Allowed time for reversing</input_port>
+        </Action>
+        <Action ID="BackUpActionClient">
+            <input_port name="In_dist" type="std_msgs::msg::Float64_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="In_speed" type="std_msgs::msg::Float32_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="BallRecovery"/>
+        <Action ID="CvConfig">
+            <input_port name="In_vision_type" type="int"/>
+        </Action>
+        <Action ID="Fib">
+            <input_port name="order" type="std::string"/>
+        </Action>
+        <Action ID="GoTo">
+            <input_port name="theta" type="float"/>
+            <input_port name="x" type="float"/>
+            <input_port name="y" type="float"/>
+        </Action>
+        <Action ID="GoToBallPose">
+            <input_port name="in_pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="GoToMiddle">
+            <input_port name="In_start_wait" type="int"/>
+            <input_port name="Ip_middle_type" type="int"/>
+        </Action>
+        <Action ID="GoToOrigin">
+            <input_port name="In_start_wait" type="int"/>
+        </Action>
+        <Action ID="GoToSiloPose">
+            <input_port name="Ip_SiloNumber" type="int"/>
+            <output_port name="Op_SiloNumber" type="std_msgs::msg::UInt8MultiArray_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="InitiallizeActuators">
+            <output_port name="OP_IsBallInside" type="bool"/>
+            <output_port name="OP_IsOnlyBall" type="bool"/>
+            <output_port name="Op_ConveyerSpeed" type="int"/>
+            <output_port name="Op_ConveyerStatus" type="bool"/>
+            <output_port name="Op_PneumaticStatus" type="bool"/>
+            <output_port name="Op_RollerSpeed" type="int"/>
+            <output_port name="Op_RollerStatus" type="bool"/>
+        </Action>
+        <Action ID="LineFollower">
+            <input_port name="In_back_dist" type="float"/>
+            <input_port name="In_pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="Ip_SiloNumber" type="std_msgs::msg::UInt8MultiArray_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="Ip_action_type" type="int"/>
+            <output_port name="Op_SiloNumber" type="unsigned char"/>
+        </Action>
+        <Action ID="PacketPublisher">
+            <input_port name="Ip_ConveyerSpeed" type="int"/>
+            <input_port name="Ip_ConveyerStatus" type="bool"/>
+            <input_port name="Ip_PneumaticStatus" type="bool"/>
+            <input_port name="Ip_RollerSpeed" type="int"/>
+            <input_port name="Ip_RollerStatus" type="bool"/>
+        </Action>
+        <Control ID="PipelineSequence"/>
+        <Action ID="PneumaticOff">
+            <output_port name="Op_PneumaticStatus" type="bool"/>
+        </Action>
+        <Action ID="PneumaticOn">
+            <output_port name="Op_PneumaticStatus" type="bool"/>
+        </Action>
+        <Decorator ID="RateController">
+            <input_port name="hz" type="double" default="10.000000">Rate</input_port>
+        </Decorator>
+        <Control ID="RecoveryNode">
+            <input_port name="number_of_retries" type="int" default="1">Number of retries</input_port>
+        </Control>
+        <Action ID="ResetOdom">
+            <input_port name="Ip_SiloNumber" type="unsigned char"/>
+        </Action>
+        <Control ID="RoundRobin"/>
+        <Action ID="StartAndWait">
+            <output_port name="OP_IsBallInside" type="bool"/>
+            <output_port name="OP_IsOnlyBall" type="bool"/>
+            <output_port name="Op_ConveyerSpeed" type="int"/>
+            <output_port name="Op_ConveyerStatus" type="bool"/>
+            <output_port name="Op_PneumaticStatus" type="bool"/>
+            <output_port name="Op_RollerSpeed" type="int"/>
+            <output_port name="Op_RollerStatus" type="bool"/>
+            <output_port name="Op_Start_wait" type="int"/>
+        </Action>
+        <Action ID="StartPhotoCapture"/>
+        <Action ID="TurnOffConveyer">
+            <output_port name="Op_ConveyerSpeed" type="int"/>
+            <output_port name="Op_ConveyerStatus" type="bool"/>
+        </Action>
+        <Action ID="TurnOffRoller">
+            <output_port name="Op_RollerSpeed" type="int"/>
+            <output_port name="Op_RollerStatus" type="bool"/>
+        </Action>
+        <Action ID="TurnOnConveyer">
+            <input_port name="Ip_ConveyerSpeed" type="int"/>
+            <output_port name="Op_ConveyerSpeed" type="int"/>
+            <output_port name="Op_ConveyerStatus" type="bool"/>
+        </Action>
+        <Action ID="TurnOnRoller">
+            <input_port name="Ip_RollerSpeed" type="int"/>
+            <output_port name="Op_RollerSpeed" type="int"/>
+            <output_port name="Op_RollerStatus" type="bool"/>
+        </Action>
+        <Action ID="ZoneAndColorConfig">
+            <output_port name="OP_Team_color" type="int"/>
+        </Action>
+        <Action ID="isBallDetected">
+            <output_port name="op_pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="isBallInside">
+            <output_port name="OP_IsBallInside" type="bool"/>
+        </Action>
+        <Action ID="isOnlyBall">
+            <output_port name="OP_IsOnlyBall" type="bool"/>
+        </Action>
+        <Action ID="returnFailure"/>
+        <Action ID="returnSuccess"/>
+        <Action ID="spinActionClient">
+            <input_port name="In_angle" type="std_msgs::msg::Float32_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="waitActionClient">
+            <input_port name="In_nanosec" type="unsigned int">wait nanosecs</input_port>
+            <input_port name="In_sec" type="std_msgs::msg::Int32_&lt;std::allocator&lt;void&gt; &gt;">wait secs</input_port>
+        </Action>
+        <Action ID="waitMillisecond">
+            <input_port name="Ip_wait_time" type="unsigned long"/>
+        </Action>
+    </TreeNodesModel>
+</root>
+
